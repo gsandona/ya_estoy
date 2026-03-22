@@ -4,6 +4,6 @@
 /backend/.vs/
 
 # Angular
-/frontend/node_modules/
-/frontend/dist/
-/frontend/.angular/
+/frontEnd/node_modules/
+/frontEnd/dist/
+/frontEnd/.angular/
