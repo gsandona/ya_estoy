@@ -1,15 +1,15 @@
-# 1. Usar la imagen oficial del SDK de .NET para construir la app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# 1. Usar la imagen oficial del SDK de .NET 10.0 para construir la app
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copiamos todo el contenido de la carpeta backend
 COPY . ./
 
-# Compilamos la aplicación en modo Release
+# Compilamos la aplicación apuntando al proyecto WebApi
 RUN dotnet publish SistemaMozoQr.WebApi/SistemaMozoQr.WebApi.csproj -c Release -o /app/out
 
-# 2. Usar una imagen más liviana solo para ejecutar la app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# 2. Usar la imagen de .NET 10.0 para ejecutar la app
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app/out .
 
@@ -17,5 +17,5 @@ COPY --from=build /app/out .
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 
-# ⚠️ IMPORTANTE: Cambiá "NombreDeTuAPI.dll" por el nombre real de tu proyecto
+# Arrancamos el .dll correcto
 ENTRYPOINT ["dotnet", "SistemaMozoQr.WebApi.dll"]
