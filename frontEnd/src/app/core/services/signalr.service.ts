@@ -46,14 +46,14 @@ export class SignalrService {
       });
     });
 
-    this.hubConnection.on('NotificarNuevoPedido', (pedidoId: string, mesaId: string, numeroMesa: number) => {
+    this.hubConnection.on('NotificarNuevoPedido', (pedidoId: string, mesaId: string, numeroMesa: number, details?: string) => {
       this.addTask({
         id: crypto.randomUUID(),
         tableId: numeroMesa,
         type: 'Pedido',
         timestamp: new Date(),
         status: 'Pending',
-        details: 'Nuevos items solicitados'
+        details: details || 'Nuevos items solicitados'
       });
     });
     

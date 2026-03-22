@@ -23,8 +23,8 @@ public class NotificacionService : INotificacionService
         await _hubContext.Clients.All.NotificarPidiendoCuenta(mesaId, numeroMesa);
     }
 
-    public async Task NotificarNuevoPedidoAsync(Guid pedidoId, Guid mesaId, int numeroMesa)
+    public async Task NotificarNuevoPedidoAsync(Guid pedidoId, Guid mesaId, int numeroMesa, string details)
     {
-        await _hubContext.Clients.All.NotificarNuevoPedido(pedidoId, mesaId, numeroMesa);
+        await _hubContext.Clients.All.NotificarNuevoPedido(pedidoId, mesaId, numeroMesa, details);
     }
 }

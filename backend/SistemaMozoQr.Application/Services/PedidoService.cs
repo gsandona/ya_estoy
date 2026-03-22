@@ -56,8 +56,10 @@ public class PedidoService : IPedidoService
 
         await _pedidoRepository.AddAsync(pedido);
 
+        var resultDetails = string.Join(", ", pedido.Items.Select(i => $"{i.Cantidad}x {i.MenuItem?.Nombre ?? "Item"}"));
+        
         // Notificar al dashboard de administración
-        await _notificacionService.NotificarNuevoPedidoAsync(pedido.Id, mesa.Id, mesa.Numero);
+        await _notificacionService.NotificarNuevoPedidoAsync(pedido.Id, mesa.Id, mesa.Numero, resultDetails);
 
         return pedido;
     }

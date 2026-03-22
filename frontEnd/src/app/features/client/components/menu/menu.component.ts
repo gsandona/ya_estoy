@@ -18,7 +18,9 @@ interface MenuItem { id: number; name: string; price: number; description: strin
             </div>
             <div class="flex flex-col items-end">
               <span class="font-bold text-primary mb-2">\${{ item.price }}</span>
-              <button class="bg-accent text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-opacity-90 transition active:scale-95 shadow-sm">
+              <button 
+                (click)="orderPlaced.emit(item.name)"
+                class="bg-accent text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-opacity-90 transition active:scale-95 shadow-sm">
                 Agregar
               </button>
             </div>

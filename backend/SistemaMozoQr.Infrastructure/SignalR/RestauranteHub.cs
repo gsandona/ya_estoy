@@ -17,7 +17,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
 
     public async Task NuevoPedido(int tableId, string details)
     {
-        await Clients.All.NotificarNuevoPedido(Guid.NewGuid(), Guid.NewGuid(), tableId);
+        await Clients.All.NotificarNuevoPedido(Guid.NewGuid(), Guid.NewGuid(), tableId, details);
     }
 
     public override Task OnConnectedAsync()
