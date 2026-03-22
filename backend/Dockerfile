@@ -6,7 +6,7 @@ WORKDIR /src
 COPY . ./
 
 # Compilamos la aplicación en modo Release
-RUN dotnet publish -c Release -o /app/out
+RUN dotnet publish SistemaMozoQr.WebApi/SistemaMozoQr.WebApi.csproj -c Release -o /app/out
 
 # 2. Usar una imagen más liviana solo para ejecutar la app
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
