@@ -1,0 +1,9 @@
+# .NET
+/backend/**/bin/
+/backend/**/obj/
+/backend/.vs/
+
+# Angular
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.angular/

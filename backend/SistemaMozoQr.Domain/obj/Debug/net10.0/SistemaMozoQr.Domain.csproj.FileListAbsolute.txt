@@ -1,0 +1,11 @@
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\bin\Debug\net10.0\SistemaMozoQr.Domain.deps.json
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\bin\Debug\net10.0\SistemaMozoQr.Domain.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\bin\Debug\net10.0\SistemaMozoQr.Domain.pdb
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\SistemaMozoQr.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\SistemaMozoQr.Domain.AssemblyInfoInputs.cache
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\SistemaMozoQr.Domain.AssemblyInfo.cs
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\SistemaMozoQr.Domain.csproj.CoreCompileInputs.cache
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\SistemaMozoQr.Domain.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\refint\SistemaMozoQr.Domain.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\SistemaMozoQr.Domain.pdb
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Domain\obj\Debug\net10.0\ref\SistemaMozoQr.Domain.dll

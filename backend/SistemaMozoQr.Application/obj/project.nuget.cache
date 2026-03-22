@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "BGlc5aO+f8g=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\gino\\Desktop\\Sistemas\\SistemaMozoQr\\backend\\SistemaMozoQr.Application\\SistemaMozoQr.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gino\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.5\\microsoft.extensions.dependencyinjection.abstractions.10.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

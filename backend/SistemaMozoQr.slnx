@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="SistemaMozoQr.Application/SistemaMozoQr.Application.csproj" />
+  <Project Path="SistemaMozoQr.Domain/SistemaMozoQr.Domain.csproj" />
+  <Project Path="SistemaMozoQr.Infrastructure/SistemaMozoQr.Infrastructure.csproj" />
+  <Project Path="SistemaMozoQr.WebApi/SistemaMozoQr.WebApi.csproj" />
+</Solution>
