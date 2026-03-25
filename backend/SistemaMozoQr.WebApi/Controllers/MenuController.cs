@@ -1,0 +1,96 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SistemaMozoQr.Domain.Entities;
+using SistemaMozoQr.Domain.Interfaces;
+using SistemaMozoQr.Application.DTOs;
+
+namespace SistemaMozoQr.WebApi.Controllers;
+
+[ApiController]
+[Route("api/menu")]
+[Authorize(Roles = "Admin")]
+public class MenuController : ControllerBase
+{
+    private readonly IMenuItemRepository _menuRepository;
+
+    public MenuController(IMenuItemRepository menuRepository)
+    {
+        _menuRepository = menuRepository;
+    }
+
+    [HttpGet]
+    [AllowAnonymous] // Permitimos a todos ver el menú
+    public async Task<IActionResult> GetMenu()
+    {
+        var items = await _menuRepository.GetAllActivosAsync();
+        return Ok(items);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetMenuItem(Guid id)
+    {
+        var item = await _menuRepository.GetByIdAsync(id);
+        if (item == null) return NotFound();
+        return Ok(item);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Crear([FromBody] CrearMenuItemDto dto)
+    {
+        var item = new MenuItem
+        {
+            Id = Guid.NewGuid(),
+            Categoria = dto.Categoria,
+            Nombre = dto.Nombre,
+            Precio = dto.Precio,
+            Descripcion = dto.Descripcion,
+            Activo = dto.Activo
+        };
+
+        var result = await _menuRepository.AddAsync(item);
+        return Ok(result);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Editar(Guid id, [FromBody] EditarMenuItemDto dto)
+    {
+        var item = await _menuRepository.GetByIdAsync(id);
+        if (item == null) return NotFound();
+
+        item.Categoria = dto.Categoria;
+        item.Nombre = dto.Nombre;
+        item.Precio = dto.Precio;
+        item.Descripcion = dto.Descripcion;
+        item.Activo = dto.Activo;
+
+        await _menuRepository.UpdateAsync(item);
+        return Ok(item);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Eliminar(Guid id)
+    {
+        var item = await _menuRepository.GetByIdAsync(id);
+        if (item == null) return NotFound();
+
+        await _menuRepository.DeleteAsync(item);
+        return NoContent();
+    }
+
+    [HttpPost("bulk")]
+    public async Task<IActionResult> BulkSync([FromBody] List<BulkMenuItemDto> dtos)
+    {
+        var items = dtos.Select(dto => new MenuItem
+        {
+            Id = dto.Id ?? Guid.NewGuid(),
+            Categoria = dto.Categoria,
+            Nombre = dto.Nombre,
+            Precio = dto.Precio,
+            Descripcion = dto.Descripcion,
+            Activo = dto.Activo
+        }).ToList();
+
+        await _menuRepository.BulkSyncAsync(items);
+        return Ok(items);
+    }
+}

@@ -13,3 +13,4 @@ C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Application\o
 C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Application\obj\Debug\net10.0\refint\SistemaMozoQr.Application.dll
 C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Application\obj\Debug\net10.0\SistemaMozoQr.Application.pdb
 C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Application\obj\Debug\net10.0\ref\SistemaMozoQr.Application.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.Application\obj\Debug\net10.0\SistemaMozoQr.Application.sourcelink.json

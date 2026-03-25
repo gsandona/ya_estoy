@@ -14,4 +14,10 @@ public class Mesa
     public EstadoMesa Estado { get; set; } = EstadoMesa.Disponible;
     
     public string? TokenQR { get; set; } // Opcional, puede generarse por sesión
+    
+    [MaxLength(250)]
+    public string? Ubicacion { get; set; }
+    
+    public Guid? MozoId { get; set; }
+    public Usuario? Mozo { get; set; }
 }

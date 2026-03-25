@@ -10,6 +10,8 @@ public static class DependencyInjection
     {
         services.AddScoped<IMesaService, MesaService>();
         services.AddScoped<IPedidoService, PedidoService>();
+        services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IAuthService, AuthService>();
         return services;
     }
 }

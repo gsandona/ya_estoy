@@ -43,3 +43,13 @@ C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\obj\De
 C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\obj\Debug\net10.0\SistemaMozoQr.WebApi.pdb
 C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\obj\Debug\net10.0\SistemaMozoQr.WebApi.genruntimeconfig.cache
 C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\obj\Debug\net10.0\ref\SistemaMozoQr.WebApi.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\obj\Debug\net10.0\SistemaMozoQr.WebApi.sourcelink.json
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\BCrypt.Net-Next.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\gino\Desktop\Sistemas\SistemaMozoQr\backend\SistemaMozoQr.WebApi\bin\Debug\net10.0\System.IdentityModel.Tokens.Jwt.dll

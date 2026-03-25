@@ -17,5 +17,8 @@ public class MenuItem
     [Required]
     public decimal Precio { get; set; }
     
+    [MaxLength(500)]
+    public string? Descripcion { get; set; }
+    
     public bool Activo { get; set; } = true;
 }
