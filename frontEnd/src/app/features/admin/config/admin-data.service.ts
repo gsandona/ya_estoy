@@ -29,17 +29,17 @@ export class AdminDataService {
 
   // Trae todo nuevamente
   refreshAll() {
-    this.http.get<AdminUser[]>('http://localhost:5173/api/users').subscribe({
+    this.http.get<AdminUser[]>('https://yaestoy.onrender.com/api/users').subscribe({
       next: d => this.users.set(d),
       error: () => this.users.set([]) // backend caído, lista vacía
     });
     
-    this.http.get<AdminMesa[]>('http://localhost:5173/api/mesas').subscribe({
+    this.http.get<AdminMesa[]>('https://yaestoy.onrender.com/api/mesas').subscribe({
       next: d => this.mesas.set(d),
       error: () => this.mesas.set([])
     });
     
-    this.http.get<AdminMenuItem[]>('http://localhost:5173/api/menu').subscribe({
+    this.http.get<AdminMenuItem[]>('https://yaestoy.onrender.com/api/menu').subscribe({
       next: d => this.menuItems.set(d),
       error: () => this.menuItems.set([])
     });

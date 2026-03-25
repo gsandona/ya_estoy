@@ -143,7 +143,7 @@ export class AbmUsuariosComponent {
     this.isSaving.set(true);
     const payload = this.dataService.users();
     
-    this.http.post('http://localhost:5173/api/users/bulk', payload).subscribe({
+    this.http.post('https://yaestoy.onrender.com/api/users/bulk', payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
@@ -152,7 +152,7 @@ export class AbmUsuariosComponent {
       error: (err: any) => {
         console.error('El backend rechazó el guardado en bloque:', err);
         this.isSaving.set(false);
-        alert('❌ Error: El Backend (' + 'http://localhost:5173/api/users/bulk' + ') rechazó guardar tu lista nueva de usuarios.');
+        alert('❌ Error: El Backend (' + 'https://yaestoy.onrender.com/api/users/bulk' + ') rechazó guardar tu lista nueva de usuarios.');
       }
     });
   }

@@ -188,7 +188,7 @@ export class MesaComponent implements OnInit {
   isValidSession = signal<boolean | undefined>(undefined);
 
   ngOnInit() {
-    this.http.get(`http://localhost:5173/api/mesas/verify?mesaId=${this.id}&token=${this.token}`).subscribe({
+    this.http.get(`https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}&token=${this.token}`).subscribe({
       next: () => {
         setTimeout(() => this.isValidSession.set(true), 800); // 800ms to show the loading animation securely
       },

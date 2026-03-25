@@ -68,7 +68,7 @@ export class MenuComponent implements OnInit {
   categories = signal<{name: string, items: MenuItem[]}[]>([]);
 
   ngOnInit() {
-    this.http.get<MenuItem[]>('http://localhost:5173/api/menu').subscribe({
+    this.http.get<MenuItem[]>('https://yaestoy.onrender.com/api/menu').subscribe({
       next: (data) => {
         this.groupAndSetCategories(data);
       },
