@@ -19,7 +19,7 @@ export class SignalrService {
 
   private buildConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://yaestoy.onrender.com/hubs/restaurante')
+      .withUrl('http://localhost:5173/hubs/restaurante')
       .withAutomaticReconnect()
       .build();
   }

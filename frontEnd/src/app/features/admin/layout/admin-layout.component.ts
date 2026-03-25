@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { AuthService } from '../../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
   template: `
     <div class="min-h-screen bg-surface flex">
       <!-- Sidebar -->
@@ -14,14 +16,26 @@ import { RouterOutlet, RouterLink } from '@angular/router';
             <span class="text-3xl">🍽️</span> 
             Sistema<span class="text-accent">QR</span>
           </h2>
-          <p class="text-slate-400 text-sm mt-1 font-medium">Gestión Staff</p>
+          <p class="text-slate-400 text-sm mt-1 font-medium select-none">Gestión Staff • {{ auth.currentUser()?.role }}</p>
         </div>
         <nav class="flex-1 p-6 space-y-3">
-          <a routerLink="/admin/dashboard" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/10 text-white shadow-sm font-semibold hover:bg-white/20 transition-all border border-white/5">
+          <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
             <span class="p-1.5 bg-accent/20 text-accent rounded-lg">📋</span>
             Task List
           </a>
+
+          @if (auth.isAdmin()) {
+            <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">⚙️</span>
+              Configuración
+            </a>
+          }
         </nav>
+        <div class="p-6">
+          <button (click)="logout()" class="w-full flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent">
+            <span>🚪</span> Cerrar Sesión
+          </button>
+        </div>
       </aside>
 
       <!-- Main Content -->
@@ -31,11 +45,15 @@ import { RouterOutlet, RouterLink } from '@angular/router';
            <span class="text-accent">🍽️</span> Staff Panel
           </h2>
           <div class="hidden md:block">
-            <h2 class="text-xl font-bold text-gray-800">Panel de Control General</h2>
+            <h2 class="text-xl font-bold text-gray-800">Panel de Control <span class="text-accent">({{ auth.currentUser()?.role }})</span></h2>
           </div>
           <div class="flex items-center gap-4">
+            <div class="flex flex-col items-end">
+               <span class="font-bold text-sm">{{ auth.currentUser()?.email }}</span>
+               <span class="text-xs text-green-500 font-semibold">Online</span>
+            </div>
             <div class="h-10 w-10 flex items-center justify-center bg-surface border border-gray-200 rounded-full font-bold text-primary">
-              JS
+              {{ auth.currentUser()?.email?.charAt(0) | uppercase}}
             </div>
           </div>
         </header>
@@ -49,4 +67,12 @@ import { RouterOutlet, RouterLink } from '@angular/router';
     </div>
   `
 })
-export class AdminLayoutComponent {}
+export class AdminLayoutComponent {
+  auth = inject(AuthService);
+  router = inject(Router);
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+}
