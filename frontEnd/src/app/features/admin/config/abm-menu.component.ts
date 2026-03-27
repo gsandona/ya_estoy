@@ -17,7 +17,7 @@ import { AdminDataService, AdminMenuItem } from './admin-data.service';
 
       @if (showForm()) {
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
-          <form class="flex flex-col gap-4 items-end" (submit)="saveForm($event)">
+          <form class="flex flex-col gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
             <div class="flex flex-col md:flex-row gap-4 w-full">
               <div class="flex-1">
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Nombre</label>
@@ -39,7 +39,7 @@ import { AdminDataService, AdminMenuItem } from './admin-data.service';
             </div>
             <div class="w-full">
                <label class="block text-xs font-semibold text-gray-500 mb-1">Descripción corta</label>
-               <input type="text" [(ngModel)]="formData.descripcion" name="descripcion" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
+               <input type="text" [(ngModel)]="formData.descripcion" name="descripcion" autocomplete="off" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
             </div>
             
             <div class="flex gap-2 w-full justify-between items-center">

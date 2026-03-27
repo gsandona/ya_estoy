@@ -17,7 +17,7 @@ import { AdminDataService, AdminUser } from './admin-data.service';
 
       @if (showForm()) {
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
-          <form class="flex flex-col md:flex-row gap-4 items-end" (submit)="saveForm($event)">
+          <form class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
             <div class="flex-1 w-full">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Email / Nombre</label>
               <input type="text" [(ngModel)]="formData.email" name="email" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
@@ -26,7 +26,7 @@ import { AdminDataService, AdminUser } from './admin-data.service';
               <label class="block text-xs font-semibold text-gray-500 mb-1">
                 Contraseña {{ editingId() ? '(Vacío para dejar la misma)' : '' }}
               </label>
-              <input type="password" [(ngModel)]="formData.password" name="password" class="w-full px-3 py-2 rounded-xl border border-gray-300" [required]="!editingId()">
+              <input type="password" [(ngModel)]="formData.password" name="password" autocomplete="new-password" class="w-full px-3 py-2 rounded-xl border border-gray-300" [required]="!editingId()">
             </div>
             <div class="w-full md:w-32">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Rol</label>

@@ -17,7 +17,7 @@ import { AdminDataService, AdminMesa } from './admin-data.service';
 
       @if (showForm()) {
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
-          <form class="flex flex-col md:flex-row gap-4 items-end" (submit)="saveForm($event)">
+          <form class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
             <div class="w-full md:w-32">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Número</label>
               <input type="number" [(ngModel)]="formData.numero" name="numero" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>

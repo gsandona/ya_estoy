@@ -13,6 +13,7 @@ export interface User {
 export class AuthService {
   private http = inject(HttpClient);
   private _currentUser = signal<User | null>(null);
+  private _token: string | null = null;
   
   public currentUser = computed(() => this._currentUser());
   public isAuthenticated = computed(() => !!this._currentUser());
@@ -20,30 +21,25 @@ export class AuthService {
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
 
   constructor() {
-    // Restaurar sesión de la TAB actual (si cierra pestaña, se borra por seguridad extrema)
-    const user = sessionStorage.getItem('user');
-    if (user) {
-      this._currentUser.set(JSON.parse(user));
-    }
+    // Al quitar sessionStorage, la sesión entera se volatiliza ante cualquier "Refresh"
+    // Cumpliendo tu nuevo requisito de máxima seguridad.
   }
 
   login(email: string, password: string) {
     return this.http.post<User>('https://yaestoy.onrender.com/api/auth/login', { email, password }).pipe(
       tap(user => {
-        sessionStorage.setItem('token', user.token);
-        sessionStorage.setItem('user', JSON.stringify(user));
+        this._token = user.token;
         this._currentUser.set(user);
       })
     );
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('user');
+    this._token = null;
     this._currentUser.set(null);
   }
 
   getToken(): string | null {
-    return sessionStorage.getItem('token');
+    return this._token;
   }
 }
