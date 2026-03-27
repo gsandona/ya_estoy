@@ -118,18 +118,15 @@ public class MesasConfigController : ControllerBase
         var mesas = await _mesaRepository.GetAllAsync();
         
         Mesa? mesa = null;
-        if (Guid.TryParse(mesaId, out Guid parsedId))
-        {
-            mesa = mesas.FirstOrDefault(m => m.Id == parsedId);
-        }
-        else if (int.TryParse(mesaId, out int parsedNum))
+        if (int.TryParse(mesaId, out int parsedNum))
         {
             mesa = mesas.FirstOrDefault(m => m.Numero == parsedNum);
         }
 
         if (mesa == null) return NotFound();
 
-        if (mesa.TokenQR != token) return BadRequest();
+        if (mesa.Id.ToString().ToLower() != token.ToLower()) 
+            return BadRequest();
 
         return Ok();
     }
