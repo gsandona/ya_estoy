@@ -8,7 +8,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/mesas")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,Mozo")]
 public class MesasConfigController : ControllerBase
 {
     private readonly IMesaRepository _mesaRepository;
@@ -36,6 +36,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Crear([FromBody] CrearMesaDto dto)
     {
         var mesa = new Mesa
@@ -52,6 +53,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Editar(Guid id, [FromBody] EditarMesaDto dto)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -67,6 +69,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Eliminar(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -77,6 +80,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("bulk")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> BulkSync([FromBody] List<BulkMesaDto> dtos)
     {
         var usuarios = await _usuarioRepository.GetAllAsync();
@@ -108,26 +112,24 @@ public class MesasConfigController : ControllerBase
         return Ok(mesas);
     }
 
-    [HttpGet("verify")]
+    [HttpPost("scan")]
     [AllowAnonymous]
-    public async Task<IActionResult> VerifyMesa([FromQuery] string mesaId, [FromQuery] string token)
+    public async Task<IActionResult> ScanMesa([FromBody] ScanMesaDto dto)
     {
-        if (string.IsNullOrEmpty(mesaId) || string.IsNullOrEmpty(token))
+        if (string.IsNullOrWhiteSpace(dto.Code))
             return BadRequest();
 
-        var mesas = await _mesaRepository.GetAllAsync();
-        
-        Mesa? mesa = null;
-        if (int.TryParse(mesaId, out int parsedNum))
+        if (!Guid.TryParse(dto.Code, out Guid parsedId))
+            return BadRequest("El código QR es inválido.");
+
+        var mesa = await _mesaRepository.GetByIdAsync(parsedId);
+
+        if (mesa == null) return NotFound("La mesa no existe o fue eliminada.");
+
+        return Ok(new ScanResponseDto
         {
-            mesa = mesas.FirstOrDefault(m => m.Numero == parsedNum);
-        }
-
-        if (mesa == null) return NotFound();
-
-        if (mesa.Id.ToString().ToLower() != token.ToLower()) 
-            return BadRequest();
-
-        return Ok();
+            MesaId = mesa.Id,
+            Numero = mesa.Numero
+        });
     }
 }

@@ -28,3 +28,15 @@ public class BulkMesaDto
     public string? Ubicacion { get; set; }
     public string? MozoId { get; set; }
 }
+
+public class ScanMesaDto
+{
+    [Required]
+    public string Code { get; set; } = string.Empty;
+}
+
+public class ScanResponseDto
+{
+    public Guid MesaId { get; set; }
+    public int Numero { get; set; }
+}
