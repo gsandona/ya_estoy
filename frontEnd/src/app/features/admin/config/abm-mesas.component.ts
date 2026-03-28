@@ -108,7 +108,7 @@ import { AdminDataService, AdminMesa } from './admin-data.service';
             </div>
 
             <p class="text-xs text-primary bg-surface py-2 px-4 rounded-xl mb-6 font-bold truncate">
-              URL: yaestoy.onrender.com/mesa/{{ showQrModal()?.numero }}/...
+              URL: yaestoy.onrender.com/#/scan?q={{ showQrModal()?.id | slice:0:8 }}...
             </p>
 
             <div class="flex flex-col gap-3">
@@ -157,9 +157,8 @@ export class AbmMesasComponent {
   }
 
   getQrImageUrl(mesa: AdminMesa) {
-    // La URL de escaneo apuntará a: mesa/{numero}/{id_unico_secreto}
-    // De esa forma el comensal no puede adivinar la URL cambiando "1" por "2"
-    const targetUrl = `https://yaestoy.onrender.com/mesa/${mesa.numero}/${mesa.id}`;
+    // Usamos el parametro ciego ?q= y ocultamos todo numero de mesa
+    const targetUrl = `https://yaestoy.onrender.com/#/scan?q=${mesa.id}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
   }
 

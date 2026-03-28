@@ -1,8 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SignalrService } from '../../../core/services/signalr.service';
+import { AdminDataService } from '../config/admin-data.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
+// ... (omitted changing imports array to not overwrite metadata incorrectly)
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [CommonModule],
@@ -23,7 +26,7 @@ import { SignalrService } from '../../../core/services/signalr.service';
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        @for (task of service.pendingTasks(); track task.id) {
+        @for (task of myPendingTasks(); track task.id) {
           <div class="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 p-6 flex flex-col gap-5 transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] relative overflow-hidden group">
             
             <div class="absolute top-0 right-0 w-2 h-full" [ngClass]="getSideBarClass(task.type)"></div>
@@ -95,7 +98,26 @@ import { SignalrService } from '../../../core/services/signalr.service';
 })
 export class AdminDashboardComponent {
   service = inject(SignalrService);
+  dataService = inject(AdminDataService);
+  auth = inject(AuthService);
+  
   currentDate = new Date();
+
+  myPendingTasks = computed(() => {
+    const allTasks = this.service.pendingTasks();
+    const userRole = this.auth.currentUser()?.role;
+    const userEmail = this.auth.currentUser()?.email;
+
+    // Los Administradores siempre ven el flujo total del restaurante
+    if (userRole === 'Admin') return allTasks;
+
+    // Los Mozos solo ven las tareas emitidas por sus mesas asignadas en BD
+    const myMesasNumeros = this.dataService.mesas()
+      .filter(m => m.mozoId === userEmail)
+      .map(m => m.numero);
+
+    return allTasks.filter(t => myMesasNumeros.includes(t.tableId));
+  });
 
   constructor() {
     setInterval(() => {

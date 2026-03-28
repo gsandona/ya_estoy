@@ -7,8 +7,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
   {
-    path: 'mesa/:id/:token',
-    loadComponent: () => import('./features/client/mesa/mesa.component').then(m => m.MesaComponent)
+    path: 'scan',
+    loadComponent: () => import('./features/client/scan/scan.component').then(m => m.ScanComponent)
+  },
+  {
+    path: 'pedido',
+    loadComponent: () => import('./features/client/pedido/pedido.component').then(m => m.PedidoComponent)
   },
   {
     path: 'admin',
