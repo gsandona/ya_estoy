@@ -1,9 +1,8 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, Input, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { SignalrService } from '../../../core/services/signalr.service';
 import { CartService } from '../../../core/services/cart.service';
-import { ActiveSessionService } from '../../../core/services/active-session.service';
 import { MenuComponent } from '../components/menu/menu.component';
 
 @Component({
@@ -11,33 +10,37 @@ import { MenuComponent } from '../components/menu/menu.component';
   standalone: true,
   imports: [CommonModule, MenuComponent],
   template: `
-    @if (!sessionService.session()) {
+    @if (isValidSession() === undefined) {
+      <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 animate-fade-in">
+        <div class="h-16 w-16 mb-6">
+          <span class="animate-spin block h-full w-full border-4 border-primary border-t-transparent rounded-full"></span>
+        </div>
+        <h2 class="text-xl font-bold text-gray-700">Validando Código QR...</h2>
+      </div>
+    } @else if (isValidSession() === false) {
       <div class="min-h-screen bg-red-50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in">
         <div class="h-28 w-28 bg-white text-red-500 rounded-full shadow-2xl flex items-center justify-center text-5xl mb-8 border-4 border-red-100 animate-[shake_0.5s_ease-out]">
           🛑
         </div>
         <h1 class="text-4xl font-black text-gray-900 mb-4 tracking-tight">Acceso Denegado</h1>
         <p class="text-lg text-gray-600 font-medium mb-8">
-          No tienes una sesión de mesa activa. Debes escanear el Código QR físico que se encuentra en tu mesa.
+          El código QR ha expirado o es inválido. Por favor avise al Mozo.
         </p>
       </div>
     } @else {
       <div class="min-h-screen bg-surface flex flex-col items-center py-12 px-4 pb-32 animate-fade-in">
         <div class="mb-10 text-center">
           <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary text-white text-3xl font-bold mb-4 shadow-lg ring-4 ring-primary/20">
-            {{ sessionService.session()?.numero }}
+            {{ id }}
           </div>
           <h1 class="text-3xl font-bold text-gray-800 mb-2 tracking-tight">Menú Interactivo</h1>
-          <p class="text-gray-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis w-48 mx-auto">
-            UID: {{ sessionService.session()?.mesaId | slice:0:8 }}
-          </p>
         </div>
 
         <div class="w-full max-w-sm space-y-4">
           <button 
             (click)="llamarMozo()"
             [disabled]="loadingLlamar()"
-            class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center transition-all active:scale-[0.98] hover:bg-[#1a233b] disabled:opacity-75 disabled:active:scale-100">
+            class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center">
             @if (loadingLlamar()) {
               <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
             } @else {
@@ -48,7 +51,7 @@ import { MenuComponent } from '../components/menu/menu.component';
           <button 
             (click)="pedirCuenta()"
             [disabled]="loadingCuenta()"
-            class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center transition-all active:scale-[0.98] hover:bg-[#0da473] disabled:opacity-75 disabled:active:scale-100">
+            class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center">
             @if (loadingCuenta()) {
               <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
             } @else {
@@ -58,7 +61,7 @@ import { MenuComponent } from '../components/menu/menu.component';
 
           <button 
             (click)="showMenu.set(!showMenu())"
-            class="w-full h-16 bg-white border-2 border-transparent text-primary rounded-2xl shadow-sm font-semibold text-lg hover:border-gray-200 flex justify-center items-center transition-all active:scale-[0.98]">
+            class="w-full h-16 bg-white border-2 border-transparent text-primary rounded-2xl shadow-sm font-semibold text-lg hover:border-gray-200 flex justify-center items-center transition-all">
             @if (showMenu()) {
               Ocultar Menú ⬆️
             } @else {
@@ -158,9 +161,14 @@ import { MenuComponent } from '../components/menu/menu.component';
   `]
 })
 export class PedidoComponent implements OnInit {
+  @Input() id!: string;
+  @Input() token!: string;
+
   private signalrService = inject(SignalrService);
-  sessionService = inject(ActiveSessionService);
+  private http = inject(HttpClient);
   cart = inject(CartService);
+
+  isValidSession = signal<boolean | undefined>(undefined);
 
   loadingLlamar = signal(false);
   loadingCuenta = signal(false);
@@ -171,37 +179,42 @@ export class PedidoComponent implements OnInit {
   showSuccessToast = signal(false);
 
   ngOnInit() {
-    this.sessionService.restoreSession();
+    this.http.get(`https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}&token=${this.token}`).subscribe({
+      next: () => {
+        setTimeout(() => this.isValidSession.set(true), 800);
+      },
+      error: (err) => {
+        console.error('Violación de seguridad: Mesa no existe o código QR falso', err);
+        setTimeout(() => this.isValidSession.set(false), 800);
+      }
+    });
   }
 
   async llamarMozo() {
-    if (!this.sessionService.session()) return;
     this.loadingLlamar.set(true);
     try {
-      await this.signalrService.sendLlamarMozo(this.sessionService.session()!.numero);
+      await this.signalrService.sendLlamarMozo(Number(this.id));
     } finally {
       setTimeout(() => this.loadingLlamar.set(false), 800);
     }
   }
 
   async pedirCuenta() {
-    if (!this.sessionService.session()) return;
     this.loadingCuenta.set(true);
     try {
-      await this.signalrService.sendPedirCuenta(this.sessionService.session()!.numero);
+      await this.signalrService.sendPedirCuenta(Number(this.id));
     } finally {
       setTimeout(() => this.loadingCuenta.set(false), 800);
     }
   }
 
   async enviarPedido() {
-    if (!this.sessionService.session()) return;
     this.loadingPedido.set(true);
     try {
       const detailsArray = this.cart.items().map(i => `${i.quantity}x ${i.nombre}`);
       const fullDetails = detailsArray.join(', ');
 
-      await this.signalrService.sendNuevoPedido(this.sessionService.session()!.numero, fullDetails);
+      await this.signalrService.sendNuevoPedido(Number(this.id), fullDetails);
       
       this.showCartModal.set(false);
       this.cart.clearCart();

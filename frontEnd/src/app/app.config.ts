@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withComponentInputBinding, withViewTransitions, withHashLocation } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -11,8 +11,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes, 
       withComponentInputBinding(),
-      withViewTransitions(),
-      withHashLocation()
+      withViewTransitions()
     ),
     provideHttpClient(
       withInterceptors([jwtInterceptor])

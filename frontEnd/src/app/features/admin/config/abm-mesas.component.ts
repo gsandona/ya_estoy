@@ -108,7 +108,7 @@ import { AdminDataService, AdminMesa } from './admin-data.service';
             </div>
 
             <p class="text-xs text-primary bg-surface py-2 px-4 rounded-xl mb-6 font-bold truncate">
-              URL: yaestoy.onrender.com/#/mesa/{{ showQrModal()?.numero }}/{{ showQrModal()?.id | slice:0:8 }}...
+              URL: /mesa/{{ showQrModal()?.numero }}/{{ showQrModal()?.id | slice:0:8 }}...
             </p>
 
             <div class="flex flex-col gap-3">
@@ -157,8 +157,10 @@ export class AbmMesasComponent {
   }
 
   getQrImageUrl(mesa: AdminMesa) {
-    // Retornamos la estructura paramétrica obligatoria por el Backend
-    const targetUrl = `https://yaestoy.onrender.com/#/mesa/${mesa.numero}/${mesa.id}`;
+    // Exacta ruta literal pedida sin # usando el frontend que esté corriendo
+    // Si estás en localhost creará localhost/mesa/1/uid, si en Vercel, el de Vercel.
+    const baseUrl = window.location.origin;
+    const targetUrl = `${baseUrl}/mesa/${mesa.numero}/${mesa.id}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
   }
 
