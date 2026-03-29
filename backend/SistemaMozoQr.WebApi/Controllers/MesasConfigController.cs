@@ -112,24 +112,35 @@ public class MesasConfigController : ControllerBase
         return Ok(mesas);
     }
 
-    [HttpPost("scan")]
+    [HttpGet("verify")]
     [AllowAnonymous]
-    public async Task<IActionResult> ScanMesa([FromBody] ScanMesaDto dto)
+    public async Task<IActionResult> VerifyMesa([FromQuery] string mesaId, [FromQuery] string token)
     {
-        if (string.IsNullOrWhiteSpace(dto.Code))
-            return BadRequest();
+        if (string.IsNullOrWhiteSpace(mesaId) || string.IsNullOrWhiteSpace(token))
+            return BadRequest("Parámetros incompletos.");
 
-        if (!Guid.TryParse(dto.Code, out Guid parsedId))
-            return BadRequest("El código QR es inválido.");
-
-        var mesa = await _mesaRepository.GetByIdAsync(parsedId);
-
-        if (mesa == null) return NotFound("La mesa no existe o fue eliminada.");
-
-        return Ok(new ScanResponseDto
+        var mesas = await _mesaRepository.GetAllAsync();
+        
+        Mesa? mesa = null;
+        if (int.TryParse(mesaId, out int parsedNum))
         {
-            MesaId = mesa.Id,
-            Numero = mesa.Numero
-        });
+            mesa = mesas.FirstOrDefault(m => m.Numero == parsedNum);
+        }
+        else if (Guid.TryParse(mesaId, out Guid parsedId))
+        {
+            mesa = mesas.FirstOrDefault(m => m.Id == parsedId);
+        }
+
+        if (mesa == null) 
+            return NotFound("La mesa solicitada no existe.");
+
+        // Validamos que el token coincida ya sea con el TokenQR guardado, o con el propio Id de base de datos
+        bool isValid = (mesa.TokenQR == token) || (mesa.Id.ToString().Equals(token, StringComparison.OrdinalIgnoreCase));
+
+        if (!isValid) 
+            return BadRequest("El token o acceso es inválido para esta mesa.");
+
+        // Retornamos OK silencioso
+        return Ok(new { mesaId = mesa.Id, numero = mesa.Numero });
     }
 }
