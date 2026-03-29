@@ -57,25 +57,26 @@ export class ScanComponent implements OnInit {
   status = signal<'loading' | 'error'>('loading');
 
   ngOnInit() {
-    // Al abrir la app desde la URL del QR, el código llega disfrazado en el query params `?q=uuid`
-    this.route.queryParams.subscribe(params => {
-      const qrCodeId = params['q'];
+    // Analizamos los parámetros clásicos de la URL: /mesa/:numero/:token
+    this.route.paramMap.subscribe(params => {
+      const numeroMesa = params.get('numero');
+      const tokenMesa = params.get('token');
       
-      if (!qrCodeId) {
+      if (!numeroMesa || !tokenMesa) {
         this.status.set('error');
         return;
       }
 
-      // Validamos el secreto blindado usando un POST. No pasamos datos en la URL del Backend por seguridad extrema
-      this.http.post<TableSession>('https://yaestoy.onrender.com/api/mesas/scan', { code: qrCodeId }).subscribe({
+      // Validamos llamando a la ruta original solicitada por el Arquitecto de Backend
+      this.http.get<TableSession>(`https://yaestoy.onrender.com/api/mesas/verify?mesaId=${numeroMesa}&token=${tokenMesa}`).subscribe({
         next: (mesaData) => {
-          // El backend dice "Sí, es el UID de la mesa 5". Guardamos silenciosamente en RAM/Session y reescribimos la URL
+          // El backend dice OK. Guardamos en el estado y avanzamos al Menú
           this.sessionService.setSession(mesaData);
           this.router.navigate(['/pedido']);
         },
         error: (err) => {
-          console.error('Violación de capa QR o servidor inactivo:', err);
-          setTimeout(() => this.status.set('error'), 800); // 800ms de farsa de carga para UX y anti-brute-force
+          console.error('El código QR ha expirado o es inválido', err);
+          setTimeout(() => this.status.set('error'), 800);
         }
       });
     });

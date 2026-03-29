@@ -7,7 +7,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
   {
-    path: 'scan',
+    path: 'mesa/:numero/:token',
     loadComponent: () => import('./features/client/scan/scan.component').then(m => m.ScanComponent)
   },
   {
