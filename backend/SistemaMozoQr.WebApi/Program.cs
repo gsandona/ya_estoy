@@ -5,6 +5,7 @@ using SistemaMozoQr.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,11 +81,12 @@ app.MapControllers();
 
 app.MapHub<RestauranteHub>("/hubs/restaurante");
 
-// Inicializar DB en memoria y ejecutar Seeders (para entorno de desarrollo/prueba)
+// Inicializar DB y aplicar migraciones pendientes (para SQL Server local)
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<RestauranteDbContext>();
-    context.Database.EnsureCreated();
+    // context.Database.EnsureCreated(); // <- Esto era para InMemory
+    context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations a SQL Server
 }
 
 app.Run();

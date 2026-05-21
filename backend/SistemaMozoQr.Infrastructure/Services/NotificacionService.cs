@@ -13,18 +13,28 @@ public class NotificacionService : INotificacionService
         _hubContext = hubContext;
     }
 
-    public async Task NotificarLlamadoMozoAsync(Guid mesaId, int numeroMesa)
+    public async Task NotificarLlamadoMozoAsync(Guid mesaId, int numeroMesa, Guid? mozoId)
     {
-        await _hubContext.Clients.All.NotificarLlamadoMozo(mesaId, numeroMesa);
+        await ObtenerDestinatarios(mozoId).NotificarLlamadoMozo(mesaId, numeroMesa);
     }
 
-    public async Task NotificarPidiendoCuentaAsync(Guid mesaId, int numeroMesa)
+    public async Task NotificarPidiendoCuentaAsync(Guid mesaId, int numeroMesa, Guid? mozoId)
     {
-        await _hubContext.Clients.All.NotificarPidiendoCuenta(mesaId, numeroMesa);
+        await ObtenerDestinatarios(mozoId).NotificarPidiendoCuenta(mesaId, numeroMesa);
     }
 
-    public async Task NotificarNuevoPedidoAsync(Guid pedidoId, Guid mesaId, int numeroMesa, string details)
+    public async Task NotificarNuevoPedidoAsync(Guid pedidoId, Guid mesaId, int numeroMesa, string details, Guid? mozoId)
     {
-        await _hubContext.Clients.All.NotificarNuevoPedido(pedidoId, mesaId, numeroMesa, details);
+        await ObtenerDestinatarios(mozoId).NotificarNuevoPedido(pedidoId, mesaId, numeroMesa, details);
+    }
+
+    private IRestauranteHubClient ObtenerDestinatarios(Guid? mozoId)
+    {
+        var grupos = new List<string> { "Admin" };
+        if (mozoId.HasValue)
+        {
+            grupos.Add($"Mozo_{mozoId.Value}");
+        }
+        return _hubContext.Clients.Groups(grupos);
     }
 }

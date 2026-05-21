@@ -55,6 +55,12 @@ public class UsuarioRepository : IUsuarioRepository
         var toDelete = dbItems.Where(db => !incomingItems.Any(inc => inc.Id == db.Id) && db.Email != "admin@r.com").ToList();
         if (toDelete.Any())
         {
+            var toDeleteIds = toDelete.Select(u => u.Id).ToList();
+            var mesasAffected = await _context.Mesas.Where(m => m.MozoId.HasValue && toDeleteIds.Contains(m.MozoId.Value)).ToListAsync();
+            foreach (var mesa in mesasAffected)
+            {
+                mesa.MozoId = null;
+            }
             _context.Usuarios.RemoveRange(toDelete);
         }
 

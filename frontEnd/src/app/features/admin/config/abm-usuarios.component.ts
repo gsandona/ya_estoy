@@ -17,16 +17,26 @@ import { AdminDataService, AdminUser } from './admin-data.service';
 
       @if (showForm()) {
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
-          <form class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
-            <div class="flex-1 w-full">
+          <form #userForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
+            <div class="flex-1 w-full relative">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Email / Nombre</label>
-              <input type="text" [(ngModel)]="formData.email" name="email" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
+              <input type="email" [(ngModel)]="formData.email" name="email" #userEmailCtrl="ngModel" 
+                     maxlength="50" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+                     class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent" required>
+              @if (userEmailCtrl.invalid && userEmailCtrl.touched) {
+                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Email inválido</span>
+              }
             </div>
-            <div class="flex-1 w-full">
+            <div class="flex-1 w-full relative">
               <label class="block text-xs font-semibold text-gray-500 mb-1">
                 Contraseña {{ editingId() ? '(Vacío para dejar la misma)' : '' }}
               </label>
-              <input type="password" [(ngModel)]="formData.password" name="password" autocomplete="new-password" class="w-full px-3 py-2 rounded-xl border border-gray-300" [required]="!editingId()">
+              <input type="password" [(ngModel)]="formData.password" name="password" autocomplete="new-password" #userPassCtrl="ngModel"
+                     maxlength="30" minlength="6"
+                     class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent" [required]="!editingId()">
+              @if (userPassCtrl.invalid && userPassCtrl.touched) {
+                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Mínimo 6 caracteres</span>
+              }
             </div>
             <div class="w-full md:w-32">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Rol</label>
@@ -36,7 +46,7 @@ import { AdminDataService, AdminUser } from './admin-data.service';
               </select>
             </div>
             <button type="button" (click)="showForm.set(false)" class="bg-gray-200 text-gray-600 px-6 py-2 rounded-xl font-bold hover:bg-gray-300 h-10">Cancelar</button>
-            <button type="submit" class="bg-accent text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-opacity-90 h-10">
+            <button type="submit" [disabled]="userForm.invalid" class="bg-accent text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-opacity-90 h-10 disabled:opacity-50 disabled:cursor-not-allowed">
               {{ editingId() ? 'Actualizar' : 'Guardar' }}
             </button>
           </form>
@@ -143,7 +153,7 @@ export class AbmUsuariosComponent {
     this.isSaving.set(true);
     const payload = this.dataService.users();
     
-    this.http.post('https://yaestoy.onrender.com/api/users/bulk', payload).subscribe({
+    this.http.post('https://localhost:7132/api/users/bulk', payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
@@ -152,7 +162,7 @@ export class AbmUsuariosComponent {
       error: (err: any) => {
         console.error('El backend rechazó el guardado en bloque:', err);
         this.isSaving.set(false);
-        alert('❌ Error: El Backend (' + 'https://yaestoy.onrender.com/api/users/bulk' + ') rechazó guardar tu lista nueva de usuarios.');
+        alert('❌ Error: El Backend (' + 'https://localhost:7132/api/users/bulk' + ') rechazó guardar tu lista nueva de usuarios.');
       }
     });
   }

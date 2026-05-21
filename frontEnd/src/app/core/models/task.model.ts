@@ -5,4 +5,5 @@ export interface MesaTask {
   timestamp: Date;
   status: 'Pending' | 'Completed';
   details?: string;
+  assignedMozoId?: string;
 }

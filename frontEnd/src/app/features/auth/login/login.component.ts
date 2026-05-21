@@ -47,19 +47,31 @@ import { AuthService } from '../../../core/services/auth.service';
           <form class="space-y-6" (submit)="onLogin($event)">
             <div>
               <label for="email" class="block text-sm font-bold text-gray-700">Identificación</label>
-              <div class="mt-2">
+              <div class="mt-2 relative">
                 <input id="email" [(ngModel)]="email" name="email" type="email" required 
+                  maxlength="50" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
+                  #emailCtrl="ngModel"
                   class="appearance-none block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent focus:border-accent text-lg transition-colors bg-gray-50 focus:bg-white"
-                  placeholder="admin&#64;r.com">
+                  [ngClass]="{'border-red-500': emailCtrl.invalid && emailCtrl.touched}"
+                  placeholder="admin@r.com">
+                @if (emailCtrl.invalid && emailCtrl.touched) {
+                  <p class="text-red-500 text-xs mt-1 absolute -bottom-5">Email inválido o demasiado largo.</p>
+                }
               </div>
             </div>
 
-            <div>
+            <div class="mt-8">
               <label for="password" class="block text-sm font-bold text-gray-700">Contraseña Segura</label>
-              <div class="mt-2">
+              <div class="mt-2 relative">
                 <input id="password" [(ngModel)]="password" name="password" type="password" required 
+                  maxlength="50" minlength="4"
+                  #passCtrl="ngModel"
                   class="appearance-none block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent focus:border-accent text-lg transition-colors bg-gray-50 focus:bg-white"
+                  [ngClass]="{'border-red-500': passCtrl.invalid && passCtrl.touched}"
                   placeholder="••••••••">
+                @if (passCtrl.invalid && passCtrl.touched) {
+                  <p class="text-red-500 text-xs mt-1 absolute -bottom-5">Contraseña requerida (mín 4 caracteres).</p>
+                }
               </div>
             </div>
 

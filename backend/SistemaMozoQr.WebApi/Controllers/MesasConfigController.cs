@@ -112,11 +112,41 @@ public class MesasConfigController : ControllerBase
         return Ok(mesas);
     }
 
+    [HttpPost("{id:guid}/abrir")]
+    [Authorize(Roles = "Admin,Mozo")]
+    public async Task<IActionResult> Abrir(Guid id)
+    {
+        var mesa = await _mesaRepository.GetByIdAsync(id);
+        if (mesa == null) return NotFound();
+
+        mesa.Estado = SistemaMozoQr.Domain.Enums.EstadoMesa.Ocupada;
+        // Generar PIN de 4 dígitos aleatorio
+        var random = new Random();
+        mesa.CodigoAcceso = random.Next(1000, 9999).ToString();
+        
+        await _mesaRepository.UpdateAsync(mesa);
+        return Ok(new { mesa.Id, mesa.Numero, mesa.Estado, mesa.CodigoAcceso });
+    }
+
+    [HttpPost("{id:guid}/cerrar")]
+    [Authorize(Roles = "Admin,Mozo")]
+    public async Task<IActionResult> Cerrar(Guid id)
+    {
+        var mesa = await _mesaRepository.GetByIdAsync(id);
+        if (mesa == null) return NotFound();
+
+        mesa.Estado = SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible;
+        mesa.CodigoAcceso = null; // Se invalida el PIN
+        
+        await _mesaRepository.UpdateAsync(mesa);
+        return Ok(new { mesa.Id, mesa.Numero, mesa.Estado, mesa.CodigoAcceso });
+    }
+
     [HttpGet("verify")]
     [AllowAnonymous]
-    public async Task<IActionResult> VerifyMesa([FromQuery] string mesaId, [FromQuery] string token)
+    public async Task<IActionResult> VerifyMesa([FromQuery] string mesaId, [FromQuery] string? pin)
     {
-        if (string.IsNullOrWhiteSpace(mesaId) || string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(mesaId))
             return BadRequest("Parámetros incompletos.");
 
         var mesas = await _mesaRepository.GetAllAsync();
@@ -134,13 +164,21 @@ public class MesasConfigController : ControllerBase
         if (mesa == null) 
             return NotFound("La mesa solicitada no existe.");
 
-        // Validamos que el token coincida ya sea con el TokenQR guardado, o con el propio Id de base de datos
-        bool isValid = (mesa.TokenQR == token) || (mesa.Id.ToString().Equals(token, StringComparison.OrdinalIgnoreCase));
+        // Validar que la mesa esté activa (PIN configurado)
+        if (string.IsNullOrEmpty(mesa.CodigoAcceso) || mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible)
+            return BadRequest(new { message = "La mesa se encuentra inactiva. Solicite al mozo que la habilite.", code = "INACTIVA" });
 
-        if (!isValid) 
-            return BadRequest("El token o acceso es inválido para esta mesa.");
+        // Validar PIN proporcionado
+        if (!string.IsNullOrEmpty(pin))
+        {
+            if (mesa.CodigoAcceso != pin)
+            {
+                return BadRequest(new { message = "PIN incorrecto.", code = "PIN_INVALIDO" });
+            }
+            return Ok(new { mesaId = mesa.Id, numero = mesa.Numero, estado = mesa.Estado, validado = true });
+        }
 
-        // Retornamos OK silencioso
-        return Ok(new { mesaId = mesa.Id, numero = mesa.Numero });
+        // Si no envía PIN, retornamos 401 para que el front pida el PIN
+        return Unauthorized(new { message = "Se requiere el PIN de la mesa.", mesaId = mesa.Id, numero = mesa.Numero });
     }
 }

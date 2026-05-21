@@ -17,27 +17,34 @@ import { AdminDataService, AdminMesa } from './admin-data.service';
 
       @if (showForm()) {
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
-          <form class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
-            <div class="w-full md:w-32">
+          <form #mesaForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
+            <div class="w-full md:w-32 relative">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Número</label>
-              <input type="number" [(ngModel)]="formData.numero" name="numero" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
+              <input type="number" [(ngModel)]="formData.numero" name="numero" #numCtrl="ngModel" 
+                     min="1" max="999"
+                     class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent" required>
+              @if (numCtrl.invalid && numCtrl.touched) {
+                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Rango 1-999</span>
+              }
             </div>
-            <div class="flex-1 w-full">
+            <div class="flex-1 w-full relative">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Ubicación / Detalles</label>
-              <input type="text" [(ngModel)]="formData.ubicacion" name="ubicacion" placeholder="Ej: Terraza Norte" class="w-full px-3 py-2 rounded-xl border border-gray-300">
+              <input type="text" [(ngModel)]="formData.ubicacion" name="ubicacion" #ubicCtrl="ngModel"
+                     maxlength="100" placeholder="Ej: Terraza Norte" 
+                     class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
             </div>
-            <div class="flex-1 w-full">
+            <div class="flex-1 w-full relative">
               <label class="block text-xs font-semibold text-gray-500 mb-1">Mozo Asignado</label>
               <!-- Dinámico conectado a Mozos reales -->
-              <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white">
-                <option value="Sin asignar">Sin asignar</option>
+              <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
+                <option [value]="null">Sin asignar</option>
                 @for (mozo of dataService.mozos(); track mozo.id) {
-                  <option [value]="mozo.email">{{ mozo.email }}</option>
+                  <option [value]="mozo.id">{{ mozo.email }}</option>
                 }
               </select>
             </div>
             <button type="button" (click)="showForm.set(false)" class="bg-gray-200 text-gray-600 px-6 py-2 rounded-xl font-bold hover:bg-gray-300 h-10">Cancelar</button>
-            <button type="submit" class="bg-accent text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-opacity-90 h-10">
+            <button type="submit" [disabled]="mesaForm.invalid" class="bg-accent text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-opacity-90 h-10 disabled:opacity-50 disabled:cursor-not-allowed">
               {{ editingId() ? 'Actualizar' : 'Guardar' }}
             </button>
           </form>
@@ -63,7 +70,9 @@ import { AdminDataService, AdminMesa } from './admin-data.service';
             </div>
             <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
               <span class="text-xs font-semibold text-gray-500">Asignado a:</span>
-              <span class="text-sm font-bold px-2 py-1 bg-surface rounded-lg text-primary">{{ mesa.mozoId }}</span>
+              <span class="text-sm font-bold px-2 py-1 bg-surface rounded-lg text-primary">
+                {{ getMozoEmail(mesa.mozoId) }}
+              </span>
             </div>
           </div>
         } @empty {
@@ -108,7 +117,7 @@ import { AdminDataService, AdminMesa } from './admin-data.service';
             </div>
 
             <p class="text-xs text-primary bg-surface py-2 px-4 rounded-xl mb-6 font-bold truncate">
-              URL: /mesa/{{ showQrModal()?.numero }}/{{ showQrModal()?.id | slice:0:8 }}...
+              URL: /mesa/{{ showQrModal()?.numero }}
             </p>
 
             <div class="flex flex-col gap-3">
@@ -158,9 +167,8 @@ export class AbmMesasComponent {
 
   getQrImageUrl(mesa: AdminMesa) {
     // Exacta ruta literal pedida sin # usando el frontend que esté corriendo
-    // Si estás en localhost creará localhost/mesa/1/uid, si en Vercel, el de Vercel.
     const baseUrl = window.location.origin;
-    const targetUrl = `${baseUrl}/mesa/${mesa.numero}/${mesa.id}`;
+    const targetUrl = `${baseUrl}/mesa/${mesa.numero}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
   }
 
@@ -214,7 +222,7 @@ export class AbmMesasComponent {
     this.isSaving.set(true);
     const payload = this.dataService.mesas();
     
-    this.http.post('https://yaestoy.onrender.com/api/mesas/bulk', payload).subscribe({
+    this.http.post('https://localhost:7132/api/mesas/bulk', payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
@@ -223,8 +231,14 @@ export class AbmMesasComponent {
       error: (err: any) => {
         console.error('El backend rechazó el guardado:', err);
         this.isSaving.set(false);
-        alert('❌ Error: El Backend (' + 'https://yaestoy.onrender.com/api/mesas/bulk' + ') rechazó tu pedido de resincronización.');
+        alert('❌ Error: El Backend (' + 'https://localhost:7132/api/mesas/bulk' + ') rechazó tu pedido de resincronización.');
       }
     });
+  }
+
+  getMozoEmail(mozoId: string | null): string {
+    if (!mozoId) return 'Sin asignar';
+    const mozo = this.dataService.mozos().find(m => m.id === mozoId);
+    return mozo?.email || 'Sin asignar';
   }
 }

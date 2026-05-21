@@ -14,12 +14,13 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDbContext<RestauranteDbContext>(options =>
-            options.UseInMemoryDatabase("SistemaMozoQrDb"));
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped<IMesaRepository, MesaRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
         services.AddScoped<IPedidoRepository, PedidoRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+        services.AddScoped<ITaskRepository, TaskRepository>();
 
         services.AddScoped<INotificacionService, NotificacionService>();
 

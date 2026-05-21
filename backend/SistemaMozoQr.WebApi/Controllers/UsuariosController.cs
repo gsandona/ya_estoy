@@ -11,10 +11,12 @@ namespace SistemaMozoQr.WebApi.Controllers;
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioService _usuarioService;
+    private readonly SistemaMozoQr.Domain.Interfaces.IUsuarioRepository _usuarioRepository;
 
-    public UsuariosController(IUsuarioService usuarioService)
+    public UsuariosController(IUsuarioService usuarioService, SistemaMozoQr.Domain.Interfaces.IUsuarioRepository usuarioRepository)
     {
         _usuarioService = usuarioService;
+        _usuarioRepository = usuarioRepository;
     }
 
     [HttpGet]
@@ -77,7 +79,6 @@ public class UsuariosController : ControllerBase
         }).ToList();
 
         // Utilizamos un repositorio directamente. Ya que este endpoint de Sync requiere saltarse unas reglas normales.
-        var _usuarioRepository = HttpContext.RequestServices.GetService(typeof(SistemaMozoQr.Domain.Interfaces.IUsuarioRepository)) as SistemaMozoQr.Domain.Interfaces.IUsuarioRepository;
         await _usuarioRepository.BulkSyncAsync(usuariosRequeridos);
 
         return Ok(dtos);

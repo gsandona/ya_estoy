@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 export interface AdminUser { id: string; email: string; role: 'Admin' | 'Mozo'; password?: string; }
-export interface AdminMesa { id: string; numero: number; ubicacion: string; mozoId: string; }
+export interface AdminMesa { id: string; numero: number; ubicacion: string; mozoId: string; codigoAcceso?: string; estado?: number; }
 export interface AdminMenuItem { 
   id: string; 
   categoria: string;
@@ -29,17 +29,17 @@ export class AdminDataService {
 
   // Trae todo nuevamente
   refreshAll() {
-    this.http.get<AdminUser[]>('https://yaestoy.onrender.com/api/users').subscribe({
+    this.http.get<AdminUser[]>('https://localhost:7132/api/users').subscribe({
       next: d => this.users.set(d),
       error: () => this.users.set([]) // backend caído, lista vacía
     });
     
-    this.http.get<AdminMesa[]>('https://yaestoy.onrender.com/api/mesas').subscribe({
+    this.http.get<AdminMesa[]>('https://localhost:7132/api/mesas').subscribe({
       next: d => this.mesas.set(d),
       error: () => this.mesas.set([])
     });
     
-    this.http.get<AdminMenuItem[]>('https://yaestoy.onrender.com/api/menu').subscribe({
+    this.http.get<AdminMenuItem[]>('https://localhost:7132/api/menu').subscribe({
       next: d => this.menuItems.set(d),
       error: () => this.menuItems.set([])
     });

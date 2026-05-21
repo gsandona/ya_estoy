@@ -5,12 +5,39 @@ import { SignalrService } from '../../../core/services/signalr.service';
 import { CartService } from '../../../core/services/cart.service';
 import { MenuComponent } from '../components/menu/menu.component';
 
+import { FormsModule } from '@angular/forms';
+
 @Component({
   selector: 'app-pedido',
   standalone: true,
-  imports: [CommonModule, MenuComponent],
+  imports: [CommonModule, MenuComponent, FormsModule],
   template: `
-    @if (isValidSession() === undefined) {
+    @if (requirePin()) {
+      <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full border border-gray-100">
+          <div class="h-20 w-20 bg-green-50 text-green-600 rounded-full mx-auto flex items-center justify-center text-3xl mb-6">🔒</div>
+          <h2 class="text-2xl font-black text-gray-800 mb-2">Mesa Protegida</h2>
+          <p class="text-gray-500 text-sm mb-6">Por favor ingrese el PIN de acceso proporcionado por su Mozo para ver el menú.</p>
+          
+          <input type="tel" #pinInputRef (focus)="pinInputRef.scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                 [(ngModel)]="pinInput" name="pin"
+                 placeholder="Ej: 4921" maxlength="4" pattern="[0-9]*"
+                 class="w-full text-center text-3xl font-black tracking-widest px-4 py-4 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition-all mb-4">
+          
+          @if(pinError()) {
+            <p class="text-red-500 text-sm font-bold mb-4 animate-fade-in">{{ pinError() }}</p>
+          }
+
+          <button (click)="submitPin()" [disabled]="validatingPin()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 transition active:scale-95 flex justify-center items-center">
+            @if(validatingPin()) {
+               <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+            } @else {
+               Desbloquear Menú
+            }
+          </button>
+        </div>
+      </div>
+    } @else if (isValidSession() === undefined) {
       <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 animate-fade-in">
         <div class="h-16 w-16 mb-6">
           <span class="animate-spin block h-full w-full border-4 border-primary border-t-transparent rounded-full"></span>
@@ -24,9 +51,13 @@ import { MenuComponent } from '../components/menu/menu.component';
         </div>
         <h1 class="text-4xl font-black text-gray-900 mb-4 tracking-tight">Acceso Denegado</h1>
         <p class="text-lg text-gray-600 font-medium mb-8">
-          El código QR ha expirado o es inválido. Por favor avise al Mozo.
+          El código QR ha expirado o la mesa está inactiva. Por favor avise al Mozo.
         </p>
+        <button (click)="verifyMesa()" class="bg-white text-gray-800 font-bold py-3 px-8 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all flex items-center gap-2">
+          <span>🔄</span> Reintentar Conexión
+        </button>
       </div>
+
     } @else {
       <div class="min-h-screen bg-surface flex flex-col items-center py-12 px-4 pb-32 animate-fade-in">
         <div class="mb-10 text-center">
@@ -162,13 +193,16 @@ import { MenuComponent } from '../components/menu/menu.component';
 })
 export class PedidoComponent implements OnInit {
   @Input() id!: string;
-  @Input() token!: string;
 
   private signalrService = inject(SignalrService);
   private http = inject(HttpClient);
   cart = inject(CartService);
 
   isValidSession = signal<boolean | undefined>(undefined);
+  requirePin = signal<boolean>(false);
+  pinInput = '';
+  pinError = signal<string | null>(null);
+  validatingPin = signal(false);
 
   loadingLlamar = signal(false);
   loadingCuenta = signal(false);
@@ -179,15 +213,50 @@ export class PedidoComponent implements OnInit {
   showSuccessToast = signal(false);
 
   ngOnInit() {
-    this.http.get(`https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}&token=${this.token}`).subscribe({
+    this.verifyMesa();
+  }
+
+  verifyMesa(pinParam?: string) {
+    if(pinParam) this.validatingPin.set(true);
+    else this.isValidSession.set(undefined);
+    const url = pinParam 
+      ? `https://localhost:7132/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
+      : `https://localhost:7132/api/mesas/verify?mesaId=${this.id}`;
+
+    this.http.get(url).subscribe({
       next: () => {
+        if(pinParam) this.validatingPin.set(false);
+        this.requirePin.set(false);
+        this.pinError.set(null);
         setTimeout(() => this.isValidSession.set(true), 800);
       },
       error: (err) => {
-        console.error('Violación de seguridad: Mesa no existe o código QR falso', err);
-        setTimeout(() => this.isValidSession.set(false), 800);
+        if(pinParam) this.validatingPin.set(false);
+        if (err.status === 401) {
+          // Requiere PIN
+          this.requirePin.set(true);
+          this.isValidSession.set(undefined);
+        } else if (err.status === 400 && pinParam) {
+          // PIN Incorrecto
+          this.pinError.set('El PIN ingresado es incorrecto.');
+        } else {
+          // Mesa apagada, token expiro, etc.
+          this.requirePin.set(false);
+          console.error('Violación de seguridad o mesa inactiva', err);
+          setTimeout(() => this.isValidSession.set(false), 800);
+        }
       }
     });
+  }
+
+  submitPin() {
+    const sanitizedPin = this.pinInput.trim().replace(/\D/g, '');
+    if (!sanitizedPin || sanitizedPin.length !== 4) {
+      this.pinError.set('Ingrese un código exacto de 4 dígitos');
+      return;
+    }
+    this.pinError.set(null);
+    this.verifyMesa(sanitizedPin);
   }
 
   async llamarMozo() {

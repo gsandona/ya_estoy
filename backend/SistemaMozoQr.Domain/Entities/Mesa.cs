@@ -20,4 +20,7 @@ public class Mesa
     
     public Guid? MozoId { get; set; }
     public Usuario? Mozo { get; set; }
+
+    [MaxLength(10)]
+    public string? CodigoAcceso { get; set; } // PIN de acceso generado cuando se abre la mesa
 }

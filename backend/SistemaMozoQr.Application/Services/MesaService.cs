@@ -45,7 +45,7 @@ public class MesaService : IMesaService
         }
 
         // Notificar en tiempo real al dashboard
-        await _notificacionService.NotificarLlamadoMozoAsync(mesa.Id, mesa.Numero);
+        await _notificacionService.NotificarLlamadoMozoAsync(mesa.Id, mesa.Numero, mesa.MozoId);
 
         return true;
     }
@@ -63,7 +63,7 @@ public class MesaService : IMesaService
         }
 
         // Notificar en tiempo real al dashboard
-        await _notificacionService.NotificarPidiendoCuentaAsync(mesa.Id, mesa.Numero);
+        await _notificacionService.NotificarPidiendoCuentaAsync(mesa.Id, mesa.Numero, mesa.MozoId);
 
         return true;
     }

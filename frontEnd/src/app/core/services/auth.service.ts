@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
+import { SignalrService } from './signalr.service';
 
 export interface User {
   id: string;
@@ -12,6 +13,7 @@ export interface User {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
+  private signalrService = inject(SignalrService);
   private _currentUser = signal<User | null>(null);
   private _token: string | null = null;
   
@@ -21,15 +23,25 @@ export class AuthService {
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
 
   constructor() {
-    // Al quitar sessionStorage, la sesión entera se volatiliza ante cualquier "Refresh"
-    // Cumpliendo tu nuevo requisito de máxima seguridad.
+    const savedToken = localStorage.getItem('auth_token');
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedToken && savedUser) {
+      this._token = savedToken;
+      const user = JSON.parse(savedUser) as User;
+      this._currentUser.set(user);
+      // Wait for signalR connection or just call it, signalr.service buffers/handles it
+      setTimeout(() => this.signalrService.joinGroup(user.role, user.id), 1000);
+    }
   }
 
   login(email: string, password: string) {
-    return this.http.post<User>('https://yaestoy.onrender.com/api/auth/login', { email, password }).pipe(
+    return this.http.post<User>('https://localhost:7132/api/auth/login', { email, password }).pipe(
       tap(user => {
         this._token = user.token;
         this._currentUser.set(user);
+        localStorage.setItem('auth_token', user.token);
+        localStorage.setItem('auth_user', JSON.stringify(user));
+        this.signalrService.joinGroup(user.role, user.id);
       })
     );
   }
@@ -37,6 +49,8 @@ export class AuthService {
   logout() {
     this._token = null;
     this._currentUser.set(null);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
   }
 
   getToken(): string | null {
