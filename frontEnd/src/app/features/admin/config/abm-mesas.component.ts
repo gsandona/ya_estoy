@@ -222,7 +222,7 @@ export class AbmMesasComponent {
     this.isSaving.set(true);
     const payload = this.dataService.mesas();
     
-    this.http.post('https://localhost:7132/api/mesas/bulk', payload).subscribe({
+    this.http.post('https://yaestoy.onrender.com/api/mesas/bulk', payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
@@ -231,7 +231,7 @@ export class AbmMesasComponent {
       error: (err: any) => {
         console.error('El backend rechazó el guardado:', err);
         this.isSaving.set(false);
-        alert('❌ Error: El Backend (' + 'https://localhost:7132/api/mesas/bulk' + ') rechazó tu pedido de resincronización.');
+        alert('❌ Error: El Backend (' + 'https://yaestoy.onrender.com/api/mesas/bulk' + ') rechazó tu pedido de resincronización.');
       }
     });
   }

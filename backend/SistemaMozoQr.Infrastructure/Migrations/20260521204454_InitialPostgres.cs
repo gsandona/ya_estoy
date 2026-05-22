@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace SistemaMozoQr.Infrastructure.Data.Migrations
+namespace SistemaMozoQr.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialPostgres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,12 +17,12 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 name: "MenuItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Categoria = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Nombre = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Precio = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Descripcion = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Activo = table.Column<bool>(type: "bit", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Categoria = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Nombre = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Precio = table.Column<decimal>(type: "numeric", nullable: false),
+                    Descripcion = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Activo = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,14 +30,31 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tasks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TableId = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    Details = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AssignedMozoId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tasks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    NombreCompleto = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Rol = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    NombreCompleto = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: false),
+                    Rol = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -48,12 +65,13 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 name: "Mesas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Numero = table.Column<int>(type: "int", nullable: false),
-                    Estado = table.Column<int>(type: "int", nullable: false),
-                    TokenQR = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Ubicacion = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: true),
-                    MozoId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Numero = table.Column<int>(type: "integer", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
+                    TokenQR = table.Column<string>(type: "text", nullable: true),
+                    Ubicacion = table.Column<string>(type: "character varying(250)", maxLength: 250, nullable: true),
+                    MozoId = table.Column<Guid>(type: "uuid", nullable: true),
+                    CodigoAcceso = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -69,10 +87,10 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 name: "Pedidos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MesaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Estado = table.Column<int>(type: "int", nullable: false),
-                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    MesaId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
+                    Fecha = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,11 +107,11 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 name: "PedidoItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PedidoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MenuItemId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Cantidad = table.Column<int>(type: "int", nullable: false),
-                    PrecioUnitario = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    PedidoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MenuItemId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Cantidad = table.Column<int>(type: "integer", nullable: false),
+                    PrecioUnitario = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,23 +135,23 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 columns: new[] { "Id", "Activo", "Categoria", "Descripcion", "Nombre", "Precio" },
                 values: new object[,]
                 {
-                    { new Guid("37ccadfb-4f6e-415f-8f50-f38d52ab07d5"), true, "Bebidas", null, "Agua M.", 1500m },
-                    { new Guid("7bf63217-308d-480d-8d6f-4e972d14be48"), true, "Platos Principales", null, "Milanesa con Papas", 8500m }
+                    { new Guid("33333333-3333-3333-3333-333333333333"), true, "Bebidas", null, "Agua M.", 1500m },
+                    { new Guid("44444444-4444-4444-4444-444444444444"), true, "Platos Principales", null, "Milanesa con Papas", 8500m }
                 });
 
             migrationBuilder.InsertData(
                 table: "Mesas",
-                columns: new[] { "Id", "Estado", "MozoId", "Numero", "TokenQR", "Ubicacion" },
+                columns: new[] { "Id", "CodigoAcceso", "Estado", "MozoId", "Numero", "TokenQR", "Ubicacion" },
                 values: new object[,]
                 {
-                    { new Guid("09166452-1e63-4b0a-91e2-d81f4ef6bdc8"), 0, null, 2, "MESA2_QR_TOKEN", null },
-                    { new Guid("e458adbe-2dba-4cbc-83f5-b2119368acb1"), 0, null, 1, "MESA1_QR_TOKEN", null }
+                    { new Guid("11111111-1111-1111-1111-111111111111"), null, 0, null, 1, "MESA1_QR_TOKEN", null },
+                    { new Guid("22222222-2222-2222-2222-222222222222"), null, 0, null, 2, "MESA2_QR_TOKEN", null }
                 });
 
             migrationBuilder.InsertData(
                 table: "Usuarios",
                 columns: new[] { "Id", "Email", "NombreCompleto", "PasswordHash", "Rol" },
-                values: new object[] { new Guid("f40eca01-3eea-4248-bcf0-27800ef6eac7"), "admin@r.com", "Administrador", "$2a$11$8xTbO1kBpjLsgQxuvoeE3uAAAXrB2I4mYhhPHyGwdcFSlcgd7BwMu", 0 });
+                values: new object[] { new Guid("55555555-5555-5555-5555-555555555555"), "admin@r.com", "Administrador", "$2a$11$eGPDhy51VNdhBOm9/5zoBeTPuPW9QSYI7UIloW4dm1iyq.NYrK7eO", 0 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Mesas_MozoId",
@@ -161,6 +179,9 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "PedidoItems");
+
+            migrationBuilder.DropTable(
+                name: "Tasks");
 
             migrationBuilder.DropTable(
                 name: "MenuItems");

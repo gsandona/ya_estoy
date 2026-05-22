@@ -229,7 +229,7 @@ export class AdminDashboardComponent {
 
   async abrirMesa(mesaId: string) {
     try {
-      const res = await fetch(`https://localhost:7132/api/mesas/${mesaId}/abrir`, {
+      const res = await fetch(`https://yaestoy.onrender.com/api/mesas/${mesaId}/abrir`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
       });
@@ -239,7 +239,7 @@ export class AdminDashboardComponent {
 
   async cerrarMesa(mesaId: string) {
     try {
-      const res = await fetch(`https://localhost:7132/api/mesas/${mesaId}/cerrar`, {
+      const res = await fetch(`https://yaestoy.onrender.com/api/mesas/${mesaId}/cerrar`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
       });

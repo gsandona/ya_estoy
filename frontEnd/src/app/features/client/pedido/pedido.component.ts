@@ -220,8 +220,8 @@ export class PedidoComponent implements OnInit {
     if(pinParam) this.validatingPin.set(true);
     else this.isValidSession.set(undefined);
     const url = pinParam 
-      ? `https://localhost:7132/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
-      : `https://localhost:7132/api/mesas/verify?mesaId=${this.id}`;
+      ? `https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
+      : `https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}`;
 
     this.http.get(url).subscribe({
       next: () => {

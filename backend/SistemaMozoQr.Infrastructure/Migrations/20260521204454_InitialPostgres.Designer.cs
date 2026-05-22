@@ -2,18 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SistemaMozoQr.Infrastructure.Data;
 
 #nullable disable
 
-namespace SistemaMozoQr.Infrastructure.Data.Migrations
+namespace SistemaMozoQr.Infrastructure.Migrations
 {
     [DbContext(typeof(RestauranteDbContext))]
-    [Migration("20260517173432_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260521204454_InitialPostgres")]
+    partial class InitialPostgres
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,35 +21,35 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.MenuItem", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Activo")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Categoria")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<decimal>("Precio")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -58,7 +58,7 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("37ccadfb-4f6e-415f-8f50-f38d52ab07d5"),
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
                             Activo = true,
                             Categoria = "Bebidas",
                             Nombre = "Agua M.",
@@ -66,7 +66,7 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                         },
                         new
                         {
-                            Id = new Guid("7bf63217-308d-480d-8d6f-4e972d14be48"),
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
                             Activo = true,
                             Categoria = "Platos Principales",
                             Nombre = "Milanesa con Papas",
@@ -78,23 +78,27 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CodigoAcceso")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<int>("Estado")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid?>("MozoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Numero")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TokenQR")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Ubicacion")
                         .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("character varying(250)");
 
                     b.HasKey("Id");
 
@@ -105,34 +109,66 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e458adbe-2dba-4cbc-83f5-b2119368acb1"),
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             Estado = 0,
                             Numero = 1,
                             TokenQR = "MESA1_QR_TOKEN"
                         },
                         new
                         {
-                            Id = new Guid("09166452-1e63-4b0a-91e2-d81f4ef6bdc8"),
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
                             Estado = 0,
                             Numero = 2,
                             TokenQR = "MESA2_QR_TOKEN"
                         });
                 });
 
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.MesaTask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AssignedMozoId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Details")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("TableId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tasks");
+                });
+
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Pedido", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Estado")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("MesaId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -145,19 +181,19 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Cantidad")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("MenuItemId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("PedidoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -172,24 +208,24 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("NombreCompleto")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Rol")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -198,10 +234,10 @@ namespace SistemaMozoQr.Infrastructure.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f40eca01-3eea-4248-bcf0-27800ef6eac7"),
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
                             Email = "admin@r.com",
                             NombreCompleto = "Administrador",
-                            PasswordHash = "$2a$11$8xTbO1kBpjLsgQxuvoeE3uAAAXrB2I4mYhhPHyGwdcFSlcgd7BwMu",
+                            PasswordHash = "$2a$11$eGPDhy51VNdhBOm9/5zoBeTPuPW9QSYI7UIloW4dm1iyq.NYrK7eO",
                             Rol = 0
                         });
                 });

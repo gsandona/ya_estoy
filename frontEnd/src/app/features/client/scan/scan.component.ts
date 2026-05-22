@@ -68,7 +68,7 @@ export class ScanComponent implements OnInit {
       }
 
       // Validamos llamando a la ruta original solicitada por el Arquitecto de Backend
-      this.http.get<TableSession>(`https://localhost:7132/api/mesas/verify?mesaId=${numeroMesa}&token=${tokenMesa}`).subscribe({
+      this.http.get<TableSession>(`https://yaestoy.onrender.com/api/mesas/verify?mesaId=${numeroMesa}&token=${tokenMesa}`).subscribe({
         next: (mesaData) => {
           // El backend dice OK. Guardamos en el estado y avanzamos al Menú
           this.sessionService.setSession(mesaData);

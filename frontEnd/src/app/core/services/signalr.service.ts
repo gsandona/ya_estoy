@@ -24,7 +24,7 @@ export class SignalrService {
   private fetchPendingTasks() {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
-    this.http.get<any[]>('https://localhost:7132/api/tareas/pendientes', {
+    this.http.get<any[]>('https://yaestoy.onrender.com/api/tareas/pendientes', {
       headers: { 'Authorization': `Bearer ${token}` }
     }).subscribe({
       next: (tasks) => {
@@ -44,7 +44,7 @@ export class SignalrService {
 
   private buildConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7132/hubs/restaurante')
+      .withUrl('https://yaestoy.onrender.com/hubs/restaurante')
       .withAutomaticReconnect()
       .build();
       

@@ -147,7 +147,7 @@ export class AbmMenuComponent {
     // Realizamos un POST masivo al backend con todo el array local actual
     const payload = this.dataService.menuItems();
     
-    this.http.post('https://localhost:7132/api/menu/bulk', payload).subscribe({
+    this.http.post('https://yaestoy.onrender.com/api/menu/bulk', payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);

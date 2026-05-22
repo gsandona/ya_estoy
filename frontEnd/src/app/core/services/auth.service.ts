@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<User>('https://localhost:7132/api/auth/login', { email, password }).pipe(
+    return this.http.post<User>('https://yaestoy.onrender.com/api/auth/login', { email, password }).pipe(
       tap(user => {
         this._token = user.token;
         this._currentUser.set(user);
