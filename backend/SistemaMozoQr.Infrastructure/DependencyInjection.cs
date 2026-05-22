@@ -13,8 +13,21 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        // Parse Render's Postgres URL to ADO.NET format
+        if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+        {
+            var uri = new Uri(connectionString);
+            var userInfo = uri.UserInfo.Split(':');
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.LocalPath.TrimStart('/');
+            connectionString = $"Host={host};Port={port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Prefer;Trust Server Certificate=true;";
+        }
+
         services.AddDbContext<RestauranteDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<IMesaRepository, MesaRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
