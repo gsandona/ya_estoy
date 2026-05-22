@@ -14,9 +14,19 @@ public class RestauranteDbContext : DbContext
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<MesaTask> Tasks { get; set; }
 
+    public DbSet<SystemSetting> SystemSettings { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // SystemSettings primary key
+        modelBuilder.Entity<SystemSetting>().HasKey(s => s.Key);
+        
+        // Seed SystemSettings
+        modelBuilder.Entity<SystemSetting>().HasData(
+            new SystemSetting { Key = "CleanupJobIntervalHours", Value = "24" }
+        );
         
         // Seed initial data con valores deterministas
         modelBuilder.Entity<Mesa>().HasData(
@@ -38,6 +48,14 @@ public class RestauranteDbContext : DbContext
                 Email = "admin@r.com", 
                 PasswordHash = "$2a$11$eGPDhy51VNdhBOm9/5zoBeTPuPW9QSYI7UIloW4dm1iyq.NYrK7eO",
                 Rol = SistemaMozoQr.Domain.Enums.Rol.Admin 
+            },
+            new Usuario
+            {
+                Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                NombreCompleto = "Gino Sandona",
+                Email = "ginoSandona",
+                PasswordHash = "$2a$11$OMRvNspLxRgV7BaauISU3.CubR7dtc.pjYcNCabaBpiPjQ.Z.C80C",
+                Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin
             }
         );
     }

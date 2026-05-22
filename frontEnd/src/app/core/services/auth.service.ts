@@ -1,12 +1,14 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { SignalrService } from './signalr.service';
 
 export interface User {
   id: string;
   email: string;
-  role: 'Admin' | 'Mozo';
+  role: 'Admin' | 'Mozo' | 'SuperAdmin';
   token: string;
 }
 
@@ -19,7 +21,8 @@ export class AuthService {
   
   public currentUser = computed(() => this._currentUser());
   public isAuthenticated = computed(() => !!this._currentUser());
-  public isAdmin = computed(() => this._currentUser()?.role === 'Admin');
+  public isAdmin = computed(() => this._currentUser()?.role === 'Admin' || this._currentUser()?.role === 'SuperAdmin');
+  public isSuperAdmin = computed(() => this._currentUser()?.role === 'SuperAdmin');
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
 
   constructor() {
@@ -35,7 +38,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    return this.http.post<User>('https://yaestoy.onrender.com/api/auth/login', { email, password }).pipe(
+    return this.http.post<User>(`${environment.apiUrl}/api/auth/login`, { email, password }).pipe(
       tap(user => {
         this._token = user.token;
         this._currentUser.set(user);

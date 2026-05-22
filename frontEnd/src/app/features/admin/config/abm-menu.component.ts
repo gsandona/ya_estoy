@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AdminDataService, AdminMenuItem } from './admin-data.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-abm-menu',
@@ -147,7 +148,7 @@ export class AbmMenuComponent {
     // Realizamos un POST masivo al backend con todo el array local actual
     const payload = this.dataService.menuItems();
     
-    this.http.post('https://yaestoy.onrender.com/api/menu/bulk', payload).subscribe({
+    this.http.post(`${environment.apiUrl}/api/menu/bulk`, payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);

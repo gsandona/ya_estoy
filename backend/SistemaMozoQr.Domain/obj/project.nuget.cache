@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "PLWSYEFMziM=",
+  "success": true,
+  "projectFilePath": "C:\\SISTEMAS\\ya_estoy\\backend\\SistemaMozoQr.Domain\\SistemaMozoQr.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gjsza\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.5\\microsoft.extensions.configuration.abstractions.10.0.5.nupkg.sha512",
+    "C:\\Users\\gjsza\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.5\\microsoft.extensions.primitives.10.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

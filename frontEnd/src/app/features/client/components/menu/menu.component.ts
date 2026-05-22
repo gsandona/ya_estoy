@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { CartService, MenuItem } from '../../../../core/services/cart.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-menu',
@@ -68,7 +69,7 @@ export class MenuComponent implements OnInit {
   categories = signal<{name: string, items: MenuItem[]}[]>([]);
 
   ngOnInit() {
-    this.http.get<MenuItem[]>('https://yaestoy.onrender.com/api/menu').subscribe({
+    this.http.get<MenuItem[]>(`${environment.apiUrl}/api/menu`).subscribe({
       next: (data) => {
         this.groupAndSetCategories(data);
       },

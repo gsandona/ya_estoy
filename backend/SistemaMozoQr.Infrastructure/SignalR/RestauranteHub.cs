@@ -52,9 +52,15 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         return mesa != null && mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Ocupada && !string.IsNullOrEmpty(mesa.CodigoAcceso);
     }
 
+    private async Task<bool> IsDuplicateAlert(int tableId, string type)
+    {
+        var pendingTasks = await _taskRepository.GetPendingTasksAsync();
+        return pendingTasks.Any(t => t.TableId == tableId && t.Type == type);
+    }
+
     public async Task LlamarMozo(int tableId)
     {
-        if (IsSpamming(tableId) || !await IsMesaActive(tableId)) return;
+        if (IsSpamming(tableId) || !await IsMesaActive(tableId) || await IsDuplicateAlert(tableId, "Llamado")) return;
         var (clients, assignedMozoId) = await GetClientsForTable(tableId);
         var taskId = Guid.NewGuid();
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask { Id = taskId, TableId = tableId, Type = "Llamado", AssignedMozoId = assignedMozoId });
@@ -63,7 +69,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
 
     public async Task PedirCuenta(int tableId)
     {
-        if (IsSpamming(tableId) || !await IsMesaActive(tableId)) return;
+        if (IsSpamming(tableId) || !await IsMesaActive(tableId) || await IsDuplicateAlert(tableId, "Cuenta")) return;
         var (clients, assignedMozoId) = await GetClientsForTable(tableId);
         var taskId = Guid.NewGuid();
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask { Id = taskId, TableId = tableId, Type = "Cuenta", AssignedMozoId = assignedMozoId });

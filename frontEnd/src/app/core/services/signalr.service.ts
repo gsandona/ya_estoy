@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as signalR from '@microsoft/signalr';
 import { MesaTask } from '../models/task.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +25,7 @@ export class SignalrService {
   private fetchPendingTasks() {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
-    this.http.get<any[]>('https://yaestoy.onrender.com/api/tareas/pendientes', {
+    this.http.get<any[]>(`${environment.apiUrl}/api/tareas/pendientes`, {
       headers: { 'Authorization': `Bearer ${token}` }
     }).subscribe({
       next: (tasks) => {
@@ -44,7 +45,7 @@ export class SignalrService {
 
   private buildConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://yaestoy.onrender.com/hubs/restaurante')
+      .withUrl(`${environment.apiUrl}/hubs/restaurante`)
       .withAutomaticReconnect()
       .build();
       
@@ -126,6 +127,10 @@ export class SignalrService {
 
   private playAudioAlert() {
     try {
+      // Si es una PC de escritorio (caja), silenciamos los sonidos para no molestar
+      const isDesktop = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isDesktop) return;
+
       // Vibración para celulares (patrón: vibra 200ms, pausa 100ms, vibra 200ms)
       if (navigator.vibrate) {
         navigator.vibrate([200, 100, 200]);

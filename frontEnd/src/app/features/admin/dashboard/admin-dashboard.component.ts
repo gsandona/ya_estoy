@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SignalrService } from '../../../core/services/signalr.service';
 import { AdminDataService } from '../config/admin-data.service';
+import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 
 import { FormsModule } from '@angular/forms';
@@ -229,7 +230,7 @@ export class AdminDashboardComponent {
 
   async abrirMesa(mesaId: string) {
     try {
-      const res = await fetch(`https://yaestoy.onrender.com/api/mesas/${mesaId}/abrir`, {
+      const res = await fetch(`${environment.apiUrl}/api/mesas/${mesaId}/abrir`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
       });
@@ -239,7 +240,7 @@ export class AdminDashboardComponent {
 
   async cerrarMesa(mesaId: string) {
     try {
-      const res = await fetch(`https://yaestoy.onrender.com/api/mesas/${mesaId}/cerrar`, {
+      const res = await fetch(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
       });

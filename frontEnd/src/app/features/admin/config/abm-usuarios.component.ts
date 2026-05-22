@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AdminDataService, AdminUser } from './admin-data.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-abm-usuarios',
@@ -153,7 +154,7 @@ export class AbmUsuariosComponent {
     this.isSaving.set(true);
     const payload = this.dataService.users();
     
-    this.http.post('https://yaestoy.onrender.com/api/users/bulk', payload).subscribe({
+    this.http.post(`${environment.apiUrl}/api/users/bulk`, payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
@@ -162,7 +163,7 @@ export class AbmUsuariosComponent {
       error: (err: any) => {
         console.error('El backend rechazó el guardado en bloque:', err);
         this.isSaving.set(false);
-        alert('❌ Error: El Backend (' + 'https://yaestoy.onrender.com/api/users/bulk' + ') rechazó guardar tu lista nueva de usuarios.');
+        alert('❌ Error: El Backend (' + environment.apiUrl + '/api/users/bulk) rechazó guardar tu lista nueva de usuarios.');
       }
     });
   }

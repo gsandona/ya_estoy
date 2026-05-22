@@ -201,6 +201,27 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                     b.ToTable("PedidoItems");
                 });
 
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.SystemSetting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("SystemSettings");
+
+                    b.HasData(
+                        new
+                        {
+                            Key = "CleanupJobIntervalHours",
+                            Value = "24"
+                        });
+                });
+
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
@@ -236,6 +257,14 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                             NombreCompleto = "Administrador",
                             PasswordHash = "$2a$11$eGPDhy51VNdhBOm9/5zoBeTPuPW9QSYI7UIloW4dm1iyq.NYrK7eO",
                             Rol = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Email = "ginoSandona",
+                            NombreCompleto = "Gino Sandona",
+                            PasswordHash = "$2a$11$OMRvNspLxRgV7BaauISU3.CubR7dtc.pjYcNCabaBpiPjQ.Z.C80C",
+                            Rol = 2
                         });
                 });
 

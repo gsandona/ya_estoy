@@ -46,6 +46,7 @@ builder.Services.AddSignalR();
 
 // Dependency Injection de Clean Architecture
 builder.Services.AddApplicationServices();
+builder.Services.AddHostedService<SistemaMozoQr.WebApi.Services.TaskCleanupService>();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
 // CORS para SignalR y frontend

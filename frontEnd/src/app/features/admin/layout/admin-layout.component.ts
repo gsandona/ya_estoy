@@ -26,8 +26,15 @@ import { CommonModule } from '@angular/common';
 
           @if (auth.isAdmin()) {
             <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">👥</span>
+              Config. Personal
+            </a>
+          }
+          
+          @if (auth.isSuperAdmin()) {
+            <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg">⚙️</span>
-              Configuración
+              Sistema
             </a>
           }
         </nav>
@@ -99,8 +106,15 @@ import { CommonModule } from '@angular/common';
 
               @if (auth.isAdmin()) {
                 <a routerLink="/admin/configuracion" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">👥</span>
+                  Config. Personal
+                </a>
+              }
+              
+              @if (auth.isSuperAdmin()) {
+                <a routerLink="/admin/sistema" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">⚙️</span>
-                  Configuración
+                  Sistema
                 </a>
               }
             </nav>

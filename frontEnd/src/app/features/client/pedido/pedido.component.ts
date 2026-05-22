@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { SignalrService } from '../../../core/services/signalr.service';
 import { CartService } from '../../../core/services/cart.service';
 import { MenuComponent } from '../components/menu/menu.component';
+import { environment } from '../../../../environments/environment';
 
 import { FormsModule } from '@angular/forms';
 
@@ -220,8 +221,8 @@ export class PedidoComponent implements OnInit {
     if(pinParam) this.validatingPin.set(true);
     else this.isValidSession.set(undefined);
     const url = pinParam 
-      ? `https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
-      : `https://yaestoy.onrender.com/api/mesas/verify?mesaId=${this.id}`;
+      ? `${environment.apiUrl}/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
+      : `${environment.apiUrl}/api/mesas/verify?mesaId=${this.id}`;
 
     this.http.get(url).subscribe({
       next: () => {

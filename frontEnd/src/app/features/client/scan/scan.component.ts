@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ActiveSessionService, TableSession } from '../../../core/services/active-session.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-scan',
@@ -68,7 +69,7 @@ export class ScanComponent implements OnInit {
       }
 
       // Validamos llamando a la ruta original solicitada por el Arquitecto de Backend
-      this.http.get<TableSession>(`https://yaestoy.onrender.com/api/mesas/verify?mesaId=${numeroMesa}&token=${tokenMesa}`).subscribe({
+      this.http.get<TableSession>(`${environment.apiUrl}/api/mesas/verify?mesaId=${numeroMesa}&token=${tokenMesa}`).subscribe({
         next: (mesaData) => {
           // El backend dice OK. Guardamos en el estado y avanzamos al Menú
           this.sessionService.setSession(mesaData);

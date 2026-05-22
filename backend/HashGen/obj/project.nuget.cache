@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "GGWdRNFbi3k=",
+  "success": true,
+  "projectFilePath": "C:\\SISTEMAS\\ya_estoy\\backend\\HashGen\\HashGen.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\gjsza\\.nuget\\packages\\bcrypt.net-next\\4.2.0\\bcrypt.net-next.4.2.0.nupkg.sha512"
+  ],
+  "logs": []
+}

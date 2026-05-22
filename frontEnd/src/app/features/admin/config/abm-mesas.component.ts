@@ -2,7 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { AdminDataService, AdminMesa } from './admin-data.service';
+import { AdminDataService, AdminMesa, AdminUser } from './admin-data.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-abm-mesas',
@@ -222,7 +223,7 @@ export class AbmMesasComponent {
     this.isSaving.set(true);
     const payload = this.dataService.mesas();
     
-    this.http.post('https://yaestoy.onrender.com/api/mesas/bulk', payload).subscribe({
+    this.http.post(`${environment.apiUrl}/api/mesas/bulk`, payload).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
@@ -231,7 +232,7 @@ export class AbmMesasComponent {
       error: (err: any) => {
         console.error('El backend rechazó el guardado:', err);
         this.isSaving.set(false);
-        alert('❌ Error: El Backend (' + 'https://yaestoy.onrender.com/api/mesas/bulk' + ') rechazó tu pedido de resincronización.');
+        alert('❌ Error: El Backend (' + environment.apiUrl + '/api/mesas/bulk) rechazó tu pedido de resincronización.');
       }
     });
   }
