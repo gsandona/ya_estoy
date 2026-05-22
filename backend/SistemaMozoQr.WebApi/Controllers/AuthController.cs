@@ -18,10 +18,17 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        var response = await _authService.LoginAsync(loginDto);
-        if (response == null)
-            return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
+        try
+        {
+            var response = await _authService.LoginAsync(loginDto);
+            if (response == null)
+                return Unauthorized(new { message = "Usuario o contraseña incorrectos" });
 
-        return Ok(response);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = ex.Message, stack = ex.StackTrace, inner = ex.InnerException?.Message });
+        }
     }
 }
