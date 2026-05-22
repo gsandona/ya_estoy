@@ -13,17 +13,19 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration.GetConnectionString("DefaultConnection")?.Trim()?.Replace("\"", "")?.Replace("'", "");
 
         // Parse Render's Postgres URL to ADO.NET format
-        if (!string.IsNullOrEmpty(connectionString) && connectionString.StartsWith("postgres://"))
+        if (!string.IsNullOrEmpty(connectionString) && 
+            (connectionString.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) || 
+             connectionString.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase)))
         {
             var uri = new Uri(connectionString);
             var userInfo = uri.UserInfo.Split(':');
             var host = uri.Host;
             var port = uri.Port > 0 ? uri.Port : 5432;
             var database = uri.LocalPath.TrimStart('/');
-            connectionString = $"Host={host};Port={port};Database={database};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Prefer;Trust Server Certificate=true;";
+            connectionString = $"Server={host};Port={port};Database={database};User Id={userInfo[0]};Password={userInfo[1]};SslMode=Prefer;Trust Server Certificate=true;";
         }
 
         services.AddDbContext<RestauranteDbContext>(options =>
