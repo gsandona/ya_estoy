@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SistemaMozoQr.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1194d9bb53210b81cafe41638cb8a9214d87adbd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+770b051df086c2c1ea84790123ca4687087ce33d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SistemaMozoQr.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SistemaMozoQr.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

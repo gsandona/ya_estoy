@@ -39,14 +39,14 @@ public class RestauranteDbContext : DbContext
             new MenuItem { Id = Guid.Parse("44444444-4444-4444-4444-444444444444"), Categoria = "Platos Principales", Nombre = "Milanesa con Papas", Precio = 8500, Activo = true }
         );
 
-        // Seeding de admin por defecto con hash estático generado pre-calculado para "admin123"
+        // Seeding de admin por defecto
         modelBuilder.Entity<Usuario>().HasData(
             new Usuario 
             { 
                 Id = Guid.Parse("55555555-5555-5555-5555-555555555555"), 
                 NombreCompleto = "Administrador", 
-                Email = "admin@r.com", 
-                PasswordHash = "$2a$11$eGPDhy51VNdhBOm9/5zoBeTPuPW9QSYI7UIloW4dm1iyq.NYrK7eO",
+                Email = "admin", 
+                PasswordHash = "$2a$11$A9snZ9y7jC9Z6s8013gbAuj8k7rpdEhUM0GCmHrXao6vxqnhNC8ta", // admin123
                 Rol = SistemaMozoQr.Domain.Enums.Rol.Admin 
             },
             new Usuario
