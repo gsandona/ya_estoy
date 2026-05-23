@@ -71,10 +71,13 @@ import { FormsModule } from '@angular/forms';
         <div class="w-full max-w-sm space-y-4">
           <button 
             (click)="llamarMozo()"
-            [disabled]="loadingLlamar()"
-            class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center">
+            [disabled]="loadingLlamar() || yaLlamo()"
+            [ngClass]="{'opacity-50 cursor-not-allowed': yaLlamo()}"
+            class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center transition-all">
             @if (loadingLlamar()) {
               <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
+            } @else if (yaLlamo()) {
+              ✅ Mozo notificado
             } @else {
               🛎️ Llamar Mozo
             }
@@ -82,10 +85,13 @@ import { FormsModule } from '@angular/forms';
 
           <button 
             (click)="pedirCuenta()"
-            [disabled]="loadingCuenta()"
-            class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center">
+            [disabled]="loadingCuenta() || yaPidioCuenta()"
+            [ngClass]="{'opacity-50 cursor-not-allowed': yaPidioCuenta()}"
+            class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center transition-all">
             @if (loadingCuenta()) {
               <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
+            } @else if (yaPidioCuenta()) {
+              ✅ Cuenta solicitada
             } @else {
               💳 Pedir Cuenta
             }
@@ -209,12 +215,32 @@ export class PedidoComponent implements OnInit {
   loadingCuenta = signal(false);
   loadingPedido = signal(false);
   
+  yaLlamo = signal(false);
+  yaPidioCuenta = signal(false);
+
   showMenu = signal(false);
   showCartModal = signal(false);
   showSuccessToast = signal(false);
 
   ngOnInit() {
+    this.checkCooldowns();
     this.verifyMesa();
+  }
+
+  checkCooldowns() {
+    const llamoTime = localStorage.getItem(`mesa_${this.id}_llamo`);
+    if (llamoTime) {
+      const diff = Date.now() - parseInt(llamoTime, 10);
+      if (diff < 15 * 60 * 1000) this.yaLlamo.set(true); // 15 mins
+      else localStorage.removeItem(`mesa_${this.id}_llamo`);
+    }
+
+    const cuentaTime = localStorage.getItem(`mesa_${this.id}_cuenta`);
+    if (cuentaTime) {
+      const diff = Date.now() - parseInt(cuentaTime, 10);
+      if (diff < 15 * 60 * 1000) this.yaPidioCuenta.set(true);
+      else localStorage.removeItem(`mesa_${this.id}_cuenta`);
+    }
   }
 
   verifyMesa(pinParam?: string) {
@@ -264,6 +290,8 @@ export class PedidoComponent implements OnInit {
     this.loadingLlamar.set(true);
     try {
       await this.signalrService.sendLlamarMozo(Number(this.id));
+      this.yaLlamo.set(true);
+      localStorage.setItem(`mesa_${this.id}_llamo`, Date.now().toString());
     } finally {
       setTimeout(() => this.loadingLlamar.set(false), 800);
     }
@@ -273,6 +301,8 @@ export class PedidoComponent implements OnInit {
     this.loadingCuenta.set(true);
     try {
       await this.signalrService.sendPedirCuenta(Number(this.id));
+      this.yaPidioCuenta.set(true);
+      localStorage.setItem(`mesa_${this.id}_cuenta`, Date.now().toString());
     } finally {
       setTimeout(() => this.loadingCuenta.set(false), 800);
     }

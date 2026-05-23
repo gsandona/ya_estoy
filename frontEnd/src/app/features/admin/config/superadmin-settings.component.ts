@@ -35,6 +35,13 @@ export interface SystemSetting {
             </div>
           </div>
           
+          <div class="w-full max-w-md">
+            <label class="block text-xs font-semibold text-gray-500 mb-1">Hora de Ejecución (ej: 04:00)</label>
+            <div class="flex items-center gap-2">
+              <input type="time" [(ngModel)]="cleanupTime" name="cleanupTime" class="w-40 px-4 py-3 rounded-xl border border-gray-300 font-bold text-gray-800" required>
+            </div>
+          </div>
+          
           <div class="flex items-center gap-3 mt-4">
              <button type="submit" [disabled]="isSaving()" class="bg-accent text-white px-8 py-3 rounded-xl font-bold shadow-sm hover:bg-opacity-90 transition-all flex items-center gap-2 disabled:opacity-50">
                 @if (isSaving()) {
@@ -57,6 +64,7 @@ export class SuperadminSettingsComponent implements OnInit {
   private auth = inject(AuthService);
 
   cleanupHours = signal<number>(24);
+  cleanupTime = signal<string>('04:00');
   isSaving = signal(false);
   saveSuccess = signal(false);
 
@@ -69,6 +77,11 @@ export class SuperadminSettingsComponent implements OnInit {
         if (cleanupSetting && cleanupSetting.value) {
           this.cleanupHours.set(parseInt(cleanupSetting.value, 10) || 24);
         }
+        
+        const timeSetting = settings.find(s => s.key === 'CleanupJobTimeOfDay');
+        if (timeSetting && timeSetting.value) {
+          this.cleanupTime.set(timeSetting.value);
+        }
       },
       error: (err) => console.error('Error fetching settings:', err)
     });
@@ -78,24 +91,28 @@ export class SuperadminSettingsComponent implements OnInit {
     e.preventDefault();
     this.isSaving.set(true);
 
-    const updatePayload: SystemSetting = {
+    const updateHoursPayload: SystemSetting = {
       key: 'CleanupJobIntervalHours',
       value: this.cleanupHours().toString()
     };
+    
+    const updateTimePayload: SystemSetting = {
+      key: 'CleanupJobTimeOfDay',
+      value: this.cleanupTime()
+    };
 
-    this.http.post(`${environment.apiUrl}/api/settings`, updatePayload, {
-      headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
-    }).subscribe({
-      next: () => {
+    // Guardamos ambas configuraciones de forma asíncrona
+    Promise.all([
+      this.http.post(`${environment.apiUrl}/api/settings`, updateHoursPayload, { headers: { 'Authorization': `Bearer ${this.auth.getToken()}` } }).toPromise(),
+      this.http.post(`${environment.apiUrl}/api/settings`, updateTimePayload, { headers: { 'Authorization': `Bearer ${this.auth.getToken()}` } }).toPromise()
+    ]).then(() => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
         setTimeout(() => this.saveSuccess.set(false), 3000);
-      },
-      error: (err) => {
+    }).catch(err => {
         this.isSaving.set(false);
         alert('❌ Error al guardar la configuración.');
         console.error(err);
-      }
     });
   }
 }

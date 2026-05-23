@@ -26,6 +26,11 @@ public class TaskCleanupService : BackgroundService
             try
             {
                 int delayHours = 24;
+                TimeSpan targetTime = new TimeSpan(4, 0, 0); // 04:00 AM por defecto
+
+                TimeZoneInfo argTz;
+                try { argTz = TimeZoneInfo.FindSystemTimeZoneById("America/Argentina/Buenos_Aires"); }
+                catch { argTz = TimeZoneInfo.FindSystemTimeZoneById("Argentina Standard Time"); }
 
                 using (var scope = _serviceProvider.CreateScope())
                 {
@@ -36,6 +41,13 @@ public class TaskCleanupService : BackgroundService
                     if (setting != null && int.TryParse(setting.Value, out int hours) && hours > 0)
                     {
                         delayHours = hours;
+                    }
+
+                    // Retrieve configured time of day
+                    var timeSetting = await dbContext.SystemSettings.FindAsync("CleanupJobTimeOfDay");
+                    if (timeSetting != null && TimeSpan.TryParse(timeSetting.Value, out TimeSpan parsedTime))
+                    {
+                        targetTime = parsedTime;
                     }
 
                     // Perform cleanup
@@ -51,8 +63,20 @@ public class TaskCleanupService : BackgroundService
                     }
                 }
 
-                _logger.LogInformation($"Task Cleanup Service will run again in {delayHours} hours.");
-                await Task.Delay(TimeSpan.FromHours(delayHours), stoppingToken);
+                // Calcular próxima ejecución usando la zona horaria correcta
+                var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, argTz);
+                var nextRun = now.Date.Add(targetTime);
+
+                // Si la hora ya pasó hoy, sumamos el intervalo (ej: 24 hs para el próximo día)
+                while (nextRun <= now)
+                {
+                    nextRun = nextRun.AddHours(delayHours);
+                }
+
+                var delay = nextRun - now;
+                _logger.LogInformation($"Task Cleanup Service will run again at {nextRun} (in {delay.TotalHours:F2} hours).");
+                
+                await Task.Delay(delay, stoppingToken);
             }
             catch (Exception ex)
             {
