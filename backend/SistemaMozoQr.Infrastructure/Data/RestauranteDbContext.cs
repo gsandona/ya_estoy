@@ -1,11 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using SistemaMozoQr.Domain.Entities;
+using SistemaMozoQr.Application.Interfaces;
+using SistemaMozoQr.Domain.Entities;
 
 namespace SistemaMozoQr.Infrastructure.Data;
 
 public class RestauranteDbContext : DbContext
 {
-    public RestauranteDbContext(DbContextOptions<RestauranteDbContext> options) : base(options) { }
+    private readonly ICurrentUserService? _currentUserService;
+
+    public RestauranteDbContext(DbContextOptions<RestauranteDbContext> options, ICurrentUserService? currentUserService = null) : base(options) 
+    { 
+        _currentUserService = currentUserService;
+    }
 
     public DbSet<Mesa> Mesas { get; set; }
     public DbSet<MenuItem> MenuItems { get; set; }
@@ -13,8 +20,9 @@ public class RestauranteDbContext : DbContext
     public DbSet<PedidoItem> PedidoItems { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
     public DbSet<MesaTask> Tasks { get; set; }
-
     public DbSet<SystemSetting> SystemSettings { get; set; }
+    public DbSet<AuditoriaLog> Auditorias { get; set; }
+    public DbSet<ErrorLog> ErrorLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,5 +66,45 @@ public class RestauranteDbContext : DbContext
                 Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin
             }
         );
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var auditEntries = new List<AuditoriaLog>();
+        var userEmail = _currentUserService?.GetUserEmail() ?? "Sistema";
+
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            if (entry.Entity is AuditoriaLog || entry.Entity is ErrorLog || entry.Entity is MesaTask || entry.Entity is SystemSetting)
+                continue;
+
+            if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted)
+            {
+                var auditLog = new AuditoriaLog
+                {
+                    UsuarioEmail = userEmail,
+                    Entidad = entry.Entity.GetType().Name,
+                    Accion = entry.State.ToString(),
+                    FechaHora = DateTime.UtcNow,
+                    Detalles = $"Entity state changed to {entry.State}"
+                };
+
+                var idProperty = entry.Entity.GetType().GetProperty("Id");
+                if (idProperty != null)
+                {
+                    var idVal = idProperty.GetValue(entry.Entity);
+                    if (idVal != null) auditLog.EntidadId = idVal.ToString();
+                }
+
+                auditEntries.Add(auditLog);
+            }
+        }
+
+        if (auditEntries.Any())
+        {
+            Auditorias.AddRange(auditEntries);
+        }
+
+        return await base.SaveChangesAsync(cancellationToken);
     }
 }

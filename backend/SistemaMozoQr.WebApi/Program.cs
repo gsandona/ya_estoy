@@ -45,6 +45,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddSignalR();
 
 // Dependency Injection de Clean Architecture
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<SistemaMozoQr.Application.Interfaces.ICurrentUserService, SistemaMozoQr.WebApi.Services.CurrentUserService>();
 builder.Services.AddApplicationServices();
 builder.Services.AddHostedService<SistemaMozoQr.WebApi.Services.TaskCleanupService>();
 builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -73,6 +75,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
+
+app.UseMiddleware<SistemaMozoQr.WebApi.Middlewares.ExceptionHandlingMiddleware>();
 
 // Importante: User Authentication antes de Authorization
 app.UseAuthentication();
