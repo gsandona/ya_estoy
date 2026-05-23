@@ -20,12 +20,12 @@ import { environment } from '../../../../environments/environment';
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
           <form #userForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
             <div class="flex-1 w-full relative">
-              <label class="block text-xs font-semibold text-gray-500 mb-1">Email / Nombre</label>
-              <input type="email" [(ngModel)]="formData.email" name="email" #userEmailCtrl="ngModel" 
-                     maxlength="50" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$"
-                     class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent" required>
+              <label class="block text-xs font-semibold text-gray-500 mb-1">Nombre de Usuario</label>
+              <input type="text" [(ngModel)]="formData.email" name="email" #userEmailCtrl="ngModel" 
+                class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-gray-800"
+                required minlength="3" [ngClass]="{'border-red-500': userEmailCtrl.invalid && userEmailCtrl.touched}">
               @if (userEmailCtrl.invalid && userEmailCtrl.touched) {
-                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Email inválido</span>
+                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Mínimo 3 caracteres</span>
               }
             </div>
             <div class="flex-1 w-full relative">
@@ -57,11 +57,11 @@ import { environment } from '../../../../environments/environment';
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="border-b border-gray-100 text-sm text-gray-500">
-              <th class="py-3 px-4">Correo / Usuario</th>
-              <th class="py-3 px-4">Rol</th>
-              <th class="py-3 px-4 text-right">Acciones</th>
-            </tr>
+              <tr>
+                <th class="py-3 px-4 text-left font-bold text-gray-500 uppercase tracking-wider">Usuario</th>
+                <th class="py-3 px-4 text-left font-bold text-gray-500 uppercase tracking-wider">Rol</th>
+                <th class="py-3 px-4 text-right font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+              </tr>
           </thead>
           <tbody>
             @for (user of dataService.users(); track user.id) {
