@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.elgransabor.app',
-  appName: 'El Gran Sabor',
+  appId: 'com.yaestoy.mozos',
+  appName: 'Ya Estoy Mozos',
   webDir: 'dist/frontend/browser'
 };
 
