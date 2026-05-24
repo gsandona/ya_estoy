@@ -68,51 +68,43 @@ import { FormsModule } from '@angular/forms';
         }
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div class="flex flex-col gap-3">
         @for (task of myPendingTasks(); track task.id) {
-          <div class="bg-white rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.03)] border border-gray-100 p-4 flex flex-col gap-3 transition-all hover:-translate-y-1 hover:shadow-[0_8px_20px_rgb(0,0,0,0.06)] relative overflow-hidden group">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-row items-center gap-4 relative overflow-hidden transition-colors hover:bg-slate-50">
             
-            <div class="absolute top-0 right-0 w-1.5 h-full" [ngClass]="getSideBarClass(task.type)"></div>
+            <!-- Barra lateral indicadora -->
+            <div class="absolute top-0 left-0 w-1.5 h-full" [ngClass]="getSideBarClass(task.type)"></div>
 
-            <!-- Header -->
-            <div class="flex justify-between items-start pr-3">
-              <div class="flex items-center gap-3">
-                <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-slate-50 border border-slate-100 text-primary flex items-center justify-center font-black text-lg sm:text-xl shadow-inner">
-                  {{ task.tableId }}
-                </div>
-                <div>
-                  <h3 class="font-bold text-gray-800 text-base sm:text-lg">Mesa {{ task.tableId }}</h3>
-                  <div class="flex items-center gap-1 mt-0.5">
-                    <span class="text-[10px] sm:text-xs font-medium text-gray-400">Hace</span>
-                    <span class="text-[11px] sm:text-xs font-bold text-gray-600">{{ getMinutesElapsed(task.timestamp) }} min</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="flex justify-between items-center">
-              <span class="px-2.5 py-1 text-[11px] font-bold rounded-lg tracking-wide uppercase shadow-sm" [ngClass]="getTypeClass(task.type)">
-                {{ task.type }}
-              </span>
-              @if(auth.currentUser()?.role === 'Admin') {
-                <button (click)="openReassignModal(task.id)" class="text-[10px] text-blue-500 hover:underline font-bold bg-blue-50 px-2 py-0.5 rounded">Reasignar</button>
-              }
+            <!-- Mesa Info (Izquierda) -->
+            <div class="pl-2 flex flex-col justify-center items-center min-w-[60px] border-r border-gray-100 pr-3">
+               <span class="text-[10px] font-black tracking-wider text-gray-400 uppercase">{{task.type}}</span>
+               <span class="text-2xl font-black text-gray-800 leading-none mt-1">{{ task.tableId }}</span>
             </div>
 
-            <!-- Body -->
-            <div class="flex-1 min-h-[30px]">
-              @if (task.details) {
-                <p class="text-gray-600 text-xs sm:text-sm bg-surface p-2.5 rounded-lg border border-gray-200 font-medium">{{ task.details }}</p>
-              }
+            <!-- Centro: Detalles y Tiempo -->
+            <div class="flex-1 flex flex-col justify-center min-w-0">
+               <div class="flex items-center gap-2 mb-1">
+                 <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                   ⏱ {{ getMinutesElapsed(task.timestamp) }} min
+                 </span>
+                 @if(auth.currentUser()?.role === 'Admin') {
+                   <button (click)="openReassignModal(task.id)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded-full">Reasignar</button>
+                 }
+               </div>
+               @if (task.details) {
+                 <p class="text-gray-600 text-xs sm:text-sm font-medium truncate">{{ task.details }}</p>
+               } @else {
+                 <p class="text-gray-400 text-xs italic">Sin detalles</p>
+               }
             </div>
 
-            <!-- Actions -->
-            <div class="flex gap-2 mt-1">
-              <button class="flex-1 bg-primary text-white py-2 sm:py-2.5 rounded-lg text-[11px] sm:text-xs font-bold hover:bg-[#1a233b] transition-all active:scale-95 shadow-md">
+            <!-- Derecha: Botones -->
+            <div class="flex flex-col sm:flex-row gap-2">
+              <button class="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1a233b] transition-colors shadow-sm whitespace-nowrap">
                 Atender
               </button>
-              <button (click)="completar(task.id)" class="flex-1 bg-white text-gray-700 border-2 border-gray-200 py-2 sm:py-2.5 rounded-lg text-[11px] sm:text-xs font-bold hover:border-accent hover:text-accent transition-all active:scale-95">
-                Completar
+              <button (click)="completar(task.id)" class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg text-xs font-bold hover:border-accent hover:text-accent transition-colors whitespace-nowrap">
+                Listo ✔
               </button>
             </div>
           </div>

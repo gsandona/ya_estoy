@@ -224,7 +224,8 @@ export class PedidoComponent implements OnInit {
 
   ngOnInit() {
     this.checkCooldowns();
-    this.verifyMesa();
+    const savedPin = localStorage.getItem(`mesa_pin_${this.id}`);
+    this.verifyMesa(savedPin || undefined);
   }
 
   checkCooldowns() {
@@ -252,7 +253,10 @@ export class PedidoComponent implements OnInit {
 
     this.http.get<any>(url).subscribe({
       next: (res) => {
-        if(pinParam) this.validatingPin.set(false);
+        if(pinParam) {
+          this.validatingPin.set(false);
+          localStorage.setItem(`mesa_pin_${this.id}`, pinParam);
+        }
         this.requirePin.set(false);
         this.pinError.set(null);
 
@@ -269,13 +273,16 @@ export class PedidoComponent implements OnInit {
         if(pinParam) this.validatingPin.set(false);
         if (err.status === 401) {
           // Requiere PIN
+          localStorage.removeItem(`mesa_pin_${this.id}`);
           this.requirePin.set(true);
           this.isValidSession.set(undefined);
         } else if (err.status === 400 && pinParam) {
           // PIN Incorrecto
+          localStorage.removeItem(`mesa_pin_${this.id}`);
           this.pinError.set('El PIN ingresado es incorrecto.');
         } else {
           // Mesa apagada, token expiro, etc.
+          localStorage.removeItem(`mesa_pin_${this.id}`);
           this.requirePin.set(false);
           console.error('Violación de seguridad o mesa inactiva', err);
           setTimeout(() => this.isValidSession.set(false), 800);
