@@ -22,29 +22,29 @@ import { FormsModule } from '@angular/forms';
       }
       
       <!-- Panel de Mesas (Control de PIN) -->
-      <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
-        <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-4">Control de Mesas</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+        <h2 class="text-xl sm:text-2xl font-black text-gray-800 tracking-tight mb-3">Control de Mesas</h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
           @for(mesa of myMesas(); track mesa.id) {
-            <div class="border rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 relative overflow-hidden"
+            <div class="border rounded-2xl p-3 flex flex-col items-center justify-center text-center gap-1.5 relative overflow-hidden"
                  [ngClass]="mesa.codigoAcceso ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'">
-              <span class="text-lg font-bold text-gray-700">Mesa {{ mesa.numero }}</span>
+              <span class="text-sm sm:text-base font-bold text-gray-700">Mesa {{ mesa.numero }}</span>
               @if(mesa.codigoAcceso) {
-                <span class="text-3xl font-black tracking-widest text-green-600 my-2">{{ mesa.codigoAcceso }}</span>
-                <button (click)="cerrarMesa(mesa.id)" class="bg-red-100 text-red-600 px-4 py-1.5 rounded-full text-xs font-bold hover:bg-red-200 w-full">Cerrar</button>
+                <span class="text-xl sm:text-2xl font-black tracking-widest text-green-600 my-1">{{ mesa.codigoAcceso }}</span>
+                <button (click)="cerrarMesa(mesa.id)" class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold hover:bg-red-200 w-full">Cerrar</button>
               } @else {
-                <span class="text-sm font-medium text-gray-400 my-3">Inactiva</span>
-                <button (click)="abrirMesa(mesa.id)" class="bg-green-600 text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-green-700 w-full shadow-sm">Abrir</button>
+                <span class="text-[10px] sm:text-xs font-medium text-gray-400 my-1.5">Inactiva</span>
+                <button (click)="abrirMesa(mesa.id)" class="bg-green-600 text-white px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold hover:bg-green-700 w-full shadow-sm">Abrir</button>
               }
             </div>
           }
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
         <div>
-          <h1 class="text-3xl font-black text-gray-800 tracking-tight">Tareas Activas</h1>
-          <p class="text-gray-500 font-medium mt-1">Monitorea y atiende las solicitudes en tiempo real</p>
+          <h1 class="text-2xl sm:text-3xl font-black text-gray-800 tracking-tight">Tareas Activas</h1>
+          <p class="text-xs sm:text-sm text-gray-500 font-medium mt-1">Monitorea y atiende las solicitudes</p>
         </div>
         
         <!-- Filtros (Solo Admin) -->
@@ -68,50 +68,50 @@ import { FormsModule } from '@angular/forms';
         }
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         @for (task of myPendingTasks(); track task.id) {
-          <div class="bg-white rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 p-6 flex flex-col gap-5 transition-all hover:-translate-y-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] relative overflow-hidden group">
+          <div class="bg-white rounded-2xl shadow-[0_4px_15px_rgb(0,0,0,0.03)] border border-gray-100 p-4 flex flex-col gap-3 transition-all hover:-translate-y-1 hover:shadow-[0_8px_20px_rgb(0,0,0,0.06)] relative overflow-hidden group">
             
-            <div class="absolute top-0 right-0 w-2 h-full" [ngClass]="getSideBarClass(task.type)"></div>
+            <div class="absolute top-0 right-0 w-1.5 h-full" [ngClass]="getSideBarClass(task.type)"></div>
 
             <!-- Header -->
-            <div class="flex justify-between items-start pr-4">
-              <div class="flex items-center gap-4">
-                <div class="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 text-primary flex items-center justify-center font-black text-2xl shadow-inner">
+            <div class="flex justify-between items-start pr-3">
+              <div class="flex items-center gap-3">
+                <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-slate-50 border border-slate-100 text-primary flex items-center justify-center font-black text-lg sm:text-xl shadow-inner">
                   {{ task.tableId }}
                 </div>
                 <div>
-                  <h3 class="font-bold text-gray-800 text-xl">Mesa {{ task.tableId }}</h3>
-                  <div class="flex items-center gap-1.5 mt-0.5">
-                    <span class="text-xs font-medium text-gray-400">Hace</span>
-                    <span class="text-sm font-bold text-gray-600">{{ getMinutesElapsed(task.timestamp) }} min</span>
+                  <h3 class="font-bold text-gray-800 text-base sm:text-lg">Mesa {{ task.tableId }}</h3>
+                  <div class="flex items-center gap-1 mt-0.5">
+                    <span class="text-[10px] sm:text-xs font-medium text-gray-400">Hace</span>
+                    <span class="text-[11px] sm:text-xs font-bold text-gray-600">{{ getMinutesElapsed(task.timestamp) }} min</span>
                   </div>
                 </div>
               </div>
             </div>
             
             <div class="flex justify-between items-center">
-              <span class="px-3.5 py-1.5 text-[13px] font-bold rounded-xl tracking-wide uppercase shadow-sm" [ngClass]="getTypeClass(task.type)">
+              <span class="px-2.5 py-1 text-[11px] font-bold rounded-lg tracking-wide uppercase shadow-sm" [ngClass]="getTypeClass(task.type)">
                 {{ task.type }}
               </span>
               @if(auth.currentUser()?.role === 'Admin') {
-                <button (click)="openReassignModal(task.id)" class="text-xs text-blue-500 hover:underline font-bold bg-blue-50 px-2 py-1 rounded">Reasignar</button>
+                <button (click)="openReassignModal(task.id)" class="text-[10px] text-blue-500 hover:underline font-bold bg-blue-50 px-2 py-0.5 rounded">Reasignar</button>
               }
             </div>
 
             <!-- Body -->
-            <div class="flex-1 min-h-[40px]">
+            <div class="flex-1 min-h-[30px]">
               @if (task.details) {
-                <p class="text-gray-600 text-sm bg-surface p-3.5 rounded-xl border border-gray-200 font-medium">{{ task.details }}</p>
+                <p class="text-gray-600 text-xs sm:text-sm bg-surface p-2.5 rounded-lg border border-gray-200 font-medium">{{ task.details }}</p>
               }
             </div>
 
             <!-- Actions -->
-            <div class="flex gap-3 mt-2">
-              <button class="flex-1 bg-primary text-white py-3 rounded-xl text-sm font-bold hover:bg-[#1a233b] transition-all active:scale-95 shadow-md">
+            <div class="flex gap-2 mt-1">
+              <button class="flex-1 bg-primary text-white py-2 sm:py-2.5 rounded-lg text-[11px] sm:text-xs font-bold hover:bg-[#1a233b] transition-all active:scale-95 shadow-md">
                 Atender
               </button>
-              <button (click)="completar(task.id)" class="flex-1 bg-white text-gray-700 border-2 border-gray-200 py-3 rounded-xl text-sm font-bold hover:border-accent hover:text-accent transition-all active:scale-95">
+              <button (click)="completar(task.id)" class="flex-1 bg-white text-gray-700 border-2 border-gray-200 py-2 sm:py-2.5 rounded-lg text-[11px] sm:text-xs font-bold hover:border-accent hover:text-accent transition-all active:scale-95">
                 Completar
               </button>
             </div>

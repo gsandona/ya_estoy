@@ -250,11 +250,19 @@ export class PedidoComponent implements OnInit {
       ? `${environment.apiUrl}/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
       : `${environment.apiUrl}/api/mesas/verify?mesaId=${this.id}`;
 
-    this.http.get(url).subscribe({
-      next: () => {
+    this.http.get<any>(url).subscribe({
+      next: (res) => {
         if(pinParam) this.validatingPin.set(false);
         this.requirePin.set(false);
         this.pinError.set(null);
+
+        // Sincronizar con el backend: si el mozo ya lo completó, desbloqueamos
+        if (res.hasLlamado) this.yaLlamo.set(true);
+        else { this.yaLlamo.set(false); localStorage.removeItem(`mesa_${this.id}_llamo`); }
+
+        if (res.hasCuenta) this.yaPidioCuenta.set(true);
+        else { this.yaPidioCuenta.set(false); localStorage.removeItem(`mesa_${this.id}_cuenta`); }
+
         setTimeout(() => this.isValidSession.set(true), 800);
       },
       error: (err) => {

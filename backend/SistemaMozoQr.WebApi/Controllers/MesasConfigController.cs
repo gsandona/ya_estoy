@@ -13,11 +13,13 @@ public class MesasConfigController : ControllerBase
 {
     private readonly IMesaRepository _mesaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly ITaskRepository _taskRepository;
 
-    public MesasConfigController(IMesaRepository mesaRepository, IUsuarioRepository usuarioRepository)
+    public MesasConfigController(IMesaRepository mesaRepository, IUsuarioRepository usuarioRepository, ITaskRepository taskRepository)
     {
         _mesaRepository = mesaRepository;
         _usuarioRepository = usuarioRepository;
+        _taskRepository = taskRepository;
     }
 
     [HttpGet]
@@ -168,17 +170,29 @@ public class MesasConfigController : ControllerBase
         if (string.IsNullOrEmpty(mesa.CodigoAcceso) || mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible)
             return BadRequest(new { message = "La mesa se encuentra inactiva. Solicite al mozo que la habilite.", code = "INACTIVA" });
 
-        // Validar PIN proporcionado
-        if (!string.IsNullOrEmpty(pin))
+        // Si no envía PIN, retornamos 401 para que el front pida el PIN
+        if (string.IsNullOrEmpty(pin))
         {
-            if (mesa.CodigoAcceso != pin)
-            {
-                return BadRequest(new { message = "PIN incorrecto.", code = "PIN_INVALIDO" });
-            }
-            return Ok(new { mesaId = mesa.Id, numero = mesa.Numero, estado = mesa.Estado, validado = true });
+            return Unauthorized(new { message = "Se requiere el PIN de la mesa.", mesaId = mesa.Id, numero = mesa.Numero });
         }
 
-        // Si no envía PIN, retornamos 401 para que el front pida el PIN
-        return Unauthorized(new { message = "Se requiere el PIN de la mesa.", mesaId = mesa.Id, numero = mesa.Numero });
+        if (mesa.CodigoAcceso != pin)
+        {
+            return BadRequest(new { message = "PIN incorrecto.", code = "PIN_INVALIDO" });
+        }
+
+        var pendingTasks = await _taskRepository.GetPendingTasksAsync();
+        var mesaTasks = pendingTasks.Where(t => t.TableId == mesa.Numero).ToList();
+        var hasLlamado = mesaTasks.Any(t => t.Type == "Llamado");
+        var hasCuenta = mesaTasks.Any(t => t.Type == "Cuenta");
+
+        return Ok(new { 
+            mesaId = mesa.Id, 
+            numero = mesa.Numero, 
+            estado = mesa.Estado, 
+            validado = true,
+            hasLlamado,
+            hasCuenta
+        });
     }
 }
