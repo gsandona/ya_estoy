@@ -53,8 +53,19 @@ export class SignalrService {
     this.hubConnection.onreconnected(() => {
       this.isConnected.set(true);
       this.fetchPendingTasks(); // Refetch en caso de que hayamos perdido algo
+      this.autoJoinGroup();
     });
     this.hubConnection.onclose(() => this.isConnected.set(false));
+  }
+
+  private autoJoinGroup() {
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        this.joinGroup(user.role, user.id);
+      } catch (e) {}
+    }
   }
 
   private startConnection() {
@@ -64,6 +75,7 @@ export class SignalrService {
         .then(() => {
           console.log('SignalR connection established...');
           this.isConnected.set(true);
+          this.autoJoinGroup();
         })
         .catch(err => console.log('Error while starting SignalR connection: ' + err));
     }
