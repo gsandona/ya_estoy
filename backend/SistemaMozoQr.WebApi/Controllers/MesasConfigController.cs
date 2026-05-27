@@ -8,7 +8,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/mesas")]
-[Authorize(Roles = "Admin,Mozo")]
+[Authorize(Roles = "Admin,SuperAdmin,Mozo")]
 public class MesasConfigController : ControllerBase
 {
     private readonly IMesaRepository _mesaRepository;
@@ -38,7 +38,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> Crear([FromBody] CrearMesaDto dto)
     {
         var mesa = new Mesa
@@ -55,7 +55,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> Editar(Guid id, [FromBody] EditarMesaDto dto)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -71,7 +71,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> Eliminar(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -82,7 +82,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("bulk")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
     public async Task<IActionResult> BulkSync([FromBody] List<BulkMesaDto> dtos)
     {
         var usuarios = await _usuarioRepository.GetAllAsync();
@@ -115,7 +115,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("{id:guid}/abrir")]
-    [Authorize(Roles = "Admin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
     public async Task<IActionResult> Abrir(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -131,7 +131,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("{id:guid}/cerrar")]
-    [Authorize(Roles = "Admin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
     public async Task<IActionResult> Cerrar(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);

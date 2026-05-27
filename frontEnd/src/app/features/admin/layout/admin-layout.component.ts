@@ -2,11 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { TenantSelectorComponent } from './tenant-selector/tenant-selector.component';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, TenantSelectorComponent],
   template: `
     <div class="min-h-screen bg-surface flex">
       <!-- Desktop Sidebar -->
@@ -64,8 +65,9 @@ import { CommonModule } from '@angular/common';
             <h2 class="text-xl font-bold text-gray-800">Panel de Control <span class="text-accent">({{ auth.currentUser()?.role }})</span></h2>
           </div>
           
-          <!-- User Profile -->
+          <!-- User Profile and Tenant Selector -->
           <div class="flex items-center gap-4">
+            <app-tenant-selector></app-tenant-selector>
             <div class="flex flex-col items-end">
                <span class="font-bold text-sm">{{ auth.currentUser()?.email }}</span>
                <span class="text-xs text-green-500 font-semibold">Online</span>

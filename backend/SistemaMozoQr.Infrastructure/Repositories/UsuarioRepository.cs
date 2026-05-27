@@ -39,7 +39,7 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario?> GetByEmailAsync(string email)
     {
-        return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.Usuarios.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task UpdateAsync(Usuario usuario)

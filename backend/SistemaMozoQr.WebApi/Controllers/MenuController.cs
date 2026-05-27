@@ -8,7 +8,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/menu")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,SuperAdmin")]
 public class MenuController : ControllerBase
 {
     private readonly IMenuItemRepository _menuRepository;
@@ -20,9 +20,17 @@ public class MenuController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous] // Permitimos a todos ver el menú
-    public async Task<IActionResult> GetMenu()
+    public async Task<IActionResult> GetMenu([FromQuery] Guid? restauranteId = null)
     {
-        var items = await _menuRepository.GetAllActivosAsync();
+        IEnumerable<MenuItem> items;
+        if (restauranteId.HasValue)
+        {
+            items = await _menuRepository.GetAllActivosPorRestauranteAsync(restauranteId.Value);
+        }
+        else
+        {
+            items = await _menuRepository.GetAllActivosAsync();
+        }
         return Ok(items);
     }
 

@@ -116,7 +116,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
 
     public async Task JoinGroup(string role, string? userId)
     {
-        if (role == "Admin")
+        if (role == "Admin" || role == "SuperAdmin")
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Admin");
         }

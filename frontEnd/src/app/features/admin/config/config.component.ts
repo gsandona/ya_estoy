@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { AbmUsuariosComponent } from './abm-usuarios.component';
 import { AbmMesasComponent } from './abm-mesas.component';
 import { AbmMenuComponent } from './abm-menu.component';
+import { AbmRestaurantesComponent } from './abm-restaurantes.component';
 
 @Component({
   selector: 'app-config',
   standalone: true,
-  imports: [CommonModule, AbmUsuariosComponent, AbmMesasComponent, AbmMenuComponent],
+  imports: [CommonModule, AbmUsuariosComponent, AbmMesasComponent, AbmMenuComponent, AbmRestaurantesComponent],
   template: `
     <div class="space-y-8 animate-fade-in">
       <div class="bg-white p-8 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 flex justify-between items-center">
@@ -42,6 +43,13 @@ import { AbmMenuComponent } from './abm-menu.component';
             <p class="text-sm text-gray-500 mb-4">Añade productos, configura precios, descripciones y disponibilidad.</p>
             <button type="button" class="w-full bg-surface text-primary py-2.5 rounded-xl text-sm font-bold border border-gray-200 hover:bg-gray-100">Gestionar Carta</button>
           </div>
+
+          <div (click)="setTab('restaurantes')" class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-lg transition cursor-pointer hover:-translate-y-1">
+            <div class="h-14 w-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-4">🏪</div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">ABM de Restaurantes</h2>
+            <p class="text-sm text-gray-500 mb-4">Configura los datos y la identidad de los establecimientos.</p>
+            <button type="button" class="w-full bg-surface text-primary py-2.5 rounded-xl text-sm font-bold border border-gray-200 hover:bg-gray-100">Gestionar Sedes</button>
+          </div>
         </div>
       }
 
@@ -53,6 +61,9 @@ import { AbmMenuComponent } from './abm-menu.component';
       }
       @if (activeTab === 'menu') {
         <app-abm-menu class="block"></app-abm-menu>
+      }
+      @if (activeTab === 'restaurantes') {
+        <app-abm-restaurantes class="block"></app-abm-restaurantes>
       }
     </div>
   `,
@@ -67,9 +78,9 @@ import { AbmMenuComponent } from './abm-menu.component';
   `]
 })
 export class ConfigComponent {
-  activeTab: 'home' | 'usuarios' | 'mesas' | 'menu' = 'home';
+  activeTab: 'home' | 'usuarios' | 'mesas' | 'menu' | 'restaurantes' = 'home';
 
-  setTab(tab: 'home' | 'usuarios' | 'mesas' | 'menu') {
+  setTab(tab: 'home' | 'usuarios' | 'mesas' | 'menu' | 'restaurantes') {
     this.activeTab = tab;
   }
 }

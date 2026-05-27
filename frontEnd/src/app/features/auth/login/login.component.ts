@@ -37,7 +37,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <span class="text-xl text-primary font-bold mt-1">Management Staff</span>
         </h2>
         <p class="mt-4 text-center text-sm text-gray-500 font-medium">
-          Acceso privado · Usa <span class="text-accent">admin</span>
+          Acceso privado · Usa tu <span class="text-accent">correo electrónico</span>
         </p>
       </div>
 
@@ -46,16 +46,19 @@ import { AuthService } from '../../../core/services/auth.service';
           
           <form class="space-y-6" (submit)="onLogin($event)">
             <div>
-              <label for="email" class="block text-sm font-bold text-gray-700">Usuario</label>
+              <label for="email" class="block text-sm font-bold text-gray-700">Correo Electrónico</label>
               <div class="mt-2 relative">
-                <input id="email" [(ngModel)]="email" name="email" type="text" required 
+                <input id="email" [(ngModel)]="email" name="email" type="email" required email
                   maxlength="50"
                   #emailCtrl="ngModel"
                   class="appearance-none block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent focus:border-accent text-lg transition-colors bg-gray-50 focus:bg-white"
                   [ngClass]="{'border-red-500': emailCtrl.invalid && emailCtrl.touched}"
-                  placeholder="admin">
+                  placeholder="usuario@restaurante.com">
                 @if (emailCtrl.invalid && emailCtrl.touched) {
-                  <p class="text-red-500 text-xs mt-1 absolute -bottom-5">Usuario inválido o demasiado largo.</p>
+                  <p class="text-red-500 text-xs mt-1 absolute -bottom-5">
+                    @if(emailCtrl.errors?.['required']) { Correo es requerido. }
+                    @if(emailCtrl.errors?.['email']) { Formato de correo inválido. }
+                  </p>
                 }
               </div>
             </div>

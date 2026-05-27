@@ -7,7 +7,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,SuperAdmin")]
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioService _usuarioService;

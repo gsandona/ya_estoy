@@ -1,9 +1,10 @@
 using SistemaMozoQr.Domain.Enums;
+using SistemaMozoQr.Domain.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMozoQr.Domain.Entities;
 
-public class Mesa
+public class Mesa : IMustHaveTenant
 {
     public Guid Id { get; set; }
     
@@ -23,4 +24,7 @@ public class Mesa
 
     [MaxLength(10)]
     public string? CodigoAcceso { get; set; } // PIN de acceso generado cuando se abre la mesa
+
+    public Guid RestauranteId { get; set; }
+    public Restaurante? Restaurante { get; set; }
 }

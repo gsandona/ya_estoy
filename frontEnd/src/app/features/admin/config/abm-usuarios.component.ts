@@ -20,12 +20,16 @@ import { environment } from '../../../../environments/environment';
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
           <form #userForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
             <div class="flex-1 w-full relative">
-              <label class="block text-xs font-semibold text-gray-500 mb-1">Nombre de Usuario</label>
-              <input type="text" [(ngModel)]="formData.email" name="email" #userEmailCtrl="ngModel" 
+              <label class="block text-xs font-semibold text-gray-500 mb-1">Correo Electrónico (Usuario)</label>
+              <input type="email" [(ngModel)]="formData.email" name="email" #userEmailCtrl="ngModel" 
                 class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all font-medium text-gray-800"
-                required minlength="3" [ngClass]="{'border-red-500': userEmailCtrl.invalid && userEmailCtrl.touched}">
+                required email minlength="3" [ngClass]="{'border-red-500': userEmailCtrl.invalid && userEmailCtrl.touched}">
               @if (userEmailCtrl.invalid && userEmailCtrl.touched) {
-                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Mínimo 3 caracteres</span>
+                <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">
+                  @if(userEmailCtrl.errors?.['required']) { Obligatorio }
+                  @if(userEmailCtrl.errors?.['email']) { Formato inválido }
+                  @if(userEmailCtrl.errors?.['minlength']) { Mínimo 3 caracteres }
+                </span>
               }
             </div>
             <div class="flex-1 w-full relative">

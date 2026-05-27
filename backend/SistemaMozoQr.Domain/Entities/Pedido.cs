@@ -1,9 +1,10 @@
 using SistemaMozoQr.Domain.Enums;
+using SistemaMozoQr.Domain.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMozoQr.Domain.Entities;
 
-public class Pedido
+public class Pedido : IMustHaveTenant
 {
     public Guid Id { get; set; }
     
@@ -18,4 +19,7 @@ public class Pedido
     public DateTime Fecha { get; set; } = DateTime.UtcNow;
     
     public List<PedidoItem> Items { get; set; } = new();
+
+    public Guid RestauranteId { get; set; }
+    public Restaurante? Restaurante { get; set; }
 }

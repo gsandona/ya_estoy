@@ -24,4 +24,32 @@ public class CurrentUserService : ICurrentUserService
     {
         return _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
     }
+
+    public Guid? GetRestauranteId()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext == null) return null;
+
+        if (IsSuperAdmin())
+        {
+            if (httpContext.Request.Headers.TryGetValue("X-Tenant-ID", out var tenantHeader) && Guid.TryParse(tenantHeader, out var parsedTenantId))
+            {
+                return parsedTenantId;
+            }
+            return null; // SuperAdmin con vista global (sin restaurante especifico)
+        }
+
+        var tenantClaim = httpContext.User?.FindFirst("TenantId")?.Value;
+        if (Guid.TryParse(tenantClaim, out var tenantId))
+        {
+            return tenantId;
+        }
+        return null;
+    }
+
+    public bool IsSuperAdmin()
+    {
+        var role = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Role);
+        return role == "SuperAdmin";
+    }
 }

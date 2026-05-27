@@ -1,9 +1,10 @@
 using SistemaMozoQr.Domain.Enums;
+using SistemaMozoQr.Domain.Interfaces;
 using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMozoQr.Domain.Entities;
 
-public class Usuario
+public class Usuario : IMustHaveTenant
 {
     public Guid Id { get; set; }
     
@@ -19,4 +20,6 @@ public class Usuario
     public string PasswordHash { get; set; } = string.Empty;
 
     public Rol Rol { get; set; } = Rol.Mozo;
+
+    public Guid RestauranteId { get; set; }
 }

@@ -26,14 +26,23 @@ public static class DependencyInjection
             var port = uri.Port > 0 ? uri.Port : 5432;
             var database = uri.LocalPath.TrimStart('/');
             connectionString = $"Server={host};Port={port};Database={database};User Id={userInfo[0]};Password={userInfo[1]};SslMode=Prefer;Trust Server Certificate=true;";
+            
+            services.AddDbContext<RestauranteDbContext>(options =>
+                options.UseNpgsql(connectionString));
         }
-
-        services.AddDbContext<RestauranteDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        else
+        {
+            // Fallback a SQLite local si no hay DB en la nube o si usa "Data Source="
+            services.AddDbContext<RestauranteDbContext>(options =>
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")?.Contains("Data Source") == true 
+                    ? configuration.GetConnectionString("DefaultConnection") 
+                    : "Data Source=local.db"));
+        }
 
         services.AddScoped<IMesaRepository, MesaRepository>();
         services.AddScoped<IMenuItemRepository, MenuItemRepository>();
         services.AddScoped<IPedidoRepository, PedidoRepository>();
+        services.AddScoped<IRestauranteRepository, RestauranteRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
 

@@ -24,6 +24,11 @@ public class MenuItemRepository : IMenuItemRepository
         return await _context.MenuItems.Where(m => m.Activo).ToListAsync();
     }
 
+    public async Task<IEnumerable<MenuItem>> GetAllActivosPorRestauranteAsync(Guid restauranteId)
+    {
+        return await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == restauranteId && m.Activo).ToListAsync();
+    }
+
     public async Task<MenuItem?> GetByIdAsync(Guid id)
     {
         return await _context.MenuItems.FindAsync(id);

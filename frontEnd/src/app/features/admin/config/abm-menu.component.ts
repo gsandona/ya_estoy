@@ -18,15 +18,21 @@ import { environment } from '../../../../environments/environment';
 
       @if (showForm()) {
         <div class="bg-surface p-4 rounded-2xl mb-6 border border-gray-200">
-          <form class="flex flex-col gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
+          <form #menuForm="ngForm" class="flex flex-col gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
             <div class="flex flex-col md:flex-row gap-4 w-full">
-              <div class="flex-1">
+              <div class="flex-1 relative">
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Nombre</label>
-                <input type="text" [(ngModel)]="formData.nombre" name="nombre" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
+                <input type="text" [(ngModel)]="formData.nombre" name="nombre" #nombreCtrl="ngModel" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent" [ngClass]="{'border-red-500': nombreCtrl.invalid && nombreCtrl.touched}" required>
+                @if (nombreCtrl.invalid && nombreCtrl.touched) {
+                  <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Obligatorio</span>
+                }
               </div>
-              <div class="w-full md:w-32">
+              <div class="w-full md:w-32 relative">
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Precio ($)</label>
-                <input type="number" [(ngModel)]="formData.precio" name="precio" class="w-full px-3 py-2 rounded-xl border border-gray-300" required>
+                <input type="number" [(ngModel)]="formData.precio" name="precio" #precioCtrl="ngModel" min="0" class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent" [ngClass]="{'border-red-500': precioCtrl.invalid && precioCtrl.touched}" required>
+                @if (precioCtrl.invalid && precioCtrl.touched) {
+                  <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Precio inválido</span>
+                }
               </div>
               <div class="w-full md:w-48">
                 <label class="block text-xs font-semibold text-gray-500 mb-1">Categoría</label>
@@ -50,7 +56,7 @@ import { environment } from '../../../../environments/environment';
               </label>
               <div class="flex gap-2">
                 <button type="button" (click)="showForm.set(false)" class="bg-gray-200 text-gray-600 px-6 py-2 rounded-xl font-bold hover:bg-gray-300">Cancelar</button>
-                <button type="submit" class="bg-accent text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-opacity-90">
+                <button type="submit" [disabled]="menuForm.invalid" class="bg-accent text-white px-6 py-2 rounded-xl font-bold shadow-sm hover:bg-opacity-90 disabled:opacity-50">
                   {{ editingId() ? 'Actualizar Producto' : 'Añadir a Carta' }}
                 </button>
               </div>

@@ -1,6 +1,8 @@
+using SistemaMozoQr.Domain.Interfaces;
+
 namespace SistemaMozoQr.Domain.Entities;
 
-public class ErrorLog
+public class ErrorLog : IMustHaveTenant
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Mensaje { get; set; } = string.Empty;
@@ -8,4 +10,7 @@ public class ErrorLog
     public string RutaAPI { get; set; } = string.Empty;
     public string? UsuarioInvolucrado { get; set; }
     public DateTime FechaHora { get; set; } = DateTime.UtcNow;
+
+    public Guid RestauranteId { get; set; }
+    public Restaurante? Restaurante { get; set; }
 }

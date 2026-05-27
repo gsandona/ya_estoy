@@ -1,13 +1,22 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { TenantContextService } from '../services/tenant-context.service';
 
 export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const token = localStorage.getItem('auth_token');
+  const tenantContext = inject(TenantContextService);
+  const tenantId = tenantContext.currentTenantId;
+
+  let headers = req.headers;
 
   if (token) {
-    const clonedReq = req.clone({
-      headers: req.headers.set('Authorization', `Bearer ${token}`)
-    });
-    return next(clonedReq);
+    headers = headers.set('Authorization', `Bearer ${token}`);
   }
-  return next(req);
+  
+  if (tenantId) {
+    headers = headers.set('X-Tenant-ID', tenantId);
+  }
+
+  const clonedReq = req.clone({ headers });
+  return next(clonedReq);
 };

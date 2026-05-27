@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SistemaMozoQr.Infrastructure.Data;
 
 #nullable disable
@@ -16,41 +15,42 @@ namespace SistemaMozoQr.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.8");
 
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.AuditoriaLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Accion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Detalles")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Entidad")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EntidadId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaHora")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UsuarioEmail")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("Auditorias");
                 });
@@ -59,27 +59,32 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaHora")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Mensaje")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RutaAPI")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("StackTrace")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UsuarioInvolucrado")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("ErrorLogs");
                 });
@@ -88,48 +93,164 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Activo")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Categoria")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Descripcion")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Precio")
-                        .HasColumnType("numeric");
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("MenuItems");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Id = new Guid("88888888-8888-8888-8888-000000000014"),
                             Activo = true,
                             Categoria = "Bebidas",
                             Nombre = "Agua M.",
-                            Precio = 1500m
+                            Precio = 1500m,
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111")
                         },
                         new
                         {
-                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Id = new Guid("88888888-8888-8888-8888-000000000015"),
                             Activo = true,
-                            Categoria = "Platos Principales",
-                            Nombre = "Milanesa con Papas",
-                            Precio = 8500m
+                            Categoria = "Platos",
+                            Nombre = "Milanesa",
+                            Precio = 8500m,
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000016"),
+                            Activo = true,
+                            Categoria = "Pizzas",
+                            Nombre = "Muzzarella",
+                            Precio = 9000m,
+                            RestauranteId = new Guid("22222222-2222-2222-2222-222222222222")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000017"),
+                            Activo = true,
+                            Categoria = "Pizzas",
+                            Descripcion = "Clásica porción fina",
+                            Nombre = "Pizza Servilleta",
+                            Precio = 250m,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000018"),
+                            Activo = true,
+                            Categoria = "Clásicos",
+                            Nombre = "Panchos con mostaza",
+                            Precio = 350m,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000019"),
+                            Activo = true,
+                            Categoria = "Bebidas",
+                            Nombre = "Cerveza Patricia 1L",
+                            Precio = 450m,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000020"),
+                            Activo = true,
+                            Categoria = "Cafetería",
+                            Nombre = "Café de Especialidad",
+                            Precio = 280m,
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000021"),
+                            Activo = true,
+                            Categoria = "Dulces",
+                            Nombre = "Medialunas Rellenas",
+                            Precio = 320m,
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000022"),
+                            Activo = true,
+                            Categoria = "Salados",
+                            Nombre = "Tostado de Campo",
+                            Precio = 450m,
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000023"),
+                            Activo = true,
+                            Categoria = "Pastas",
+                            Nombre = "Ravioles de espinaca",
+                            Precio = 800m,
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000024"),
+                            Activo = true,
+                            Categoria = "Pizzas",
+                            Nombre = "Pizza Margherita",
+                            Precio = 700m,
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000025"),
+                            Activo = true,
+                            Categoria = "Cervezas",
+                            Nombre = "IPA Cordon",
+                            Precio = 350m,
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000026"),
+                            Activo = true,
+                            Categoria = "Comidas",
+                            Nombre = "Hamburguesa Completa",
+                            Precio = 650m,
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666")
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000027"),
+                            Activo = true,
+                            Categoria = "Comidas",
+                            Nombre = "Papas Cheddar y Bacon",
+                            Precio = 450m,
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666")
                         });
                 });
 
@@ -137,48 +258,193 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("CodigoAcceso")
                         .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Estado")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("MozoId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Numero")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TokenQR")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Ubicacion")
                         .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MozoId");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("Mesas");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Id = new Guid("11111000-0000-0000-0000-000000000001"),
                             Estado = 0,
                             Numero = 1,
-                            TokenQR = "MESA1_QR_TOKEN"
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            TokenQR = "MESA1_R1_QR"
                         },
                         new
                         {
-                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Id = new Guid("11111000-0000-0000-0000-000000000002"),
                             Estado = 0,
                             Numero = 2,
-                            TokenQR = "MESA2_QR_TOKEN"
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            TokenQR = "MESA2_R1_QR"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222000-0000-0000-0000-000000000001"),
+                            Estado = 0,
+                            Numero = 1,
+                            RestauranteId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            TokenQR = "MESA1_R2_QR"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000001"),
+                            Estado = 0,
+                            MozoId = new Guid("30000000-0000-0000-0000-000000000001"),
+                            Numero = 1,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            TokenQR = "PASIVA_QR_1",
+                            Ubicacion = "Mesa principal entrada"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000002"),
+                            Estado = 0,
+                            MozoId = new Guid("30000000-0000-0000-0000-000000000001"),
+                            Numero = 2,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            TokenQR = "PASIVA_QR_2",
+                            Ubicacion = "Mesa redonda en el centro"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000003"),
+                            Estado = 0,
+                            MozoId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            Numero = 3,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            TokenQR = "PASIVA_QR_3",
+                            Ubicacion = "Box familiar derecha"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000004"),
+                            Estado = 0,
+                            MozoId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            Numero = 4,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            TokenQR = "PASIVA_QR_4",
+                            Ubicacion = "Ambiente intimo al fondo"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000005"),
+                            Estado = 0,
+                            MozoId = new Guid("30000000-0000-0000-0000-000000000003"),
+                            Numero = 5,
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            TokenQR = "PASIVA_QR_5",
+                            Ubicacion = "Sector fumadores terraza"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000006"),
+                            Estado = 0,
+                            MozoId = new Guid("40000000-0000-0000-0000-000000000001"),
+                            Numero = 1,
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            TokenQR = "MERIENDA_QR_1",
+                            Ubicacion = "Ventana luminosa"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000007"),
+                            Estado = 0,
+                            MozoId = new Guid("40000000-0000-0000-0000-000000000002"),
+                            Numero = 2,
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            TokenQR = "MERIENDA_QR_2",
+                            Ubicacion = "Sofa grande"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000008"),
+                            Estado = 0,
+                            MozoId = new Guid("40000000-0000-0000-0000-000000000003"),
+                            Numero = 3,
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            TokenQR = "MERIENDA_QR_3",
+                            Ubicacion = "Rincon lectura"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000009"),
+                            Estado = 0,
+                            MozoId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            Numero = 1,
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            TokenQR = "ITALIA_QR_1",
+                            Ubicacion = "Mesa romantica"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000010"),
+                            Estado = 0,
+                            MozoId = new Guid("50000000-0000-0000-0000-000000000002"),
+                            Numero = 2,
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            TokenQR = "ITALIA_QR_2",
+                            Ubicacion = "Mesa central"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000011"),
+                            Estado = 0,
+                            MozoId = new Guid("60000000-0000-0000-0000-000000000001"),
+                            Numero = 1,
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            TokenQR = "BEER_QR_1",
+                            Ubicacion = "Barra 1"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000012"),
+                            Estado = 0,
+                            MozoId = new Guid("60000000-0000-0000-0000-000000000003"),
+                            Numero = 2,
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            TokenQR = "BEER_QR_2",
+                            Ubicacion = "Mesa Alta"
+                        },
+                        new
+                        {
+                            Id = new Guid("88888888-8888-8888-8888-000000000013"),
+                            Estado = 0,
+                            MozoId = new Guid("60000000-0000-0000-0000-000000000005"),
+                            Numero = 3,
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            TokenQR = "BEER_QR_3",
+                            Ubicacion = "Sector Pool"
                         });
                 });
 
@@ -186,30 +452,35 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("AssignedMozoId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Details")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("TableId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("Tasks");
                 });
@@ -218,20 +489,25 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Estado")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("Fecha")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("MesaId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MesaId");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("Pedidos");
                 });
@@ -240,19 +516,19 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Cantidad")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("MenuItemId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("PedidoId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("numeric");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -263,14 +539,96 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                     b.ToTable("PedidoItems");
                 });
 
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Restaurante", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IconoPrincipal")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LogoUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ParentRestauranteId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentRestauranteId");
+
+                    b.ToTable("Restaurantes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Activo = true,
+                            FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IconoPrincipal = "🍽️",
+                            Nombre = "El Gran Sabor"
+                        },
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Activo = true,
+                            FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IconoPrincipal = "🥩",
+                            Nombre = "La Parrilla de Juan"
+                        },
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Activo = true,
+                            FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IconoPrincipal = "🌭",
+                            Nombre = "La Pasiva"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Activo = true,
+                            FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IconoPrincipal = "☕",
+                            Nombre = "La Merienda"
+                        },
+                        new
+                        {
+                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Activo = true,
+                            FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IconoPrincipal = "🍕",
+                            Nombre = "Bella Italia"
+                        },
+                        new
+                        {
+                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Activo = true,
+                            FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            IconoPrincipal = "🍺",
+                            Nombre = "Cordon Beer"
+                        });
+                });
+
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.SystemSetting", b =>
                 {
                     b.Property<string>("Key")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Key");
 
@@ -288,46 +646,329 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NombreCompleto")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RestauranteId")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Rol")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RestauranteId");
 
                     b.ToTable("Usuarios");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("55555555-5555-5555-5555-555555555555"),
-                            Email = "admin",
-                            NombreCompleto = "Administrador",
-                            PasswordHash = "$2a$11$A9snZ9y7jC9Z6s8013gbAuj8k7rpdEhUM0GCmHrXao6vxqnhNC8ta",
+                            Id = new Guid("99999999-9999-9999-9999-999999999999"),
+                            Email = "super@gino.com",
+                            NombreCompleto = "Super Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Rol = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("10000000-0000-0000-0000-000000000001"),
+                            Email = "admin@sabor.com",
+                            NombreCompleto = "Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111"),
                             Rol = 0
                         },
                         new
                         {
-                            Id = new Guid("66666666-6666-6666-6666-666666666666"),
-                            Email = "ginoSandona",
-                            NombreCompleto = "Gino Sandona",
-                            PasswordHash = "$2a$11$OMRvNspLxRgV7BaauISU3.CubR7dtc.pjYcNCabaBpiPjQ.Z.C80C",
-                            Rol = 2
+                            Id = new Guid("10000000-0000-0000-0000-000000000002"),
+                            Email = "mozo@sabor.com",
+                            NombreCompleto = "Mozo",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
+                            Email = "admin@roma.com",
+                            NombreCompleto = "Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Rol = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
+                            Email = "mozo@roma.com",
+                            NombreCompleto = "Mozo",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("22222222-2222-2222-2222-222222222222"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000000"),
+                            Email = "admin@lapasiva.com",
+                            NombreCompleto = "Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000001"),
+                            Email = "mozo1@lapasiva.com",
+                            NombreCompleto = "Mozo 1",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000002"),
+                            Email = "mozo2@lapasiva.com",
+                            NombreCompleto = "Mozo 2",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000003"),
+                            Email = "mozo3@lapasiva.com",
+                            NombreCompleto = "Mozo 3",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000004"),
+                            Email = "mozo4@lapasiva.com",
+                            NombreCompleto = "Mozo 4",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000005"),
+                            Email = "mozo5@lapasiva.com",
+                            NombreCompleto = "Mozo 5",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000006"),
+                            Email = "mozo6@lapasiva.com",
+                            NombreCompleto = "Mozo 6",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000007"),
+                            Email = "mozo7@lapasiva.com",
+                            NombreCompleto = "Mozo 7",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000008"),
+                            Email = "mozo8@lapasiva.com",
+                            NombreCompleto = "Mozo 8",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000009"),
+                            Email = "mozo9@lapasiva.com",
+                            NombreCompleto = "Mozo 9",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000010"),
+                            Email = "mozo10@lapasiva.com",
+                            NombreCompleto = "Mozo 10",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000000"),
+                            Email = "admin@lamerienda.com",
+                            NombreCompleto = "Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Rol = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000001"),
+                            Email = "lucia@lamerienda.com",
+                            NombreCompleto = "Lucia",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000002"),
+                            Email = "mateo@lamerienda.com",
+                            NombreCompleto = "Mateo",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("40000000-0000-0000-0000-000000000003"),
+                            Email = "sofia@lamerienda.com",
+                            NombreCompleto = "Sofia",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("50000000-0000-0000-0000-000000000000"),
+                            Email = "admin@bellaitalia.com",
+                            NombreCompleto = "Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Rol = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("50000000-0000-0000-0000-000000000001"),
+                            Email = "mario@bellaitalia.com",
+                            NombreCompleto = "Mario",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("50000000-0000-0000-0000-000000000002"),
+                            Email = "luigi@bellaitalia.com",
+                            NombreCompleto = "Luigi",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("55555555-5555-5555-5555-555555555555"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000000"),
+                            Email = "admin@cordonbeer.com",
+                            NombreCompleto = "Admin",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Rol = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000001"),
+                            Email = "bartender1@cordonbeer.com",
+                            NombreCompleto = "Bartender 1",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000002"),
+                            Email = "bartender2@cordonbeer.com",
+                            NombreCompleto = "Bartender 2",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000003"),
+                            Email = "mesero1@cordonbeer.com",
+                            NombreCompleto = "Mesero 1",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000004"),
+                            Email = "mesero2@cordonbeer.com",
+                            NombreCompleto = "Mesero 2",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Rol = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("60000000-0000-0000-0000-000000000005"),
+                            Email = "mesero3@cordonbeer.com",
+                            NombreCompleto = "Mesero 3",
+                            PasswordHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa",
+                            RestauranteId = new Guid("66666666-6666-6666-6666-666666666666"),
+                            Rol = 1
                         });
+                });
+
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.AuditoriaLog", b =>
+                {
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.ErrorLog", b =>
+                {
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.MenuItem", b =>
+                {
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", "Restaurante")
+                        .WithMany("MenuItems")
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurante");
                 });
 
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Mesa", b =>
@@ -336,7 +977,26 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("MozoId");
 
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", "Restaurante")
+                        .WithMany("Mesas")
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Mozo");
+
+                    b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.MesaTask", b =>
+                {
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurante");
                 });
 
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Pedido", b =>
@@ -347,7 +1007,15 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", "Restaurante")
+                        .WithMany()
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Mesa");
+
+                    b.Navigation("Restaurante");
                 });
 
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.PedidoItem", b =>
@@ -369,9 +1037,35 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                     b.Navigation("Pedido");
                 });
 
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Restaurante", b =>
+                {
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", null)
+                        .WithMany()
+                        .HasForeignKey("ParentRestauranteId")
+                        .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Usuario", b =>
+                {
+                    b.HasOne("SistemaMozoQr.Domain.Entities.Restaurante", null)
+                        .WithMany("Usuarios")
+                        .HasForeignKey("RestauranteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Pedido", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Restaurante", b =>
+                {
+                    b.Navigation("MenuItems");
+
+                    b.Navigation("Mesas");
+
+                    b.Navigation("Usuarios");
                 });
 #pragma warning restore 612, 618
         }

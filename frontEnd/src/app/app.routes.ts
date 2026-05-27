@@ -27,7 +27,7 @@ export const routes: Routes = [
       },
       {
         path: 'sistema',
-        loadComponent: () => import('./features/admin/config/superadmin-settings.component').then(m => m.SuperadminSettingsComponent),
+        loadComponent: () => import('./features/admin/superadmin-dashboard.component').then(m => m.SuperAdminDashboardComponent),
         canActivate: [roleGuard],
         data: { roles: ['SuperAdmin'] }
       },

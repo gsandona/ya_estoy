@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using SistemaMozoQr.Domain.Interfaces;
 
 namespace SistemaMozoQr.Domain.Entities;
 
-public class MenuItem
+public class MenuItem : IMustHaveTenant
 {
     public Guid Id { get; set; }
     
@@ -21,4 +22,7 @@ public class MenuItem
     public string? Descripcion { get; set; }
     
     public bool Activo { get; set; } = true;
+
+    public Guid RestauranteId { get; set; }
+    public Restaurante? Restaurante { get; set; }
 }
