@@ -1,4 +1,4 @@
-Ôªøusing System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -125,10 +125,10 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 columns: new[] { "Id", "Activo", "Categoria", "Descripcion", "Nombre", "Precio", "RestauranteId" },
                 values: new object[,]
                 {
-                    { new Guid("88888888-8888-8888-8888-000000000017"), true, "Pizzas", "Cl√°sica porci√≥n fina", "Pizza Servilleta", 250m, new Guid("33333333-3333-3333-3333-333333333333") },
-                    { new Guid("88888888-8888-8888-8888-000000000018"), true, "Cl√°sicos", null, "Panchos con mostaza", 350m, new Guid("33333333-3333-3333-3333-333333333333") },
+                    { new Guid("88888888-8888-8888-8888-000000000017"), true, "Pizzas", "Cl·sica porciÛn fina", "Pizza Servilleta", 250m, new Guid("33333333-3333-3333-3333-333333333333") },
+                    { new Guid("88888888-8888-8888-8888-000000000018"), true, "Cl·sicos", null, "Panchos con mostaza", 350m, new Guid("33333333-3333-3333-3333-333333333333") },
                     { new Guid("88888888-8888-8888-8888-000000000019"), true, "Bebidas", null, "Cerveza Patricia 1L", 450m, new Guid("33333333-3333-3333-3333-333333333333") },
-                    { new Guid("88888888-8888-8888-8888-000000000020"), true, "Cafeter√≠a", null, "Caf√© de Especialidad", 280m, new Guid("44444444-4444-4444-4444-444444444444") },
+                    { new Guid("88888888-8888-8888-8888-000000000020"), true, "CafeterÌa", null, "CafÈ de Especialidad", 280m, new Guid("44444444-4444-4444-4444-444444444444") },
                     { new Guid("88888888-8888-8888-8888-000000000021"), true, "Dulces", null, "Medialunas Rellenas", 320m, new Guid("44444444-4444-4444-4444-444444444444") },
                     { new Guid("88888888-8888-8888-8888-000000000022"), true, "Salados", null, "Tostado de Campo", 450m, new Guid("44444444-4444-4444-4444-444444444444") },
                     { new Guid("88888888-8888-8888-8888-000000000023"), true, "Pastas", null, "Ravioles de espinaca", 800m, new Guid("55555555-5555-5555-5555-555555555555") },

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -17,12 +17,12 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Restaurantes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Nombre = table.Column<string>(type: "TEXT", nullable: false),
-                    ColorPrincipal = table.Column<string>(type: "TEXT", nullable: false),
-                    LogoUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    Activo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    Nombre = table.Column<string>(nullable: false),
+                    ColorPrincipal = table.Column<string>(nullable: false),
+                    LogoUrl = table.Column<string>(nullable: true),
+                    Activo = table.Column<bool>(nullable: false),
+                    FechaCreacion = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,8 +33,8 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "SystemSettings",
                 columns: table => new
                 {
-                    Key = table.Column<string>(type: "TEXT", nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: false)
+                    Key = table.Column<string>(nullable: false),
+                    Value = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -45,14 +45,14 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Auditorias",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UsuarioEmail = table.Column<string>(type: "TEXT", nullable: true),
-                    Accion = table.Column<string>(type: "TEXT", nullable: false),
-                    Entidad = table.Column<string>(type: "TEXT", nullable: false),
-                    EntidadId = table.Column<string>(type: "TEXT", nullable: false),
-                    Detalles = table.Column<string>(type: "TEXT", nullable: false),
-                    FechaHora = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    UsuarioEmail = table.Column<string>(nullable: true),
+                    Accion = table.Column<string>(nullable: false),
+                    Entidad = table.Column<string>(nullable: false),
+                    EntidadId = table.Column<string>(nullable: false),
+                    Detalles = table.Column<string>(nullable: false),
+                    FechaHora = table.Column<DateTime>(nullable: false),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,13 +69,13 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "ErrorLogs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Mensaje = table.Column<string>(type: "TEXT", nullable: false),
-                    StackTrace = table.Column<string>(type: "TEXT", nullable: false),
-                    RutaAPI = table.Column<string>(type: "TEXT", nullable: false),
-                    UsuarioInvolucrado = table.Column<string>(type: "TEXT", nullable: true),
-                    FechaHora = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    Mensaje = table.Column<string>(nullable: false),
+                    StackTrace = table.Column<string>(nullable: false),
+                    RutaAPI = table.Column<string>(nullable: false),
+                    UsuarioInvolucrado = table.Column<string>(nullable: true),
+                    FechaHora = table.Column<DateTime>(nullable: false),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,13 +92,13 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "MenuItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Categoria = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Nombre = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Precio = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Descripcion = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    Activo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    Categoria = table.Column<string>(maxLength: 100, nullable: false),
+                    Nombre = table.Column<string>(maxLength: 200, nullable: false),
+                    Precio = table.Column<decimal>(nullable: false),
+                    Descripcion = table.Column<string>(maxLength: 500, nullable: true),
+                    Activo = table.Column<bool>(nullable: false),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,14 +115,14 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Tasks",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TableId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Type = table.Column<string>(type: "TEXT", nullable: false),
-                    Details = table.Column<string>(type: "TEXT", nullable: false),
-                    Status = table.Column<string>(type: "TEXT", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    AssignedMozoId = table.Column<string>(type: "TEXT", nullable: true),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    TableId = table.Column<int>(nullable: false),
+                    Type = table.Column<string>(nullable: false),
+                    Details = table.Column<string>(nullable: false),
+                    Status = table.Column<string>(nullable: false),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    AssignedMozoId = table.Column<string>(nullable: true),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,12 +139,12 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    NombreCompleto = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: false),
-                    Rol = table.Column<int>(type: "INTEGER", nullable: false),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    NombreCompleto = table.Column<string>(maxLength: 100, nullable: false),
+                    Email = table.Column<string>(maxLength: 100, nullable: false),
+                    PasswordHash = table.Column<string>(nullable: false),
+                    Rol = table.Column<int>(nullable: false),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,14 +161,14 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Mesas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Numero = table.Column<int>(type: "INTEGER", nullable: false),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
-                    TokenQR = table.Column<string>(type: "TEXT", nullable: true),
-                    Ubicacion = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
-                    MozoId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    CodigoAcceso = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    Numero = table.Column<int>(nullable: false),
+                    Estado = table.Column<int>(nullable: false),
+                    TokenQR = table.Column<string>(nullable: true),
+                    Ubicacion = table.Column<string>(maxLength: 250, nullable: true),
+                    MozoId = table.Column<Guid>(nullable: true),
+                    CodigoAcceso = table.Column<string>(maxLength: 10, nullable: true),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -190,11 +190,11 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Pedidos",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    MesaId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
-                    Fecha = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    MesaId = table.Column<Guid>(nullable: false),
+                    Estado = table.Column<int>(nullable: false),
+                    Fecha = table.Column<DateTime>(nullable: false),
+                    RestauranteId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -217,11 +217,11 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "PedidoItems",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    PedidoId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    MenuItemId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Cantidad = table.Column<int>(type: "INTEGER", nullable: false),
-                    PrecioUnitario = table.Column<decimal>(type: "TEXT", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    PedidoId = table.Column<Guid>(nullable: false),
+                    MenuItemId = table.Column<Guid>(nullable: false),
+                    Cantidad = table.Column<int>(nullable: false),
+                    PrecioUnitario = table.Column<decimal>(nullable: false)
                 },
                 constraints: table =>
                 {
