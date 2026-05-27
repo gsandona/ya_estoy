@@ -27,16 +27,20 @@ public static class DependencyInjection
             var database = uri.LocalPath.TrimStart('/');
             connectionString = $"Server={host};Port={port};Database={database};User Id={userInfo[0]};Password={userInfo[1]};SslMode=Prefer;Trust Server Certificate=true;";
             
-            services.AddDbContext<RestauranteDbContext>(options =>
-                options.UseNpgsql(connectionString));
+            services.AddDbContext<RestauranteDbContext>(options => {
+                options.UseNpgsql(connectionString);
+                options.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+            });
         }
         else
         {
             // Fallback a SQLite local si no hay DB en la nube o si usa "Data Source="
-            services.AddDbContext<RestauranteDbContext>(options =>
+            services.AddDbContext<RestauranteDbContext>(options => {
                 options.UseSqlite(configuration.GetConnectionString("DefaultConnection")?.Contains("Data Source") == true 
                     ? configuration.GetConnectionString("DefaultConnection") 
-                    : "Data Source=local.db"));
+                    : "Data Source=local.db");
+                options.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+            });
         }
 
         services.AddScoped<IMesaRepository, MesaRepository>();
