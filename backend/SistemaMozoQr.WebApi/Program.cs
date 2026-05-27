@@ -91,7 +91,23 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<RestauranteDbContext>();
     // context.Database.EnsureCreated(); // <- Esto era para InMemory
-    context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations a SQL Server
+    try
+    {
+        context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations
+    }
+    catch (Exception ex) when (ex.Message.Contains("42P07") || ex.Message.Contains("already exists"))
+    {
+        if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+        {
+            // Wipe old schema and retry (only for Postgres in dev/staging reset scenarios)
+            context.Database.ExecuteSqlRaw("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
+            context.Database.Migrate();
+        }
+        else
+        {
+            throw;
+        }
+    }
 }
 
 app.Run();
