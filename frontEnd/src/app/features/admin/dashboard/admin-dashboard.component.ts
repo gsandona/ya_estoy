@@ -4,6 +4,7 @@ import { SignalrService } from '../../../core/services/signalr.service';
 import { AdminDataService } from '../config/admin-data.service';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
 import { FormsModule } from '@angular/forms';
 
@@ -152,6 +153,7 @@ export class AdminDashboardComponent {
   service = inject(SignalrService);
   dataService = inject(AdminDataService);
   auth = inject(AuthService);
+  http = inject(HttpClient);
   
   currentDate = new Date();
 
@@ -222,21 +224,19 @@ export class AdminDashboardComponent {
 
   async abrirMesa(mesaId: string) {
     try {
-      const res = await fetch(`${environment.apiUrl}/api/mesas/${mesaId}/abrir`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
+      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/abrir`, {}).subscribe({
+        next: () => this.dataService.refreshAll(),
+        error: (e) => console.error(e)
       });
-      if(res.ok) this.dataService.refreshAll();
     } catch(e) { console.error(e); }
   }
 
   async cerrarMesa(mesaId: string) {
     try {
-      const res = await fetch(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${this.auth.getToken()}` }
+      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, {}).subscribe({
+        next: () => this.dataService.refreshAll(),
+        error: (e) => console.error(e)
       });
-      if(res.ok) this.dataService.refreshAll();
     } catch(e) { console.error(e); }
   }
 

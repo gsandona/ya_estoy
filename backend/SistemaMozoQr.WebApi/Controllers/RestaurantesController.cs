@@ -29,7 +29,7 @@ public class RestaurantesController : ControllerBase
         else
         {
             var restaurantes = await _context.Restaurantes
-                .Where(r => r.ParentRestauranteId == _context.CurrentTenantId)
+                .Where(r => r.Id == _context.CurrentTenantId || r.ParentRestauranteId == _context.CurrentTenantId)
                 .ToListAsync();
             return Ok(restaurantes);
         }

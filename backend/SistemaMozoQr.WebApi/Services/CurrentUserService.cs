@@ -30,13 +30,17 @@ public class CurrentUserService : ICurrentUserService
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext == null) return null;
 
-        if (IsSuperAdmin())
+        var role = httpContext.User?.FindFirstValue(ClaimTypes.Role);
+        var isSuperAdmin = role == "SuperAdmin";
+        var isAdmin = role == "Admin";
+
+        if (isSuperAdmin || isAdmin)
         {
             if (httpContext.Request.Headers.TryGetValue("X-Tenant-ID", out var tenantHeader) && Guid.TryParse(tenantHeader, out var parsedTenantId))
             {
                 return parsedTenantId;
             }
-            return null; // SuperAdmin con vista global (sin restaurante especifico)
+            if (isSuperAdmin) return null; // SuperAdmin global view
         }
 
         var tenantClaim = httpContext.User?.FindFirst("TenantId")?.Value;

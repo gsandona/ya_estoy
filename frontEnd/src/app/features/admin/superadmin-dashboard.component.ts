@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
+import { AbmRestaurantesComponent } from './config/abm-restaurantes.component';
 
 interface Restaurante {
   id: string;
@@ -25,7 +26,7 @@ interface Log {
 @Component({
   selector: 'app-super-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AbmRestaurantesComponent],
   template: `
     <div class="p-6">
       <h1 class="text-3xl font-black mb-8">Centro de Control SaaS</h1>
@@ -39,42 +40,7 @@ interface Log {
 
       <!-- Tab Restaurantes -->
       @if (activeTab() === 'restaurantes') {
-        <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold">Clientes / Restaurantes</h2>
-            <button class="bg-primary text-white px-4 py-2 rounded-lg font-bold">Nuevo Cliente</button>
-          </div>
-          
-          <table class="w-full text-left">
-            <thead>
-              <tr class="text-gray-500 text-sm uppercase tracking-wider border-b">
-                <th class="py-3">Nombre</th>
-                <th class="py-3">Color</th>
-                <th class="py-3">Estado</th>
-                <th class="py-3">Creación</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (r of restaurantes(); track r.id) {
-                <tr class="border-b hover:bg-gray-50">
-                  <td class="py-4 font-bold">{{ r.nombre }}</td>
-                  <td class="py-4">
-                    <div class="flex items-center gap-2">
-                      <div class="text-2xl">{{ r.iconoPrincipal }}</div>
-                      <span class="text-xs text-gray-500 font-medium">{{ r.nombre }}</span>
-                    </div>
-                  </td>
-                  <td class="py-4">
-                    <span class="px-2 py-1 text-xs font-bold rounded-lg" [ngClass]="r.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
-                      {{ r.activo ? 'ACTIVO' : 'INACTIVO' }}
-                    </span>
-                  </td>
-                  <td class="py-4 text-sm text-gray-500">{{ r.fechaCreacion | date }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <app-abm-restaurantes></app-abm-restaurantes>
       }
 
       <!-- Tab Auditoria -->

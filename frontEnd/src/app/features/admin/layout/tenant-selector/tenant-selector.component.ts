@@ -10,7 +10,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="tenant-selector" *ngIf="isSuperAdmin">
+    <div class="tenant-selector" *ngIf="isSuperAdmin || isAdmin">
       <label for="tenantSelect" class="form-label mb-0 me-2 text-white">Restaurante Activo:</label>
       <select 
         id="tenantSelect" 
@@ -18,7 +18,7 @@ import { AuthService } from '../../../../core/services/auth.service';
         style="width: 200px; display: inline-block;"
         [ngModel]="selectedTenantId"
         (ngModelChange)="onTenantChange($event)">
-        <option [ngValue]="null">Todos (Global)</option>
+        <option *ngIf="isSuperAdmin" [ngValue]="null">Todos (Global)</option>
         <option *ngFor="let rest of restaurantes" [ngValue]="rest.id">{{ rest.nombre }}</option>
       </select>
     </div>
@@ -36,6 +36,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class TenantSelectorComponent implements OnInit {
   isSuperAdmin = false;
+  isAdmin = false;
   restaurantes: Restaurante[] = [];
   selectedTenantId: string | null = null;
 
@@ -47,8 +48,9 @@ export class TenantSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.isSuperAdmin = this.authService.isSuperAdmin();
+    this.isAdmin = this.authService.currentUser()?.role === 'Admin';
 
-    if (this.isSuperAdmin) {
+    if (this.isSuperAdmin || this.isAdmin) {
       this.loadRestaurantes();
       this.tenantContext.tenantId$.subscribe(id => {
         this.selectedTenantId = id;
