@@ -74,7 +74,6 @@ public class RestaurantesController : ControllerBase
             return Forbid();
 
         existing.Nombre = restaurante.Nombre;
-        existing.IconoPrincipal = restaurante.IconoPrincipal;
         existing.Activo = restaurante.Activo;
         existing.LogoUrl = restaurante.LogoUrl;
 

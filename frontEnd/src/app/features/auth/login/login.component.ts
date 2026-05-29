@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -26,14 +28,17 @@ import { AuthService } from '../../../core/services/auth.service';
       
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-8">
-          <div class="h-32 w-32 bg-gradient-to-br from-primary to-[#1a233b] text-accent rounded-full shadow-2xl flex items-center justify-center border-[6px] border-white">
-            <svg class="w-16 h-16 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V3m0 3a9 9 0 0 1 9 9v3H3v-3a9 9 0 0 1 9-9zM6 12v3M18 12v3"></path>
-            </svg>
+          <div class="h-32 w-32 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-white overflow-hidden p-2">
+            <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain" />
+            <div *ngIf="!globalLogoBase64()" class="w-full h-full bg-gradient-to-br from-primary to-[#1a233b] rounded-2xl flex items-center justify-center">
+              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V3m0 3a9 9 0 0 1 9 9v3H3v-3a9 9 0 0 1 9-9zM6 12v3M18 12v3"></path>
+              </svg>
+            </div>
           </div>
         </div>
         <h2 class="text-center text-4xl font-black text-gray-900 tracking-tight mb-2 flex flex-col">
-          <span>El Gran Sabor</span>
+          <span>{{ globalAppName() || 'El Gran Sabor' }}</span>
           <span class="text-xl text-primary font-bold mt-1">Management Staff</span>
         </h2>
         <p class="mt-4 text-center text-sm text-gray-500 font-medium">
@@ -116,12 +121,25 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   authService = inject(AuthService);
   router = inject(Router);
+  http = inject(HttpClient);
   
   email = '';
   password = '';
   
   isLoading = signal(false);
   errorMessage = signal('');
+  
+  globalAppName = signal<string>('');
+  globalLogoBase64 = signal<string>('');
+
+  constructor() {
+    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
+      const appName = data.find(s => s.key === 'GlobalAppName')?.value;
+      const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
+      if (appName) this.globalAppName.set(appName);
+      if (appLogo) this.globalLogoBase64.set(appLogo);
+    });
+  }
 
   onLogin(event: Event) {
     event.preventDefault();

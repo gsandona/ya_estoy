@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="space-y-8 animate-fade-in pb-20">
+    <div class="space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto">
       
       @if (!service.isConnected()) {
         <div class="bg-red-500 text-white p-3 rounded-2xl shadow-md flex items-center justify-center gap-2 font-bold mb-4 animate-[slide-down_0.3s_ease-out]">
@@ -23,45 +23,45 @@ import { FormsModule } from '@angular/forms';
       }
       
       <!-- Panel de Mesas (Control de PIN) -->
-      <div class="bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
-        <h2 class="text-xl sm:text-2xl font-black text-gray-800 tracking-tight mb-3">Control de Mesas</h2>
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
+      <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-4 flex items-center gap-2">🕹️ Control de Mesas</h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
           @for(mesa of myMesas(); track mesa.id) {
-            <div class="border rounded-2xl p-3 flex flex-col items-center justify-center text-center gap-1.5 relative overflow-hidden"
-                 [ngClass]="mesa.codigoAcceso ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'">
-              <span class="text-sm sm:text-base font-bold text-gray-700">Mesa {{ mesa.numero }}</span>
+            <div class="border rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 relative overflow-hidden transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
+                 [ngClass]="mesa.codigoAcceso ? 'bg-green-50/50 border-green-200' : 'bg-gray-50/50 border-gray-200'">
+              <span class="text-sm font-bold text-gray-700">Mesa {{ mesa.numero }}</span>
               @if(mesa.codigoAcceso) {
-                <span class="text-xl sm:text-2xl font-black tracking-widest text-green-600 my-1">{{ mesa.codigoAcceso }}</span>
-                <button (click)="cerrarMesa(mesa.id)" class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold hover:bg-red-200 w-full">Cerrar</button>
+                <span class="text-2xl font-black tracking-widest text-green-600 drop-shadow-sm">{{ mesa.codigoAcceso }}</span>
+                <button (click)="cerrarMesa(mesa.id)" class="bg-red-100 text-red-600 px-4 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200 w-full transition-colors">Cerrar</button>
               } @else {
-                <span class="text-[10px] sm:text-xs font-medium text-gray-400 my-1.5">Inactiva</span>
-                <button (click)="abrirMesa(mesa.id)" class="bg-green-600 text-white px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold hover:bg-green-700 w-full shadow-sm">Abrir</button>
+                <span class="text-xs font-medium text-gray-400 py-1.5">Inactiva</span>
+                <button (click)="abrirMesa(mesa.id)" class="bg-primary text-white px-4 py-1.5 rounded-xl text-xs font-bold hover:bg-primary/90 w-full shadow-sm transition-colors">Abrir</button>
               }
             </div>
           }
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
         <div>
-          <h1 class="text-2xl sm:text-3xl font-black text-gray-800 tracking-tight">Tareas Activas</h1>
-          <p class="text-xs sm:text-sm text-gray-500 font-medium mt-1">Monitorea y atiende las solicitudes</p>
+          <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">🔔 Solicitudes Activas</h1>
+          <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
         </div>
         
         <!-- Filtros (Solo Admin) -->
         @if(auth.currentUser()?.role === 'Admin') {
-          <div class="flex flex-wrap items-center gap-3 bg-surface px-4 py-3 rounded-xl border border-gray-200">
-            <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-white border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:ring-accent focus:border-accent">
+          <div class="flex flex-wrap items-center gap-3 bg-surface/50 px-4 py-2 rounded-2xl border border-gray-200 backdrop-blur-sm">
+            <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
               <option value="All">Todos los Tipos</option>
               <option value="Llamado">Llamado</option>
               <option value="Pedido">Pedido</option>
               <option value="Cuenta">Cuenta</option>
             </select>
-            <select [ngModel]="filterMesa()" (ngModelChange)="filterMesa.set($event)" class="bg-white border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:ring-accent focus:border-accent">
+            <select [ngModel]="filterMesa()" (ngModelChange)="filterMesa.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
               <option value="All">Todas las Mesas</option>
               @for(m of dataService.mesas(); track m.id) { <option [value]="m.numero">Mesa {{m.numero}}</option> }
             </select>
-            <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-white border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:ring-accent focus:border-accent">
+            <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
               <option value="All">Todos los Mozos</option>
               @for(mz of dataService.mozos(); track mz.id) { <option [value]="mz.id">{{mz.email}}</option> }
             </select>
@@ -69,53 +69,56 @@ import { FormsModule } from '@angular/forms';
         }
       </div>
 
-      <div class="flex flex-col gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         @for (task of myPendingTasks(); track task.id) {
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 flex flex-row items-center gap-4 relative overflow-hidden transition-colors hover:bg-slate-50">
+          <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md border border-gray-100 p-4 flex flex-col relative overflow-hidden transition-all group hover:-translate-y-1">
             
-            <!-- Barra lateral indicadora -->
-            <div class="absolute top-0 left-0 w-1.5 h-full" [ngClass]="getSideBarClass(task.type)"></div>
+            <!-- Barra superior indicadora -->
+            <div class="absolute top-0 left-0 w-full h-1.5" [ngClass]="getSideBarClass(task.type)"></div>
 
-            <!-- Mesa Info (Izquierda) -->
-            <div class="pl-2 flex flex-col justify-center items-center min-w-[60px] border-r border-gray-100 pr-3">
-               <span class="text-[10px] font-black tracking-wider text-gray-400 uppercase">{{task.type}}</span>
-               <span class="text-2xl font-black text-gray-800 leading-none mt-1">{{ task.tableId }}</span>
+            <div class="flex justify-between items-start mb-3 pt-1">
+              <div class="flex items-center gap-3">
+                 <div class="w-12 h-12 rounded-2xl flex flex-col justify-center items-center font-black shadow-inner" [ngClass]="getTypeBgClass(task.type)">
+                   <span class="text-xs opacity-80 leading-none mb-0.5">Mesa</span>
+                   <span class="text-xl leading-none">{{ task.tableId }}</span>
+                 </div>
+                 <div>
+                   <span class="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md" [ngClass]="getTypeTagClass(task.type)">{{task.type}}</span>
+                   <div class="text-[10px] font-bold text-gray-400 mt-1 flex items-center gap-1">
+                     ⏱ Hace {{ getMinutesElapsed(task.timestamp) }} min
+                   </div>
+                 </div>
+              </div>
+              
+              @if(auth.currentUser()?.role === 'Admin') {
+                <button (click)="openReassignModal(task.id)" class="text-[10px] text-indigo-600 hover:text-white font-bold bg-indigo-50 hover:bg-indigo-500 px-2.5 py-1 rounded-lg transition-colors border border-indigo-100">Reasignar</button>
+              }
             </div>
 
-            <!-- Centro: Detalles y Tiempo -->
-            <div class="flex-1 flex flex-col justify-center min-w-0">
-               <div class="flex items-center gap-2 mb-1">
-                 <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full flex items-center gap-1">
-                   ⏱ {{ getMinutesElapsed(task.timestamp) }} min
-                 </span>
-                 @if(auth.currentUser()?.role === 'Admin') {
-                   <button (click)="openReassignModal(task.id)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded-full">Reasignar</button>
-                 }
-               </div>
+            <div class="flex-1 bg-surface/50 rounded-xl p-3 mb-4 border border-gray-50">
                @if (task.details) {
-                 <p class="text-gray-600 text-xs sm:text-sm font-medium truncate">{{ task.details }}</p>
+                 <p class="text-gray-600 text-sm font-medium line-clamp-2 leading-snug">{{ task.details }}</p>
                } @else {
-                 <p class="text-gray-400 text-xs italic">Sin detalles</p>
+                 <p class="text-gray-400 text-sm italic">Atención requerida en la mesa.</p>
                }
             </div>
 
-            <!-- Derecha: Botones -->
-            <div class="flex flex-col sm:flex-row gap-2">
-              <button class="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-[#1a233b] transition-colors shadow-sm whitespace-nowrap">
-                Atender
+            <div class="flex gap-2 mt-auto">
+              <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
+                Ver 👁️
               </button>
-              <button (click)="completar(task.id)" class="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg text-xs font-bold hover:border-accent hover:text-accent transition-colors whitespace-nowrap">
-                Listo ✔
+              <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
+                Completar ✔
               </button>
             </div>
           </div>
         } @empty {
-          <div class="col-span-full py-20 flex flex-col items-center justify-center text-gray-400 bg-white rounded-[2rem] border-2 border-dashed border-gray-200">
-            <div class="h-24 w-24 bg-surface rounded-full flex items-center justify-center mb-6 shadow-sm">
-              <span class="text-4xl filter grayscale opacity-50">📋</span>
+          <div class="col-span-full py-16 flex flex-col items-center justify-center text-gray-400 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
+            <div class="h-20 w-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-gray-100">
+              <span class="text-3xl filter grayscale opacity-40">✨</span>
             </div>
-            <h3 class="text-xl font-bold text-gray-500 mb-2">Todo al día</h3>
-            <p class="text-gray-400 font-medium">No hay solicitudes pendientes en este momento.</p>
+            <h3 class="text-xl font-black text-gray-600 mb-1">Todo al día</h3>
+            <p class="text-gray-400 font-medium text-sm">No hay solicitudes pendientes en este momento.</p>
           </div>
         }
       </div>
@@ -123,18 +126,21 @@ import { FormsModule } from '@angular/forms';
 
     <!-- Modal Reasignar -->
     @if(showReassignModal()) {
-      <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm p-4 animate-fade-in">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
-          <h3 class="text-xl font-bold mb-4 text-gray-800">Reasignar Tarea</h3>
-          <p class="text-sm text-gray-500 mb-4">Selecciona al mozo que se encargará de esta solicitud.</p>
-          <div class="space-y-2 mb-6 max-h-60 overflow-y-auto">
+      <div class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center backdrop-blur-md p-4 animate-fade-in">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-white/20 relative">
+          <button (click)="showReassignModal.set(null)" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 font-bold transition-colors">&times;</button>
+          
+          <h3 class="text-xl font-black mb-1 text-gray-800 flex items-center gap-2">🔄 Reasignar</h3>
+          <p class="text-sm text-gray-500 mb-6 font-medium">Transfiere esta tarea a otro mozo disponible.</p>
+          
+          <div class="space-y-2 mb-6 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
             @for(mz of dataService.mozos(); track mz.id) {
-              <button (click)="reasignar(showReassignModal()!, mz.id)" class="w-full text-left px-4 py-3 rounded-xl border border-gray-200 hover:border-accent hover:bg-accent/5 font-medium transition-colors">
+              <button (click)="reasignar(showReassignModal()!, mz.id)" class="w-full text-left px-4 py-3 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 font-bold text-gray-700 transition-all flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs group-hover:bg-primary/10 group-hover:text-primary">👤</div>
                 {{mz.email}}
               </button>
             }
           </div>
-          <button (click)="showReassignModal.set(null)" class="w-full py-3 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200">Cancelar</button>
         </div>
       </div>
     }
@@ -200,12 +206,21 @@ export class AdminDashboardComponent {
     return Math.max(0, Math.floor(diffMs / 60000));
   }
 
-  getTypeClass(type: string): string {
+  getTypeBgClass(type: string): string {
     switch(type) {
-      case 'Llamado': return 'bg-yellow-50 text-yellow-700 border border-yellow-200';
-      case 'Pedido': return 'bg-blue-50 text-blue-700 border border-blue-200';
+      case 'Llamado': return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
+      case 'Pedido': return 'bg-blue-100 text-blue-800 border border-blue-200';
       case 'Cuenta': return 'bg-accent/10 text-accent border border-accent/20';
-      default: return 'bg-gray-50 text-gray-700 border border-gray-200';
+      default: return 'bg-gray-100 text-gray-800 border border-gray-200';
+    }
+  }
+
+  getTypeTagClass(type: string): string {
+    switch(type) {
+      case 'Llamado': return 'bg-yellow-100 text-yellow-700';
+      case 'Pedido': return 'bg-blue-100 text-blue-700';
+      case 'Cuenta': return 'bg-accent/10 text-accent';
+      default: return 'bg-gray-100 text-gray-700';
     }
   }
 
@@ -224,7 +239,7 @@ export class AdminDashboardComponent {
 
   async abrirMesa(mesaId: string) {
     try {
-      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/abrir`, {}).subscribe({
+      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/abrir`, null).subscribe({
         next: () => this.dataService.refreshAll(),
         error: (e) => console.error(e)
       });
@@ -233,7 +248,7 @@ export class AdminDashboardComponent {
 
   async cerrarMesa(mesaId: string) {
     try {
-      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, {}).subscribe({
+      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null).subscribe({
         next: () => this.dataService.refreshAll(),
         error: (e) => console.error(e)
       });

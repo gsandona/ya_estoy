@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 import { TenantSelectorComponent } from './tenant-selector/tenant-selector.component';
 
 @Component({
@@ -13,9 +15,12 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
       <!-- Desktop Sidebar -->
       <aside class="w-72 bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all">
         <div class="p-6 border-b border-white/10 mt-4">
-          <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-            <span class="text-3xl">🍽️</span> 
-            Sistema<span class="text-accent">QR</span>
+          <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0">
+              <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain p-1" />
+              <span *ngIf="!globalLogoBase64()" class="text-xl">🍽️</span>
+            </div>
+            <span class="truncate">{{ globalAppName() || 'SistemaQR' }}</span>
           </h2>
           <p class="text-slate-400 text-sm mt-1 font-medium select-none">Gestión Staff • {{ auth.currentUser()?.role }}</p>
         </div>
@@ -55,8 +60,12 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
             <button (click)="mobileMenuOpen.set(true)" class="p-2 bg-surface rounded-xl hover:bg-gray-100 transition-colors active:scale-95">
               <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-             <span class="text-accent">🍽️</span> Staff
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 max-w-[200px] truncate">
+             <div class="w-6 h-6 rounded flex items-center justify-center overflow-hidden shrink-0">
+               <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain" />
+               <span *ngIf="!globalLogoBase64()" class="text-accent">🍽️</span>
+             </div>
+             <span class="truncate">{{ globalAppName() || 'Staff' }}</span>
             </h2>
           </div>
           
@@ -91,7 +100,11 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
             <div class="p-6 border-b border-white/10 mt-4 flex justify-between items-center">
               <div>
                 <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                  <span class="text-accent">🍽️</span> Sistema
+                  <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0">
+                    <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain p-1" />
+                    <span *ngIf="!globalLogoBase64()" class="text-xl">🍽️</span>
+                  </div>
+                  <span class="truncate">{{ globalAppName() || 'Sistema' }}</span>
                 </h2>
                 <p class="text-slate-400 text-xs mt-1 font-medium">{{ auth.currentUser()?.role }}</p>
               </div>
@@ -146,8 +159,20 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
 export class AdminLayoutComponent {
   auth = inject(AuthService);
   router = inject(Router);
+  http = inject(HttpClient);
   
   mobileMenuOpen = signal(false);
+  globalAppName = signal<string>('');
+  globalLogoBase64 = signal<string>('');
+
+  constructor() {
+    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
+      const appName = data.find(s => s.key === 'GlobalAppName')?.value;
+      const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
+      if (appName) this.globalAppName.set(appName);
+      if (appLogo) this.globalLogoBase64.set(appLogo);
+    });
+  }
 
   logout() {
     this.auth.logout();

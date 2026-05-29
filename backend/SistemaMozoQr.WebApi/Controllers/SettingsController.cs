@@ -25,6 +25,16 @@ public class SettingsController : ControllerBase
         return Ok(settings);
     }
 
+    [HttpGet("public")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPublicSettings()
+    {
+        var settings = await _context.SystemSettings
+            .Where(s => s.Key == "GlobalAppName" || s.Key == "GlobalLogoBase64")
+            .ToListAsync();
+        return Ok(settings);
+    }
+
     [HttpPost]
     public async Task<IActionResult> UpdateSetting([FromBody] SystemSetting settingUpdate)
     {
