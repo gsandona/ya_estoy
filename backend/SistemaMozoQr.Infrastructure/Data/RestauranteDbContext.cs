@@ -89,14 +89,17 @@ public class RestauranteDbContext : DbContext
                     Entidad = entry.Entity.GetType().Name,
                     Accion = entry.State.ToString(),
                     FechaHora = DateTime.UtcNow,
-                    Detalles = $"Entity state changed to {entry.State}"
+                    Detalles = $"Entity state changed to {entry.State}",
+                    RestauranteId = entry.Entity is IMustHaveTenant t ? t.RestauranteId 
+                                    : (entry.Entity is Restaurante r ? r.Id 
+                                    : (CurrentTenantId ?? Guid.Parse("11111111-1111-1111-1111-111111111111")))
                 };
 
                 var idProperty = entry.Entity.GetType().GetProperty("Id");
                 if (idProperty != null)
                 {
                     var idVal = idProperty.GetValue(entry.Entity);
-                    if (idVal != null) auditLog.EntidadId = idVal.ToString();
+                    if (idVal != null) auditLog.EntidadId = idVal.ToString() ?? string.Empty;
                 }
 
                 auditEntries.Add(auditLog);

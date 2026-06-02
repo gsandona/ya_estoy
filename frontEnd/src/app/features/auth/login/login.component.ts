@@ -11,14 +11,46 @@ import { environment } from '../../../../environments/environment';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
+    <!-- Splash Screen Inicial -->
+    @if (isSplashing()) {
+      <div class="fixed inset-0 bg-[#0f172a] flex flex-col items-center justify-center z-50 transition-opacity duration-500" [ngClass]="{'opacity-0 pointer-events-none': !isSplashing()}">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a]"></div>
+        <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
+          <!-- Pulsing Logo Container -->
+          <div class="h-28 w-28 bg-white/5 rounded-[2rem] border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-md mb-6 animate-pulse">
+            <span class="text-5xl drop-shadow-lg">🛎️</span>
+          </div>
+          <h1 class="text-white text-4xl font-black tracking-tight mb-2">mozoGo</h1>
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mt-2">Cargando Sistema...</p>
+          <div class="w-32 bg-white/10 h-1.5 rounded-full mt-6 overflow-hidden border border-white/5">
+            <div class="bg-accent h-full w-1/2 rounded-full animate-[loading-bar_1.5s_infinite_ease-in-out]"></div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Pantalla de Login Principal -->
     <div class="min-h-screen bg-surface flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      
       <!-- Falla de validación (Toast Flotante y Moderno) -->
       @if (errorMessage()) {
         <div class="fixed top-8 left-0 right-0 z-50 flex justify-center w-full px-4 animate-[slide-down_0.5s_ease-out,shake_0.4s_ease-in-out_0.5s]">
           <div class="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(239,68,68,0.4)] border border-red-400 flex items-center gap-4 max-w-sm w-full backdrop-blur-md">
             <div class="bg-white/20 p-2 rounded-full">⚠️</div>
             <p class="text-sm font-bold leading-tight">{{ errorMessage() }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- Fullscreen Loading Overlay (cuando conecta al servidor) -->
+      @if (isLoading()) {
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-fade-in">
+          <div class="bg-white/95 p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-xs w-full mx-4 border border-white/20">
+            <div class="h-16 w-16 mb-4 relative flex items-center justify-center">
+              <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
+              <span class="text-2xl">🔐</span>
+            </div>
+            <h3 class="text-lg font-black text-gray-800">Conectando...</h3>
+            <p class="text-gray-500 text-sm mt-2 font-medium">Validando tus credenciales en MozoGo</p>
           </div>
         </div>
       }
@@ -85,11 +117,7 @@ import { environment } from '../../../../environments/environment';
             <div class="pt-2">
               <button type="submit" [disabled]="isLoading()"
                 class="w-full flex justify-center py-4 px-4 rounded-xl shadow-[0_4px_15px_rgb(16,185,129,0.3)] text-lg font-black text-white bg-accent hover:bg-[#0da473] hover:shadow-[0_8px_25px_rgb(16,185,129,0.4)] transition-all active:scale-[0.98] disabled:opacity-75 disabled:active:scale-100 disabled:hover:shadow-none items-center gap-3 tracking-wide">
-                @if (isLoading()) {
-                  <span class="animate-spin h-6 w-6 border-[3px] border-white border-t-transparent rounded-full"></span> Conectando al Servidor...
-                } @else {
-                  🔐 Iniciar Sesión de Trabajo
-                }
+                🔐 Iniciar Sesión de Trabajo
               </button>
             </div>
           </form>
@@ -111,6 +139,11 @@ import { environment } from '../../../../environments/environment';
       25% { transform: translateX(-6px) rotate(-1deg); }
       75% { transform: translateX(6px) rotate(1deg); }
     }
+    @keyframes loading-bar {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
     .animate-fade-in {
       animation: fade-in 0.5s ease-out forwards;
       opacity: 0;
@@ -127,16 +160,23 @@ export class LoginComponent {
   
   isLoading = signal(false);
   errorMessage = signal('');
+  isSplashing = signal(true);
   
   globalAppName = signal<string>('');
   globalLogoBase64 = signal<string>('');
 
   constructor() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
-      const appName = data.find(s => s.key === 'GlobalAppName')?.value;
-      const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
-      if (appName) this.globalAppName.set(appName);
-      if (appLogo) this.globalLogoBase64.set(appLogo);
+    // Splash screen timer
+    setTimeout(() => this.isSplashing.set(false), 1800);
+
+    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe({
+      next: data => {
+        const appName = data.find(s => s.key === 'GlobalAppName')?.value;
+        const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
+        if (appName) this.globalAppName.set(appName);
+        if (appLogo) this.globalLogoBase64.set(appLogo);
+      },
+      error: () => {}
     });
   }
 
