@@ -22,6 +22,15 @@ public class TaskRepository : ITaskRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<MesaTask>> GetPendingTasksIgnoreQueryFiltersAsync()
+    {
+        return await _context.Tasks
+            .IgnoreQueryFilters()
+            .Where(t => t.Status == "Pending")
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task<MesaTask?> GetByIdAsync(Guid id)
     {
         return await _context.Tasks.FindAsync(id);
