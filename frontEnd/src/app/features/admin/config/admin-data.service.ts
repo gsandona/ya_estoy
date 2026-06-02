@@ -21,6 +21,7 @@ export class AdminDataService {
   public users = signal<AdminUser[]>([]);
   public mesas = signal<AdminMesa[]>([]);
   public menuItems = signal<AdminMenuItem[]>([]);
+  public isLoading = signal(true);
   
   public mozos = computed(() => this.users().filter(u => u.role === 'Mozo'));
 
@@ -30,19 +31,30 @@ export class AdminDataService {
 
   // Trae todo nuevamente
   refreshAll() {
+    this.isLoading.set(true);
+    let usersDone = false;
+    let mesasDone = false;
+    let menuDone = false;
+
+    const checkDone = () => {
+      if (usersDone && mesasDone && menuDone) {
+        this.isLoading.set(false);
+      }
+    };
+
     this.http.get<AdminUser[]>(`${environment.apiUrl}/api/users`).subscribe({
-      next: d => this.users.set(d),
-      error: () => this.users.set([]) // backend caído, lista vacía
+      next: d => { this.users.set(d); usersDone = true; checkDone(); },
+      error: () => { this.users.set([]); usersDone = true; checkDone(); }
     });
     
     this.http.get<AdminMesa[]>(`${environment.apiUrl}/api/mesas`).subscribe({
-      next: d => this.mesas.set(d),
-      error: () => this.mesas.set([])
+      next: d => { this.mesas.set(d); mesasDone = true; checkDone(); },
+      error: () => { this.mesas.set([]); mesasDone = true; checkDone(); }
     });
     
     this.http.get<AdminMenuItem[]>(`${environment.apiUrl}/api/menu`).subscribe({
-      next: d => this.menuItems.set(d),
-      error: () => this.menuItems.set([])
+      next: d => { this.menuItems.set(d); menuDone = true; checkDone(); },
+      error: () => { this.menuItems.set([]); menuDone = true; checkDone(); }
     });
   }
 

@@ -17,8 +17,8 @@ import { environment } from '../../../../environments/environment';
         <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a]"></div>
         <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
           <!-- Pulsing Logo Container -->
-          <div class="h-28 w-28 bg-white/5 rounded-[2rem] border border-white/10 flex items-center justify-center shadow-2xl backdrop-blur-md mb-6 animate-pulse">
-            <span class="text-5xl drop-shadow-lg">🛎️</span>
+          <div class="h-28 w-28 bg-white rounded-[2rem] border border-white/10 flex items-center justify-center shadow-2xl mb-6 animate-pulse p-2 bg-opacity-95">
+            <img src="logo.png" class="w-full h-full object-contain" />
           </div>
           <h1 class="text-white text-4xl font-black tracking-tight mb-2">mozoGo</h1>
           <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mt-2">Cargando Sistema...</p>
@@ -45,9 +45,9 @@ import { environment } from '../../../../environments/environment';
       @if (isLoading()) {
         <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-fade-in">
           <div class="bg-white/95 p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-xs w-full mx-4 border border-white/20">
-            <div class="h-16 w-16 mb-4 relative flex items-center justify-center">
+            <div class="h-16 w-16 mb-4 relative flex items-center justify-center p-2">
               <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
-              <span class="text-2xl">🔐</span>
+              <img src="logo.png" class="w-full h-full object-contain" />
             </div>
             <h3 class="text-lg font-black text-gray-800">Conectando...</h3>
             <p class="text-gray-500 text-sm mt-2 font-medium">Validando tus credenciales en MozoGo</p>
@@ -61,12 +61,7 @@ import { environment } from '../../../../environments/environment';
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-8">
           <div class="h-32 w-32 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-white overflow-hidden p-2">
-            <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain" />
-            <div *ngIf="!globalLogoBase64()" class="w-full h-full bg-gradient-to-br from-primary to-[#1a233b] rounded-2xl flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V3m0 3a9 9 0 0 1 9 9v3H3v-3a9 9 0 0 1 9-9zM6 12v3M18 12v3"></path>
-              </svg>
-            </div>
+            <img src="logo.png" class="w-full h-full object-contain" />
           </div>
         </div>
         <h2 class="text-center text-4xl font-black text-gray-900 tracking-tight mb-2 flex flex-col">

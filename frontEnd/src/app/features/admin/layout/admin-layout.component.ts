@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { TenantSelectorComponent } from './tenant-selector/tenant-selector.component';
+import { AdminDataService } from '../config/admin-data.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -16,9 +17,8 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
       <aside class="w-72 bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all">
         <div class="p-6 border-b border-white/10 mt-4">
           <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0">
-              <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain p-1" />
-              <span *ngIf="!globalLogoBase64()" class="text-xl">🍽️</span>
+            <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0 p-1">
+              <img src="logo.png" class="w-full h-full object-contain" />
             </div>
             <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
           </h2>
@@ -62,8 +62,7 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
             </button>
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 max-w-[200px] truncate">
              <div class="w-6 h-6 rounded flex items-center justify-center overflow-hidden shrink-0">
-               <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain" />
-               <span *ngIf="!globalLogoBase64()" class="text-accent">🍽️</span>
+               <img src="logo.png" class="w-full h-full object-contain" />
              </div>
              <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
             </h2>
@@ -87,7 +86,19 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
           </div>
         </header>
 
-        <div class="p-4 md:p-8 flex-1 overflow-auto bg-[#fafafa]">
+        <div class="p-4 md:p-8 flex-1 overflow-auto bg-[#fafafa] relative">
+          @if (dataService.isLoading()) {
+            <div class="absolute inset-0 bg-white/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-fade-in">
+              <div class="flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-xs">
+                <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
+                  <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
+                  <img src="logo.png" class="w-full h-full object-contain" />
+                </div>
+                <h3 class="text-lg font-black text-gray-800">Cargando datos...</h3>
+                <p class="text-gray-400 text-xs mt-1 font-semibold uppercase tracking-wider animate-pulse">Sincronizando con MozoGo</p>
+              </div>
+            </div>
+          }
           <div class="max-w-7xl mx-auto">
             <router-outlet></router-outlet>
           </div>
@@ -100,9 +111,8 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
             <div class="p-6 border-b border-white/10 mt-4 flex justify-between items-center">
               <div>
                 <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0">
-                    <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain p-1" />
-                    <span *ngIf="!globalLogoBase64()" class="text-xl">🍽️</span>
+                  <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center overflow-hidden shrink-0 p-1">
+                    <img src="logo.png" class="w-full h-full object-contain" />
                   </div>
                   <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
                 </h2>
@@ -160,6 +170,7 @@ export class AdminLayoutComponent {
   auth = inject(AuthService);
   router = inject(Router);
   http = inject(HttpClient);
+  dataService = inject(AdminDataService);
   
   mobileMenuOpen = signal(false);
   globalAppName = signal<string>('');
