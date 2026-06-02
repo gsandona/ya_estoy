@@ -20,7 +20,7 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
               <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain p-1" />
               <span *ngIf="!globalLogoBase64()" class="text-xl">🍽️</span>
             </div>
-            <span class="truncate">{{ globalAppName() || 'SistemaQR' }}</span>
+            <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
           </h2>
           <p class="text-slate-400 text-sm mt-1 font-medium select-none">Gestión Staff • {{ auth.currentUser()?.role }}</p>
         </div>
@@ -65,7 +65,7 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
                <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain" />
                <span *ngIf="!globalLogoBase64()" class="text-accent">🍽️</span>
              </div>
-             <span class="truncate">{{ globalAppName() || 'Staff' }}</span>
+             <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
             </h2>
           </div>
           
@@ -104,7 +104,7 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
                     <img *ngIf="globalLogoBase64()" [src]="globalLogoBase64()" class="w-full h-full object-contain p-1" />
                     <span *ngIf="!globalLogoBase64()" class="text-xl">🍽️</span>
                   </div>
-                  <span class="truncate">{{ globalAppName() || 'Sistema' }}</span>
+                  <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
                 </h2>
                 <p class="text-slate-400 text-xs mt-1 font-medium">{{ auth.currentUser()?.role }}</p>
               </div>

@@ -38,8 +38,7 @@ import { environment } from '../../../../environments/environment';
           </div>
         </div>
         <h2 class="text-center text-4xl font-black text-gray-900 tracking-tight mb-2 flex flex-col">
-          <span>{{ globalAppName() || 'El Gran Sabor' }}</span>
-          <span class="text-xl text-primary font-bold mt-1">Management Staff</span>
+          <span>mozoGo</span>
         </h2>
         <p class="mt-4 text-center text-sm text-gray-500 font-medium">
           Acceso privado · Usa tu <span class="text-accent">correo electrónico</span>

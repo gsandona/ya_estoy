@@ -73,7 +73,6 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
         <table class="w-full text-left text-sm">
           <thead class="bg-gray-50/80 border-b border-gray-100">
             <tr class="text-gray-500 uppercase tracking-wider text-xs font-bold">
-              <th class="py-4 px-4">Logo</th>
               <th class="py-4 px-4">Nombre</th>
               <th class="py-4 px-4">Estado</th>
               <th class="py-4 px-4">Creación</th>
@@ -82,12 +81,6 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
           </thead>
           <tbody class="divide-y divide-gray-50">
             <tr *ngFor="let r of restaurantes" class="hover:bg-primary/5 transition-colors group">
-              <td class="py-3 px-4">
-                <div class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 overflow-hidden flex items-center justify-center">
-                  <img *ngIf="r.logoUrl" [src]="r.logoUrl" class="w-full h-full object-contain p-1" />
-                  <span *ngIf="!r.logoUrl" class="text-gray-300 text-xs font-bold">N/A</span>
-                </div>
-              </td>
               <td class="py-3 px-4 font-bold text-gray-800">{{ r.nombre }}</td>
               <td class="py-3 px-4">
                 <span class="px-2.5 py-1 text-xs font-bold rounded-lg" [ngClass]="r.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
@@ -101,7 +94,7 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
               </td>
             </tr>
             <tr *ngIf="restaurantes.length === 0 && !isLoading">
-              <td colspan="5" class="py-8 text-center text-gray-500">No hay restaurantes registrados.</td>
+              <td colspan="4" class="py-8 text-center text-gray-500">No hay restaurantes registrados.</td>
             </tr>
           </tbody>
         </table>

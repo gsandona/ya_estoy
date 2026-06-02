@@ -151,16 +151,14 @@ public class MesasConfigController : ControllerBase
         if (string.IsNullOrWhiteSpace(mesaId))
             return BadRequest("Parámetros incompletos.");
 
-        var mesas = await _mesaRepository.GetAllAsync();
-        
         Mesa? mesa = null;
         if (int.TryParse(mesaId, out int parsedNum))
         {
-            mesa = mesas.FirstOrDefault(m => m.Numero == parsedNum);
+            mesa = await _mesaRepository.GetByNumeroIgnoreQueryFiltersAsync(parsedNum);
         }
         else if (Guid.TryParse(mesaId, out Guid parsedId))
         {
-            mesa = mesas.FirstOrDefault(m => m.Id == parsedId);
+            mesa = await _mesaRepository.GetByIdAsync(parsedId);
         }
 
         if (mesa == null) 
