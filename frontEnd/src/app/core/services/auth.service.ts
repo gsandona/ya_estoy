@@ -4,18 +4,22 @@ import { tap, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SignalrService } from './signalr.service';
+import { TenantContextService } from './tenant-context.service';
 
 export interface User {
   id: string;
   email: string;
   role: 'Admin' | 'Mozo' | 'SuperAdmin';
   token: string;
+  restauranteId?: string;
+  restauranteNombre?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private signalrService = inject(SignalrService);
+  private tenantContext = inject(TenantContextService);
   private _currentUser = signal<User | null>(null);
   private _token: string | null = null;
   
@@ -32,6 +36,14 @@ export class AuthService {
       this._token = savedToken;
       const user = JSON.parse(savedUser) as User;
       this._currentUser.set(user);
+
+      // Auto-set the active tenant ID for Admin and Mozo
+      if ((user.role === 'Admin' || user.role === 'Mozo') && user.restauranteId) {
+        if (!this.tenantContext.currentTenantId) {
+          this.tenantContext.setTenantId(user.restauranteId);
+        }
+      }
+
       // Wait for signalR connection or just call it, signalr.service buffers/handles it
       setTimeout(() => this.signalrService.joinGroup(user.role, user.id), 1000);
     }
@@ -44,6 +56,12 @@ export class AuthService {
         this._currentUser.set(user);
         localStorage.setItem('auth_token', user.token);
         localStorage.setItem('auth_user', JSON.stringify(user));
+
+        // Auto-set the active tenant ID for Admin and Mozo
+        if ((user.role === 'Admin' || user.role === 'Mozo') && user.restauranteId) {
+          this.tenantContext.setTenantId(user.restauranteId);
+        }
+
         this.signalrService.joinGroup(user.role, user.id);
       })
     );

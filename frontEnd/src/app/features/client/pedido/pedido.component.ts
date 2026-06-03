@@ -115,7 +115,7 @@ import { FormsModule } from '@angular/forms';
 
         @if (showMenu()) {
           <div class="w-full max-w-md mt-10 animate-fade-in pb-20">
-             <app-menu></app-menu>
+             <app-menu [restauranteId]="restauranteId()"></app-menu>
           </div>
         }
 
@@ -219,6 +219,7 @@ export class PedidoComponent implements OnInit {
   pinError = signal<string | null>(null);
   validatingPin = signal(false);
   numeroMesa = signal<string>('');
+  restauranteId = signal<string>('');
 
   loadingLlamar = signal(false);
   loadingCuenta = signal(false);
@@ -269,6 +270,9 @@ export class PedidoComponent implements OnInit {
         this.requirePin.set(false);
         this.pinError.set(null);
         this.id = res.mesaId; // Guardamos el GUID para las llamadas de SignalR
+        if (res.restauranteId) {
+          this.restauranteId.set(res.restauranteId);
+        }
 
         // Sincronizar con el backend: si el mozo ya lo completó, desbloqueamos
         if (res.hasLlamado) this.yaLlamo.set(true);

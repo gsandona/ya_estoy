@@ -191,6 +191,7 @@ public class MesasConfigController : ControllerBase
 
         return Ok(new { 
             mesaId = mesa.Id, 
+            restauranteId = mesa.RestauranteId,
             numero = mesa.Numero, 
             estado = mesa.Estado, 
             validado = true,

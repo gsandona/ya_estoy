@@ -120,7 +120,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
             </div>
 
             <p class="text-xs text-primary bg-surface py-2 px-4 rounded-xl mb-6 font-bold truncate">
-              URL: /mesa/{{ showQrModal()?.numero }}
+              URL: /mesa/{{ restauranteNombre() }}/{{ showQrModal()?.numero }}
             </p>
 
             <div class="flex flex-col gap-3">
@@ -164,14 +164,17 @@ export class AbmMesasComponent {
   restauranteNombre = signal<string>('restaurante');
 
   constructor() {
-    const tenantId = this.tenantContext.currentTenantId;
-    if (tenantId) {
-      this.restauranteService.getById(tenantId).subscribe(rest => {
-        if (rest && rest.nombre) {
-          this.restauranteNombre.set(this.slugify(rest.nombre));
-        }
-      });
-    }
+    this.tenantContext.tenantId$.subscribe(tenantId => {
+      if (tenantId) {
+        this.restauranteService.getById(tenantId).subscribe(rest => {
+          if (rest && rest.nombre) {
+            this.restauranteNombre.set(this.slugify(rest.nombre));
+          }
+        });
+      } else {
+        this.restauranteNombre.set('restaurante');
+      }
+    });
   }
 
   slugify(text: string): string {

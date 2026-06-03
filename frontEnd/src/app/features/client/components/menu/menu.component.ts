@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, Input, inject, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { CartService, MenuItem } from '../../../../core/services/cart.service';
@@ -63,13 +63,19 @@ import { environment } from '../../../../../environments/environment';
   `]
 })
 export class MenuComponent implements OnInit {
+  @Input() restauranteId!: string;
+
   cartService = inject(CartService);
   http = inject(HttpClient);
 
   categories = signal<{name: string, items: MenuItem[]}[]>([]);
 
   ngOnInit() {
-    this.http.get<MenuItem[]>(`${environment.apiUrl}/api/menu`).subscribe({
+    const url = this.restauranteId 
+      ? `${environment.apiUrl}/api/menu?restauranteId=${this.restauranteId}`
+      : `${environment.apiUrl}/api/menu`;
+
+    this.http.get<MenuItem[]>(url).subscribe({
       next: (data) => {
         this.groupAndSetCategories(data);
       },

@@ -18,6 +18,8 @@ public class AuthResponseDto
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty;
+    public Guid? RestauranteId { get; set; }
+    public string? RestauranteNombre { get; set; }
 }
 
 public class CrearUsuarioDto

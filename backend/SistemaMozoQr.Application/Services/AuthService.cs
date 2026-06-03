@@ -13,11 +13,13 @@ public class AuthService : IAuthService
 {
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IConfiguration _configuration;
+    private readonly IRestauranteRepository _restauranteRepository;
 
-    public AuthService(IUsuarioRepository usuarioRepository, IConfiguration configuration)
+    public AuthService(IUsuarioRepository usuarioRepository, IConfiguration configuration, IRestauranteRepository restauranteRepository)
     {
         _usuarioRepository = usuarioRepository;
         _configuration = configuration;
+        _restauranteRepository = restauranteRepository;
     }
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
@@ -52,12 +54,24 @@ public class AuthService : IAuthService
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
+        string? restauranteNombre = null;
+        if (user.RestauranteId != Guid.Empty)
+        {
+            var restaurante = await _restauranteRepository.GetByIdAsync(user.RestauranteId);
+            if (restaurante != null)
+            {
+                restauranteNombre = restaurante.Nombre;
+            }
+        }
+
         return new AuthResponseDto
         {
             Id = user.Id,
             Email = user.Email,
             Role = user.Rol.ToString(),
-            Token = tokenHandler.WriteToken(token)
+            Token = tokenHandler.WriteToken(token),
+            RestauranteId = user.RestauranteId != Guid.Empty ? user.RestauranteId : null,
+            RestauranteNombre = restauranteNombre
         };
     }
 }
