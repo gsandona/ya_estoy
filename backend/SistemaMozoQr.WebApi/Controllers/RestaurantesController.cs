@@ -41,7 +41,7 @@ public class RestaurantesController : ControllerBase
         var restaurante = await _context.Restaurantes.FindAsync(id);
         if (restaurante == null) return NotFound();
         
-        if (!_context.IsSuperAdmin && restaurante.ParentRestauranteId != _context.CurrentTenantId)
+        if (!_context.IsSuperAdmin && restaurante.Id != _context.CurrentTenantId && restaurante.ParentRestauranteId != _context.CurrentTenantId)
             return Forbid();
 
         return Ok(restaurante);

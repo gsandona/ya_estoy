@@ -6,6 +6,7 @@ import { AdminDataService, AdminMesa, AdminUser } from './admin-data.service';
 import { environment } from '../../../../environments/environment';
 import { RestauranteService } from '../../../core/services/restaurante.service';
 import { TenantContextService } from '../../../core/services/tenant-context.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-abm-mesas',
@@ -152,6 +153,7 @@ export class AbmMesasComponent {
   http = inject(HttpClient);
   private restauranteService = inject(RestauranteService);
   private tenantContext = inject(TenantContextService);
+  private authService = inject(AuthService);
   
   showForm = signal(false);
   editingId = signal<string | null>(null);
@@ -164,11 +166,29 @@ export class AbmMesasComponent {
   restauranteNombre = signal<string>('restaurante');
 
   constructor() {
+    const currentUser = this.authService.currentUser();
+    if (currentUser && currentUser.restauranteNombre) {
+      this.restauranteNombre.set(this.slugify(currentUser.restauranteNombre));
+    }
+
     this.tenantContext.tenantId$.subscribe(tenantId => {
       if (tenantId) {
-        this.restauranteService.getById(tenantId).subscribe(rest => {
-          if (rest && rest.nombre) {
-            this.restauranteNombre.set(this.slugify(rest.nombre));
+        if (currentUser && currentUser.restauranteId === tenantId && currentUser.restauranteNombre) {
+          this.restauranteNombre.set(this.slugify(currentUser.restauranteNombre));
+          return;
+        }
+
+        this.restauranteService.getById(tenantId).subscribe({
+          next: (rest) => {
+            if (rest && rest.nombre) {
+              this.restauranteNombre.set(this.slugify(rest.nombre));
+            }
+          },
+          error: (err) => {
+            console.error('Error al obtener restaurante por id, usando fallback:', err);
+            if (currentUser && currentUser.restauranteNombre) {
+              this.restauranteNombre.set(this.slugify(currentUser.restauranteNombre));
+            }
           }
         });
       } else {
