@@ -204,7 +204,10 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class PedidoComponent implements OnInit {
-  @Input() id!: string;
+  @Input() restaurante!: string;
+  @Input() numero!: string;
+
+  id = ''; // Se resolverá al GUID de la mesa retornado por el backend
 
   private signalrService = inject(SignalrService);
   private http = inject(HttpClient);
@@ -230,23 +233,23 @@ export class PedidoComponent implements OnInit {
 
   ngOnInit() {
     this.checkCooldowns();
-    const savedPin = localStorage.getItem(`mesa_pin_${this.id}`);
+    const savedPin = localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`);
     this.verifyMesa(savedPin || undefined);
   }
 
   checkCooldowns() {
-    const llamoTime = localStorage.getItem(`mesa_${this.id}_llamo`);
+    const llamoTime = localStorage.getItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
     if (llamoTime) {
       const diff = Date.now() - parseInt(llamoTime, 10);
       if (diff < 15 * 60 * 1000) this.yaLlamo.set(true); // 15 mins
-      else localStorage.removeItem(`mesa_${this.id}_llamo`);
+      else localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
     }
 
-    const cuentaTime = localStorage.getItem(`mesa_${this.id}_cuenta`);
+    const cuentaTime = localStorage.getItem(`mesa_${this.restaurante}_${this.numero}_cuenta`);
     if (cuentaTime) {
       const diff = Date.now() - parseInt(cuentaTime, 10);
       if (diff < 15 * 60 * 1000) this.yaPidioCuenta.set(true);
-      else localStorage.removeItem(`mesa_${this.id}_cuenta`);
+      else localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`);
     }
   }
 
@@ -254,24 +257,25 @@ export class PedidoComponent implements OnInit {
     if(pinParam) this.validatingPin.set(true);
     else this.isValidSession.set(undefined);
     const url = pinParam 
-      ? `${environment.apiUrl}/api/mesas/verify?mesaId=${this.id}&pin=${pinParam}`
-      : `${environment.apiUrl}/api/mesas/verify?mesaId=${this.id}`;
+      ? `${environment.apiUrl}/api/mesas/verify?restaurante=${this.restaurante}&numero=${this.numero}&pin=${pinParam}`
+      : `${environment.apiUrl}/api/mesas/verify?restaurante=${this.restaurante}&numero=${this.numero}`;
 
     this.http.get<any>(url).subscribe({
       next: (res) => {
         if(pinParam) {
           this.validatingPin.set(false);
-          localStorage.setItem(`mesa_pin_${this.id}`, pinParam);
+          localStorage.setItem(`mesa_pin_${this.restaurante}_${this.numero}`, pinParam);
         }
         this.requirePin.set(false);
         this.pinError.set(null);
+        this.id = res.mesaId; // Guardamos el GUID para las llamadas de SignalR
 
         // Sincronizar con el backend: si el mozo ya lo completó, desbloqueamos
         if (res.hasLlamado) this.yaLlamo.set(true);
-        else { this.yaLlamo.set(false); localStorage.removeItem(`mesa_${this.id}_llamo`); }
+        else { this.yaLlamo.set(false); localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`); }
 
         if (res.hasCuenta) this.yaPidioCuenta.set(true);
-        else { this.yaPidioCuenta.set(false); localStorage.removeItem(`mesa_${this.id}_cuenta`); }
+        else { this.yaPidioCuenta.set(false); localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`); }
 
         if (res.numero) {
           this.numeroMesa.set(res.numero.toString());
@@ -283,16 +287,16 @@ export class PedidoComponent implements OnInit {
         if(pinParam) this.validatingPin.set(false);
         if (err.status === 401) {
           // Requiere PIN
-          localStorage.removeItem(`mesa_pin_${this.id}`);
+          localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.requirePin.set(true);
           this.isValidSession.set(undefined);
         } else if (err.status === 400 && pinParam) {
           // PIN Incorrecto
-          localStorage.removeItem(`mesa_pin_${this.id}`);
+          localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.pinError.set('El PIN ingresado es incorrecto.');
         } else {
           // Mesa apagada, token expiro, etc.
-          localStorage.removeItem(`mesa_pin_${this.id}`);
+          localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.requirePin.set(false);
           console.error('Violación de seguridad o mesa inactiva', err);
           setTimeout(() => this.isValidSession.set(false), 800);
@@ -316,7 +320,7 @@ export class PedidoComponent implements OnInit {
     try {
       await this.signalrService.sendLlamarMozo(this.id);
       this.yaLlamo.set(true);
-      localStorage.setItem(`mesa_${this.id}_llamo`, Date.now().toString());
+      localStorage.setItem(`mesa_${this.restaurante}_${this.numero}_llamo`, Date.now().toString());
     } finally {
       setTimeout(() => this.loadingLlamar.set(false), 800);
     }
@@ -327,7 +331,7 @@ export class PedidoComponent implements OnInit {
     try {
       await this.signalrService.sendPedirCuenta(this.id);
       this.yaPidioCuenta.set(true);
-      localStorage.setItem(`mesa_${this.id}_cuenta`, Date.now().toString());
+      localStorage.setItem(`mesa_${this.restaurante}_${this.numero}_cuenta`, Date.now().toString());
     } finally {
       setTimeout(() => this.loadingCuenta.set(false), 800);
     }

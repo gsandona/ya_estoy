@@ -29,6 +29,20 @@ public class MesaRepository : IMesaRepository
         return await _context.Mesas.IgnoreQueryFilters().Include(m => m.Mozo).FirstOrDefaultAsync(m => m.Numero == numero);
     }
 
+    public async Task<Mesa?> GetByRestauranteAndNumeroAsync(string restauranteNombre, int numeroMesa)
+    {
+        var mesas = await _context.Mesas
+            .IgnoreQueryFilters()
+            .Include(m => m.Restaurante)
+            .Include(m => m.Mozo)
+            .ToListAsync();
+
+        return mesas.FirstOrDefault(m => 
+            m.Numero == numeroMesa && 
+            m.Restaurante != null && 
+            NormalizeString(m.Restaurante.Nombre) == NormalizeString(restauranteNombre));
+    }
+
     public async Task<IEnumerable<Mesa>> GetAllAsync()
     {
         return await _context.Mesas.Include(m => m.Mozo).ToListAsync();
@@ -82,5 +96,13 @@ public class MesaRepository : IMesaRepository
         }
 
         await _context.SaveChangesAsync();
+    }
+
+    private static string NormalizeString(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+        return new string(input.ToLowerInvariant()
+            .Where(c => !char.IsWhiteSpace(c) && c != '-')
+            .ToArray());
     }
 }

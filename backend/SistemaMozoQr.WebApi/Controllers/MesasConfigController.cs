@@ -146,23 +146,28 @@ public class MesasConfigController : ControllerBase
 
     [HttpGet("verify")]
     [AllowAnonymous]
-    public async Task<IActionResult> VerifyMesa([FromQuery] string mesaId, [FromQuery] string? pin)
+    public async Task<IActionResult> VerifyMesa([FromQuery] string? mesaId, [FromQuery] string? pin, [FromQuery] string? restaurante, [FromQuery] int? numero)
     {
-        if (string.IsNullOrWhiteSpace(mesaId))
-            return BadRequest("Parámetros incompletos.");
-
         Mesa? mesa = null;
-        if (int.TryParse(mesaId, out int parsedNum))
+
+        if (restaurante != null && numero.HasValue)
         {
-            mesa = await _mesaRepository.GetByNumeroIgnoreQueryFiltersAsync(parsedNum);
+            mesa = await _mesaRepository.GetByRestauranteAndNumeroAsync(restaurante, numero.Value);
         }
-        else if (Guid.TryParse(mesaId, out Guid parsedId))
+        else if (!string.IsNullOrWhiteSpace(mesaId))
         {
-            mesa = await _mesaRepository.GetByIdAsync(parsedId);
+            if (int.TryParse(mesaId, out int parsedNum))
+            {
+                mesa = await _mesaRepository.GetByNumeroIgnoreQueryFiltersAsync(parsedNum);
+            }
+            else if (Guid.TryParse(mesaId, out Guid parsedId))
+            {
+                mesa = await _mesaRepository.GetByIdAsync(parsedId);
+            }
         }
 
         if (mesa == null) 
-            return NotFound("La mesa solicitada no existe.");
+            return NotFound("La mesa solicitada no existe o parámetros incompletos.");
 
         // Validar que la mesa esté activa (PIN configurado)
         if (string.IsNullOrEmpty(mesa.CodigoAcceso) || mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible)

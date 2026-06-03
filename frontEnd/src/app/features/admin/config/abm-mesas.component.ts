@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AdminDataService, AdminMesa, AdminUser } from './admin-data.service';
 import { environment } from '../../../../environments/environment';
+import { RestauranteService } from '../../../core/services/restaurante.service';
+import { TenantContextService } from '../../../core/services/tenant-context.service';
 
 @Component({
   selector: 'app-abm-mesas',
@@ -148,6 +150,8 @@ import { environment } from '../../../../environments/environment';
 export class AbmMesasComponent {
   dataService = inject(AdminDataService);
   http = inject(HttpClient);
+  private restauranteService = inject(RestauranteService);
+  private tenantContext = inject(TenantContextService);
   
   showForm = signal(false);
   editingId = signal<string | null>(null);
@@ -157,6 +161,27 @@ export class AbmMesasComponent {
 
   formData: AdminMesa = { id: '', numero: 1, ubicacion: '', mozoId: 'Sin asignar' };
   showQrModal = signal<AdminMesa | null>(null);
+  restauranteNombre = signal<string>('restaurante');
+
+  constructor() {
+    const tenantId = this.tenantContext.currentTenantId;
+    if (tenantId) {
+      this.restauranteService.getById(tenantId).subscribe(rest => {
+        if (rest && rest.nombre) {
+          this.restauranteNombre.set(this.slugify(rest.nombre));
+        }
+      });
+    }
+  }
+
+  slugify(text: string): string {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
 
   openQrModal(mesa: AdminMesa) {
     this.showQrModal.set(mesa);
@@ -169,7 +194,7 @@ export class AbmMesasComponent {
   getQrImageUrl(mesa: AdminMesa) {
     // Exacta ruta literal pedida sin # usando el frontend que esté corriendo
     const baseUrl = window.location.origin;
-    const targetUrl = `${baseUrl}/mesa/${mesa.id}`;
+    const targetUrl = `${baseUrl}/mesa/${this.restauranteNombre()}/${mesa.numero}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
   }
 
