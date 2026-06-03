@@ -11,7 +11,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
 {
     private readonly IMesaRepository _mesaRepository;
     private readonly ITaskRepository _taskRepository;
-    private static readonly ConcurrentDictionary<int, DateTime> _lastCalls = new();
+    private static readonly ConcurrentDictionary<Guid, DateTime> _lastCalls = new();
 
     public RestauranteHub(IMesaRepository mesaRepository, ITaskRepository taskRepository)
     {
@@ -19,15 +19,17 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         _taskRepository = taskRepository;
     }
 
-    private async Task<(IRestauranteHubClient Clients, string? AssignedMozoId, Guid RestauranteId)> GetClientsForTable(int tableId)
+    private async Task<(IRestauranteHubClient Clients, string? AssignedMozoId, Guid RestauranteId, int Numero)> GetClientsForMesa(Guid mesaId)
     {
-        var mesa = await _mesaRepository.GetByNumeroIgnoreQueryFiltersAsync(tableId);
+        var mesa = await _mesaRepository.GetByIdAsync(mesaId);
         
         var grupos = new List<string> { "Admin" };
         string? assignedMozoId = null;
         Guid restauranteId = Guid.Empty;
+        int numero = 0;
         if (mesa != null)
         {
+            numero = mesa.Numero;
             restauranteId = mesa.RestauranteId;
             if (mesa.MozoId.HasValue)
             {
@@ -35,79 +37,81 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
                 grupos.Add($"Mozo_{assignedMozoId}");
             }
         }
-        return (Clients.Groups(grupos), assignedMozoId, restauranteId);
+        return (Clients.Groups(grupos), assignedMozoId, restauranteId, numero);
     }
 
-    private bool IsSpamming(int tableId)
+    private bool IsSpamming(Guid mesaId)
     {
         var now = DateTime.UtcNow;
-        if (_lastCalls.TryGetValue(tableId, out var lastCall))
+        if (_lastCalls.TryGetValue(mesaId, out var lastCall))
         {
             if ((now - lastCall).TotalSeconds < 15) return true; // Bloquear si fue hace menos de 15 segundos
         }
-        _lastCalls[tableId] = now;
+        _lastCalls[mesaId] = now;
         return false;
     }
 
-    private async Task<bool> IsMesaActive(int tableId)
+    private async Task<bool> IsMesaActive(Guid mesaId)
     {
-        var mesa = await _mesaRepository.GetByNumeroIgnoreQueryFiltersAsync(tableId);
+        var mesa = await _mesaRepository.GetByIdAsync(mesaId);
         return mesa != null && mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Ocupada && !string.IsNullOrEmpty(mesa.CodigoAcceso);
     }
 
-    private async Task<bool> IsDuplicateAlert(int tableId, string type)
+    private async Task<bool> IsDuplicateAlert(Guid mesaId, string type)
     {
+        var mesa = await _mesaRepository.GetByIdAsync(mesaId);
+        if (mesa == null) return false;
         var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
-        return pendingTasks.Any(t => t.TableId == tableId && t.Type == type);
+        return pendingTasks.Any(t => t.TableId == mesa.Numero && t.Type == type && t.RestauranteId == mesa.RestauranteId);
     }
 
-    public async Task LlamarMozo(int tableId)
+    public async Task LlamarMozo(Guid mesaId)
     {
-        if (IsSpamming(tableId) || !await IsMesaActive(tableId) || await IsDuplicateAlert(tableId, "Llamado")) return;
-        var (clients, assignedMozoId, restauranteId) = await GetClientsForTable(tableId);
+        if (IsSpamming(mesaId) || !await IsMesaActive(mesaId) || await IsDuplicateAlert(mesaId, "Llamado")) return;
+        var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
         var taskId = Guid.NewGuid();
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask 
         { 
             Id = taskId, 
-            TableId = tableId, 
+            TableId = tableNumero, 
             Type = "Llamado", 
             AssignedMozoId = assignedMozoId,
             RestauranteId = restauranteId
         });
-        await clients.NotificarLlamadoMozo(taskId, tableId);
+        await clients.NotificarLlamadoMozo(taskId, tableNumero);
     }
 
-    public async Task PedirCuenta(int tableId)
+    public async Task PedirCuenta(Guid mesaId)
     {
-        if (IsSpamming(tableId) || !await IsMesaActive(tableId) || await IsDuplicateAlert(tableId, "Cuenta")) return;
-        var (clients, assignedMozoId, restauranteId) = await GetClientsForTable(tableId);
+        if (IsSpamming(mesaId) || !await IsMesaActive(mesaId) || await IsDuplicateAlert(mesaId, "Cuenta")) return;
+        var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
         var taskId = Guid.NewGuid();
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask 
         { 
             Id = taskId, 
-            TableId = tableId, 
+            TableId = tableNumero, 
             Type = "Cuenta", 
             AssignedMozoId = assignedMozoId,
             RestauranteId = restauranteId
         });
-        await clients.NotificarPidiendoCuenta(taskId, tableId);
+        await clients.NotificarPidiendoCuenta(taskId, tableNumero);
     }
 
-    public async Task NuevoPedido(int tableId, string details)
+    public async Task NuevoPedido(Guid mesaId, string details)
     {
-        if (IsSpamming(tableId) || !await IsMesaActive(tableId)) return;
-        var (clients, assignedMozoId, restauranteId) = await GetClientsForTable(tableId);
+        if (IsSpamming(mesaId) || !await IsMesaActive(mesaId)) return;
+        var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
         var taskId = Guid.NewGuid();
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask 
         { 
             Id = taskId, 
-            TableId = tableId, 
+            TableId = tableNumero, 
             Type = "Pedido", 
             Details = details, 
             AssignedMozoId = assignedMozoId,
             RestauranteId = restauranteId
         });
-        await clients.NotificarNuevoPedido(Guid.NewGuid(), taskId, tableId, details);
+        await clients.NotificarNuevoPedido(Guid.NewGuid(), taskId, tableNumero, details);
     }
 
     public async Task ReasignarTarea(string taskId, string newMozoId)

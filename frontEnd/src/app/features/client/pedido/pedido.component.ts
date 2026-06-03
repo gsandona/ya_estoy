@@ -68,7 +68,7 @@ import { FormsModule } from '@angular/forms';
       <div class="min-h-screen bg-surface flex flex-col items-center py-12 px-4 pb-32 animate-fade-in">
         <div class="mb-10 text-center">
           <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary text-white text-3xl font-bold mb-4 shadow-lg ring-4 ring-primary/20">
-            {{ id }}
+            {{ numeroMesa() || '...' }}
           </div>
           <h1 class="text-3xl font-bold text-gray-800 mb-2 tracking-tight">Menú Interactivo</h1>
         </div>
@@ -215,6 +215,7 @@ export class PedidoComponent implements OnInit {
   pinInput = '';
   pinError = signal<string | null>(null);
   validatingPin = signal(false);
+  numeroMesa = signal<string>('');
 
   loadingLlamar = signal(false);
   loadingCuenta = signal(false);
@@ -272,6 +273,10 @@ export class PedidoComponent implements OnInit {
         if (res.hasCuenta) this.yaPidioCuenta.set(true);
         else { this.yaPidioCuenta.set(false); localStorage.removeItem(`mesa_${this.id}_cuenta`); }
 
+        if (res.numero) {
+          this.numeroMesa.set(res.numero.toString());
+        }
+
         setTimeout(() => this.isValidSession.set(true), 800);
       },
       error: (err) => {
@@ -309,7 +314,7 @@ export class PedidoComponent implements OnInit {
   async llamarMozo() {
     this.loadingLlamar.set(true);
     try {
-      await this.signalrService.sendLlamarMozo(Number(this.id));
+      await this.signalrService.sendLlamarMozo(this.id);
       this.yaLlamo.set(true);
       localStorage.setItem(`mesa_${this.id}_llamo`, Date.now().toString());
     } finally {
@@ -320,7 +325,7 @@ export class PedidoComponent implements OnInit {
   async pedirCuenta() {
     this.loadingCuenta.set(true);
     try {
-      await this.signalrService.sendPedirCuenta(Number(this.id));
+      await this.signalrService.sendPedirCuenta(this.id);
       this.yaPidioCuenta.set(true);
       localStorage.setItem(`mesa_${this.id}_cuenta`, Date.now().toString());
     } finally {
@@ -334,7 +339,7 @@ export class PedidoComponent implements OnInit {
       const detailsArray = this.cart.items().map(i => `${i.quantity}x ${i.nombre}`);
       const fullDetails = detailsArray.join(', ');
 
-      await this.signalrService.sendNuevoPedido(Number(this.id), fullDetails);
+      await this.signalrService.sendNuevoPedido(this.id, fullDetails);
       
       this.showCartModal.set(false);
       this.cart.clearCart();

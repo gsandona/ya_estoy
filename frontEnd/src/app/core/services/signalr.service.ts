@@ -199,14 +199,14 @@ export class SignalrService {
     }
   }
 
-  public async sendLlamarMozo(tableId: number) {
+  public async sendLlamarMozo(mesaId: string) {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('LlamarMozo', tableId);
+      await this.hubConnection.invoke('LlamarMozo', mesaId);
     } else {
       console.warn('SignalR not connected, mock send locally.');
       this.addTask({
         id: crypto.randomUUID(),
-        tableId,
+        tableId: 0,
         type: 'Llamado',
         timestamp: new Date(),
         status: 'Pending'
@@ -214,14 +214,14 @@ export class SignalrService {
     }
   }
 
-  public async sendPedirCuenta(tableId: number) {
+  public async sendPedirCuenta(mesaId: string) {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('PedirCuenta', tableId);
+      await this.hubConnection.invoke('PedirCuenta', mesaId);
     } else {
       console.warn('SignalR not connected, mock send locally.');
       this.addTask({
         id: crypto.randomUUID(),
-        tableId,
+        tableId: 0,
         type: 'Cuenta',
         timestamp: new Date(),
         status: 'Pending'
@@ -229,14 +229,14 @@ export class SignalrService {
     }
   }
 
-  public async sendNuevoPedido(tableId: number, details: string) {
+  public async sendNuevoPedido(mesaId: string, details: string) {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('NuevoPedido', tableId, details);
+      await this.hubConnection.invoke('NuevoPedido', mesaId, details);
     } else {
       console.warn('SignalR not connected, mock send locally.');
       this.addTask({
         id: crypto.randomUUID(),
-        tableId,
+        tableId: 0,
         type: 'Pedido',
         timestamp: new Date(),
         status: 'Pending',

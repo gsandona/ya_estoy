@@ -169,7 +169,7 @@ export class AbmMesasComponent {
   getQrImageUrl(mesa: AdminMesa) {
     // Exacta ruta literal pedida sin # usando el frontend que esté corriendo
     const baseUrl = window.location.origin;
-    const targetUrl = `${baseUrl}/mesa/${mesa.numero}`;
+    const targetUrl = `${baseUrl}/mesa/${mesa.id}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
   }
 
