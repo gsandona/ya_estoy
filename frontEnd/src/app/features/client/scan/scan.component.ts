@@ -15,9 +15,11 @@ import { environment } from '../../../../environments/environment';
       <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5"></div>
       
       @if (status() === 'loading') {
-        <div class="h-20 w-20 bg-white border border-gray-100 rounded-3xl shadow-xl flex items-center justify-center mb-6 relative p-2 z-10">
+        <div class="h-20 w-20 bg-white border border-gray-100 rounded-full shadow-xl flex items-center justify-center mb-6 relative p-2 z-10">
           <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
-          <img src="logo.png" class="w-full h-full object-contain" />
+          <div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
+            <img src="logo.png" class="w-full h-full object-cover" />
+          </div>
         </div>
         <h2 class="text-xl font-bold text-gray-800 tracking-tight z-10">Conectando con tu Mesa...</h2>
         <p class="text-gray-500 text-sm mt-3 font-medium z-10">Estableciendo canal encriptado</p>

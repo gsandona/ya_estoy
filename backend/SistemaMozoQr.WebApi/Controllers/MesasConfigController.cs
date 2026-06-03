@@ -184,8 +184,8 @@ public class MesasConfigController : ControllerBase
             return BadRequest(new { message = "PIN incorrecto.", code = "PIN_INVALIDO" });
         }
 
-        var pendingTasks = await _taskRepository.GetPendingTasksAsync();
-        var mesaTasks = pendingTasks.Where(t => t.TableId == mesa.Numero).ToList();
+        var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
+        var mesaTasks = pendingTasks.Where(t => t.TableId == mesa.Numero && t.RestauranteId == mesa.RestauranteId).ToList();
         var hasLlamado = mesaTasks.Any(t => t.Type == "Llamado");
         var hasCuenta = mesaTasks.Any(t => t.Type == "Cuenta");
 

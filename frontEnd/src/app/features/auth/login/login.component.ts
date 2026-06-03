@@ -17,8 +17,8 @@ import { environment } from '../../../../environments/environment';
         <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a]"></div>
         <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
           <!-- Pulsing Logo Container -->
-          <div class="h-28 w-28 bg-white rounded-[2rem] border border-white/10 flex items-center justify-center shadow-2xl mb-6 animate-pulse p-2 bg-opacity-95">
-            <img src="logo.png" class="w-full h-full object-contain" />
+          <div class="h-28 w-28 bg-white rounded-full border border-white/10 flex items-center justify-center shadow-2xl mb-6 animate-pulse p-2 bg-opacity-95 overflow-hidden">
+            <img src="logo.png" class="w-full h-full object-cover" />
           </div>
           <h1 class="text-white text-4xl font-black tracking-tight mb-2">mozoGo</h1>
           <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mt-2">Cargando Sistema...</p>
@@ -47,7 +47,9 @@ import { environment } from '../../../../environments/environment';
           <div class="bg-white/95 p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-xs w-full mx-4 border border-white/20">
             <div class="h-16 w-16 mb-4 relative flex items-center justify-center p-2">
               <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
-              <img src="logo.png" class="w-full h-full object-contain" />
+              <div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-white p-1">
+                <img src="logo.png" class="w-full h-full object-cover" />
+              </div>
             </div>
             <h3 class="text-lg font-black text-gray-800">Conectando...</h3>
             <p class="text-gray-500 text-sm mt-2 font-medium">Validando tus credenciales en MozoGo</p>
@@ -60,8 +62,8 @@ import { environment } from '../../../../environments/environment';
       
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-8">
-          <div class="h-32 w-32 bg-white rounded-3xl shadow-2xl flex items-center justify-center border-4 border-white overflow-hidden p-2">
-            <img src="logo.png" class="w-full h-full object-contain" />
+          <div class="h-32 w-32 bg-white rounded-full shadow-2xl flex items-center justify-center border-4 border-white overflow-hidden p-2">
+            <img src="logo.png" class="w-full h-full object-cover" />
           </div>
         </div>
         <h2 class="text-center text-4xl font-black text-gray-900 tracking-tight mb-2 flex flex-col">
