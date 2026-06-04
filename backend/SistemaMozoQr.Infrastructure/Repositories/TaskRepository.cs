@@ -36,6 +36,11 @@ public class TaskRepository : ITaskRepository
         return await _context.Tasks.FindAsync(id);
     }
 
+    public async Task<MesaTask?> GetByIdIgnoreQueryFiltersAsync(Guid id)
+    {
+        return await _context.Tasks.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == id);
+    }
+
     public async Task AddAsync(MesaTask task)
     {
         await _context.Tasks.AddAsync(task);

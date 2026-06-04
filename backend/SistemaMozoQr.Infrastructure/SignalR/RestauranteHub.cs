@@ -118,7 +118,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
     {
         if (Guid.TryParse(taskId, out Guid parsedTaskId))
         {
-            var task = await _taskRepository.GetByIdAsync(parsedTaskId);
+            var task = await _taskRepository.GetByIdIgnoreQueryFiltersAsync(parsedTaskId);
             if (task != null)
             {
                 task.AssignedMozoId = newMozoId;
@@ -133,7 +133,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
     {
         if (Guid.TryParse(taskId, out Guid parsedTaskId))
         {
-            var task = await _taskRepository.GetByIdAsync(parsedTaskId);
+            var task = await _taskRepository.GetByIdIgnoreQueryFiltersAsync(parsedTaskId);
             if (task != null)
             {
                 task.Status = "Completed";
