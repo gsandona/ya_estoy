@@ -29,12 +29,35 @@ export class AuthService {
   public isSuperAdmin = computed(() => this._currentUser()?.role === 'SuperAdmin');
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
 
+  private parseJwt(token: string): any {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      return null;
+    }
+  }
+
   constructor() {
     const savedToken = localStorage.getItem('auth_token');
     const savedUser = localStorage.getItem('auth_user');
     if (savedToken && savedUser) {
       this._token = savedToken;
       const user = JSON.parse(savedUser) as User;
+
+      // Auto-recover missing properties from JWT token if needed
+      if ((user.role === 'Admin' || user.role === 'Mozo') && !user.restauranteId) {
+        const decoded = this.parseJwt(savedToken);
+        if (decoded && decoded.TenantId) {
+          user.restauranteId = decoded.TenantId;
+          localStorage.setItem('auth_user', JSON.stringify(user));
+        }
+      }
+
       this._currentUser.set(user);
 
       // Auto-set the active tenant ID for Admin and Mozo
