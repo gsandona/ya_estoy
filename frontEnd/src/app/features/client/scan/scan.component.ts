@@ -17,7 +17,9 @@ import { environment } from '../../../../environments/environment';
       @if (status() === 'loading') {
         <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2 z-10">
           <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
-          <img src="logo.png" class="w-12 h-12 object-cover rounded-2xl shadow-md border border-gray-100" />
+          <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex">
+            <img src="logo.png" class="w-full h-full object-cover" />
+          </div>
         </div>
         <h2 class="text-xl font-bold text-gray-800 tracking-tight z-10">Conectando con tu Mesa...</h2>
         <p class="text-gray-500 text-sm mt-3 font-medium z-10">Estableciendo canal encriptado</p>

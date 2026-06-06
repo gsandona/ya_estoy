@@ -44,7 +44,9 @@ import { FormsModule } from '@angular/forms';
         <div class="relative flex flex-col items-center">
           <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2">
             <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
-            <img src="logo.png" class="w-12 h-12 object-cover rounded-2xl shadow-md border border-gray-100" />
+            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex">
+              <img src="logo.png" class="w-full h-full object-cover" />
+            </div>
           </div>
           <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2">MozoGo</h2>
           <p class="text-gray-400 text-sm font-semibold uppercase tracking-widest animate-pulse">Validando Código QR...</p>
