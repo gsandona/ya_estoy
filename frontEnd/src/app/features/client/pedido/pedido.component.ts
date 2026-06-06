@@ -42,10 +42,10 @@ import { FormsModule } from '@angular/forms';
       <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5"></div>
         <div class="relative flex flex-col items-center">
-          <div class="h-20 w-20 bg-white border border-gray-100 rounded-full shadow-xl flex items-center justify-center mb-6 relative p-2">
+          <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2">
             <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
-            <div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center">
-              <img src="logo.png" class="w-full h-full object-cover" />
+            <div class="w-12 h-12 flex items-center justify-center">
+              <img src="logo.png" class="w-full h-full object-contain" />
             </div>
           </div>
           <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2">MozoGo</h2>
