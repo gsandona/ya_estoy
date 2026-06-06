@@ -17,9 +17,7 @@ import { AdminDataService } from '../config/admin-data.service';
       <aside class="w-72 bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all">
         <div class="p-6 border-b border-white/10 mt-4">
           <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 p-1.5 shadow-md">
-              <img src="logo.png" class="w-full h-full object-contain" />
-            </div>
+            <img src="logo.png" class="w-10 h-10 object-cover rounded-2xl shadow-md border border-white/10 shrink-0" />
             <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
           </h2>
           <p class="text-slate-400 text-sm mt-1 font-medium select-none">Gestión Staff • {{ auth.currentUser()?.role }}</p>
@@ -61,10 +59,8 @@ import { AdminDataService } from '../config/admin-data.service';
               <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 max-w-[200px] truncate">
-             <div class="w-8 h-8 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center overflow-hidden shrink-0 p-1 shadow-sm">
-               <img src="logo.png" class="w-full h-full object-contain" />
-             </div>
-             <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
+              <img src="logo.png" class="w-8 h-8 object-cover rounded-xl shadow-sm border border-gray-100 shrink-0" />
+              <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
             </h2>
           </div>
           
@@ -92,9 +88,7 @@ import { AdminDataService } from '../config/admin-data.service';
               <div class="flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-xs">
                 <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
                   <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
-                  <div class="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center p-1.5 shadow-inner">
-                    <img src="logo.png" class="w-full h-full object-contain" />
-                  </div>
+                  <img src="logo.png" class="w-12 h-12 object-cover rounded-2xl shadow-inner border border-gray-100" />
                 </div>
                 <h3 class="text-lg font-black text-gray-800">Cargando datos...</h3>
                 <p class="text-gray-400 text-xs mt-1 font-semibold uppercase tracking-wider animate-pulse">Sincronizando con MozoGo</p>
@@ -113,9 +107,7 @@ import { AdminDataService } from '../config/admin-data.service';
             <div class="p-6 border-b border-white/10 mt-4 flex justify-between items-center">
               <div>
                 <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                  <div class="w-10 h-10 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 p-1.5 shadow-md">
-                    <img src="logo.png" class="w-full h-full object-contain" />
-                  </div>
+                  <img src="logo.png" class="w-10 h-10 object-cover rounded-2xl shadow-md border border-white/10 shrink-0" />
                   <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
                 </h2>
                 <p class="text-slate-400 text-xs mt-1 font-medium">{{ auth.currentUser()?.role }}</p>
