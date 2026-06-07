@@ -29,6 +29,12 @@ public class MesaRepository : IMesaRepository
         return await _context.Mesas.IgnoreQueryFilters().Include(m => m.Mozo).FirstOrDefaultAsync(m => m.Numero == numero);
     }
 
+    public async Task<Mesa?> GetByRestauranteIdAndNumeroIgnoreQueryFiltersAsync(Guid restauranteId, int numero)
+    {
+        return await _context.Mesas.IgnoreQueryFilters().Include(m => m.Mozo)
+            .FirstOrDefaultAsync(m => m.RestauranteId == restauranteId && m.Numero == numero);
+    }
+
     public async Task<Mesa?> GetByRestauranteAndNumeroAsync(string restauranteNombre, int numeroMesa)
     {
         var mesas = await _context.Mesas

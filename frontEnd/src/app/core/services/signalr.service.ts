@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import * as signalR from '@microsoft/signalr';
 import { MesaTask } from '../models/task.model';
 import { environment } from '../../../environments/environment';
+import { AdminDataService } from '../../features/admin/config/admin-data.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,10 +11,12 @@ import { environment } from '../../../environments/environment';
 export class SignalrService {
   private hubConnection: signalR.HubConnection | null = null;
   private http = inject(HttpClient);
+  private adminDataService = inject(AdminDataService);
   
   private _tasks = signal<MesaTask[]>([]);
   public readonly pendingTasks = computed(() => this._tasks().filter(t => t.status === 'Pending'));
   public readonly isConnected = signal<boolean>(false);
+  public readonly taskCompleted = signal<string | null>(null);
 
   constructor() {
     this.buildConnection();
@@ -122,12 +125,20 @@ export class SignalrService {
       this._tasks.update(tasks => tasks.map(t => 
         t.id === taskId ? { ...t, assignedMozoId: newMozoId } : t
       ));
+      // Update the local waiter assignment for this table
+      const task = this._tasks().find(t => t.id === taskId);
+      if (task) {
+        this.adminDataService.mesas.update(mesas => mesas.map(m => 
+          m.numero === task.tableId ? { ...m, mozoId: newMozoId } : m
+        ));
+      }
     });
 
     this.hubConnection.on('TareaCompletada', (taskId: string) => {
       this._tasks.update(tasks => tasks.map(t => 
         t.id === taskId ? { ...t, status: 'Completed' } : t
       ));
+      this.taskCompleted.set(taskId);
     });
   }
 
@@ -199,49 +210,67 @@ export class SignalrService {
     }
   }
 
-  public async sendLlamarMozo(mesaId: string) {
+  public async sendLlamarMozo(mesaId: string): Promise<string> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('LlamarMozo', mesaId);
+      return await this.hubConnection.invoke<string>('LlamarMozo', mesaId);
     } else {
       console.warn('SignalR not connected, mock send locally.');
+      const taskId = crypto.randomUUID();
       this.addTask({
-        id: crypto.randomUUID(),
+        id: taskId,
         tableId: 0,
         type: 'Llamado',
         timestamp: new Date(),
         status: 'Pending'
       });
+      return taskId;
     }
   }
 
-  public async sendPedirCuenta(mesaId: string) {
+  public async sendPedirCuenta(mesaId: string): Promise<string> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('PedirCuenta', mesaId);
+      return await this.hubConnection.invoke<string>('PedirCuenta', mesaId);
     } else {
       console.warn('SignalR not connected, mock send locally.');
+      const taskId = crypto.randomUUID();
       this.addTask({
-        id: crypto.randomUUID(),
+        id: taskId,
         tableId: 0,
         type: 'Cuenta',
         timestamp: new Date(),
         status: 'Pending'
       });
+      return taskId;
     }
   }
 
-  public async sendNuevoPedido(mesaId: string, details: string) {
+  public async sendNuevoPedido(mesaId: string, details: string): Promise<string> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('NuevoPedido', mesaId, details);
+      return await this.hubConnection.invoke<string>('NuevoPedido', mesaId, details);
     } else {
       console.warn('SignalR not connected, mock send locally.');
+      const taskId = crypto.randomUUID();
       this.addTask({
-        id: crypto.randomUUID(),
+        id: taskId,
         tableId: 0,
         type: 'Pedido',
         timestamp: new Date(),
         status: 'Pending',
         details
       });
+      return taskId;
+    }
+  }
+
+  public async cancelTask(taskId: string): Promise<void> {
+    if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
+      await this.hubConnection.invoke('CancelarTarea', taskId);
+    } else {
+      console.warn('SignalR not connected, mock cancel locally.');
+      this._tasks.update(tasks => tasks.map(t => 
+        t.id === taskId ? { ...t, status: 'Completed' } : t
+      ));
+      this.taskCompleted.set(taskId);
     }
   }
 }

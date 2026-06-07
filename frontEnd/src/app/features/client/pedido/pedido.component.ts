@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, OnInit } from '@angular/core';
+import { Component, Input, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { SignalrService } from '../../../core/services/signalr.service';
@@ -76,33 +76,63 @@ import { FormsModule } from '@angular/forms';
         </div>
 
         <div class="w-full max-w-sm space-y-4">
-          <button 
-            (click)="llamarMozo()"
-            [disabled]="loadingLlamar() || yaLlamo()"
-            [ngClass]="{'opacity-50 cursor-not-allowed': yaLlamo()}"
-            class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center transition-all">
-            @if (loadingLlamar()) {
-              <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
-            } @else if (yaLlamo()) {
-              ✅ Mozo notificado
-            } @else {
-              🛎️ Llamar Mozo
-            }
-          </button>
+          @if (yaLlamo()) {
+            <div class="flex gap-2 w-full">
+              <div class="flex-1 h-16 bg-primary/10 border border-primary/20 text-primary rounded-2xl font-semibold text-lg flex justify-center items-center select-none">
+                🛎️ Mozo notificado
+              </div>
+              <button 
+                (click)="cancelarLlamado()"
+                [disabled]="loadingCancelarLlamar()"
+                class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-2xl flex justify-center items-center transition-all active:scale-95 shadow-md">
+                @if (loadingCancelarLlamar()) {
+                  <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                } @else {
+                  ❌
+                }
+              </button>
+            </div>
+          } @else {
+            <button 
+              (click)="llamarMozo()"
+              [disabled]="loadingLlamar()"
+              class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center transition-all active:scale-95 hover:brightness-105">
+              @if (loadingLlamar()) {
+                <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
+              } @else {
+                🛎️ Llamar Mozo
+              }
+            </button>
+          }
 
-          <button 
-            (click)="pedirCuenta()"
-            [disabled]="loadingCuenta() || yaPidioCuenta()"
-            [ngClass]="{'opacity-50 cursor-not-allowed': yaPidioCuenta()}"
-            class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center transition-all">
-            @if (loadingCuenta()) {
-              <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
-            } @else if (yaPidioCuenta()) {
-              ✅ Cuenta solicitada
-            } @else {
-              💳 Pedir Cuenta
-            }
-          </button>
+          @if (yaPidioCuenta()) {
+            <div class="flex gap-2 w-full">
+              <div class="flex-1 h-16 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-semibold text-lg flex justify-center items-center select-none">
+                💳 Cuenta solicitada
+              </div>
+              <button 
+                (click)="cancelarCuenta()"
+                [disabled]="loadingCancelarCuenta()"
+                class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-2xl flex justify-center items-center transition-all active:scale-95 shadow-md">
+                @if (loadingCancelarCuenta()) {
+                  <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                } @else {
+                  ❌
+                }
+              </button>
+            </div>
+          } @else {
+            <button 
+              (click)="pedirCuenta()"
+              [disabled]="loadingCuenta()"
+              class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center transition-all active:scale-95 hover:brightness-105">
+              @if (loadingCuenta()) {
+                <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
+              } @else {
+                💳 Pedir Cuenta
+              }
+            </button>
+          }
 
           <button 
             (click)="showMenu.set(!showMenu())"
@@ -114,6 +144,34 @@ import { FormsModule } from '@angular/forms';
             }
           </button>
         </div>
+
+        <!-- Pending Order Card -->
+        @if (activePedidoTaskId()) {
+          <div class="w-full max-w-sm bg-blue-50/50 border border-blue-100 rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3">
+            <div class="flex justify-between items-start">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🍳</span>
+                <div>
+                  <h3 class="font-bold text-gray-800 text-sm">Pedido en Cocina</h3>
+                  <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-wider">Pendiente de Aprobación</p>
+                </div>
+              </div>
+              <button 
+                (click)="cancelarPedido()"
+                [disabled]="loadingCancelarPedido()"
+                class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center gap-1">
+                @if (loadingCancelarPedido()) {
+                  <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full"></span>
+                } @else {
+                  Cancelar Pedido
+                }
+              </button>
+            </div>
+            <div class="bg-white/80 p-3 rounded-2xl text-xs font-semibold text-gray-600 border border-blue-50/50 line-clamp-3">
+              {{ activePedidoDetails() }}
+            </div>
+          </div>
+        }
 
         @if (showMenu()) {
           <div class="w-full max-w-md mt-10 animate-fade-in pb-20">
@@ -227,12 +285,47 @@ export class PedidoComponent implements OnInit {
   loadingCuenta = signal(false);
   loadingPedido = signal(false);
   
+  loadingCancelarLlamar = signal(false);
+  loadingCancelarCuenta = signal(false);
+  loadingCancelarPedido = signal(false);
+  
   yaLlamo = signal(false);
   yaPidioCuenta = signal(false);
+
+  activeLlamoTaskId = signal<string | null>(null);
+  activeCuentaTaskId = signal<string | null>(null);
+  activePedidoTaskId = signal<string | null>(null);
+  activePedidoDetails = signal<string | null>(null);
 
   showMenu = signal(false);
   showCartModal = signal(false);
   showSuccessToast = signal(false);
+
+  constructor() {
+    effect(() => {
+      const completedTaskId = this.signalrService.taskCompleted();
+      if (completedTaskId) {
+        if (completedTaskId === this.activeLlamoTaskId()) {
+          this.yaLlamo.set(false);
+          this.activeLlamoTaskId.set(null);
+          localStorage.removeItem('mozo_go_llamo_task_id');
+          localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
+        }
+        if (completedTaskId === this.activeCuentaTaskId()) {
+          this.yaPidioCuenta.set(false);
+          this.activeCuentaTaskId.set(null);
+          localStorage.removeItem('mozo_go_cuenta_task_id');
+          localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`);
+        }
+        if (completedTaskId === this.activePedidoTaskId()) {
+          this.activePedidoTaskId.set(null);
+          this.activePedidoDetails.set(null);
+          localStorage.removeItem('mozo_go_pedido_task_id');
+          localStorage.removeItem('mozo_go_pedido_details');
+        }
+      }
+    });
+  }
 
   ngOnInit() {
     this.checkCooldowns();
@@ -241,10 +334,22 @@ export class PedidoComponent implements OnInit {
   }
 
   checkCooldowns() {
+    const llamoTaskId = localStorage.getItem('mozo_go_llamo_task_id');
+    if (llamoTaskId) this.activeLlamoTaskId.set(llamoTaskId);
+    
+    const cuentaTaskId = localStorage.getItem('mozo_go_cuenta_task_id');
+    if (cuentaTaskId) this.activeCuentaTaskId.set(cuentaTaskId);
+    
+    const pedidoTaskId = localStorage.getItem('mozo_go_pedido_task_id');
+    if (pedidoTaskId) {
+      this.activePedidoTaskId.set(pedidoTaskId);
+      this.activePedidoDetails.set(localStorage.getItem('mozo_go_pedido_details'));
+    }
+
     const llamoTime = localStorage.getItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
     if (llamoTime) {
       const diff = Date.now() - parseInt(llamoTime, 10);
-      if (diff < 15 * 60 * 1000) this.yaLlamo.set(true); // 15 mins
+      if (diff < 15 * 60 * 1000) this.yaLlamo.set(true);
       else localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
     }
 
@@ -277,11 +382,45 @@ export class PedidoComponent implements OnInit {
         }
 
         // Sincronizar con el backend: si el mozo ya lo completó, desbloqueamos
-        if (res.hasLlamado) this.yaLlamo.set(true);
-        else { this.yaLlamo.set(false); localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`); }
+        if (res.hasLlamado) {
+          this.yaLlamo.set(true);
+          if (res.llamoTaskId) {
+            this.activeLlamoTaskId.set(res.llamoTaskId);
+            localStorage.setItem('mozo_go_llamo_task_id', res.llamoTaskId);
+          }
+        } else {
+          this.yaLlamo.set(false);
+          localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
+          localStorage.removeItem('mozo_go_llamo_task_id');
+          this.activeLlamoTaskId.set(null);
+        }
 
-        if (res.hasCuenta) this.yaPidioCuenta.set(true);
-        else { this.yaPidioCuenta.set(false); localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`); }
+        if (res.hasCuenta) {
+          this.yaPidioCuenta.set(true);
+          if (res.cuentaTaskId) {
+            this.activeCuentaTaskId.set(res.cuentaTaskId);
+            localStorage.setItem('mozo_go_cuenta_task_id', res.cuentaTaskId);
+          }
+        } else {
+          this.yaPidioCuenta.set(false);
+          localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`);
+          localStorage.removeItem('mozo_go_cuenta_task_id');
+          this.activeCuentaTaskId.set(null);
+        }
+
+        if (res.pedidoTaskId) {
+          this.activePedidoTaskId.set(res.pedidoTaskId);
+          this.activePedidoDetails.set(res.pedidoDetails);
+          localStorage.setItem('mozo_go_pedido_task_id', res.pedidoTaskId);
+          if (res.pedidoDetails) {
+            localStorage.setItem('mozo_go_pedido_details', res.pedidoDetails);
+          }
+        } else {
+          this.activePedidoTaskId.set(null);
+          this.activePedidoDetails.set(null);
+          localStorage.removeItem('mozo_go_pedido_task_id');
+          localStorage.removeItem('mozo_go_pedido_details');
+        }
 
         if (res.numero) {
           this.numeroMesa.set(res.numero.toString());
@@ -324,9 +463,13 @@ export class PedidoComponent implements OnInit {
   async llamarMozo() {
     this.loadingLlamar.set(true);
     try {
-      await this.signalrService.sendLlamarMozo(this.id);
-      this.yaLlamo.set(true);
-      localStorage.setItem(`mesa_${this.restaurante}_${this.numero}_llamo`, Date.now().toString());
+      const taskId = await this.signalrService.sendLlamarMozo(this.id);
+      if (taskId && taskId !== '00000000-0000-0000-0000-000000000000') {
+        this.yaLlamo.set(true);
+        this.activeLlamoTaskId.set(taskId);
+        localStorage.setItem('mozo_go_llamo_task_id', taskId);
+        localStorage.setItem(`mesa_${this.restaurante}_${this.numero}_llamo`, Date.now().toString());
+      }
     } finally {
       setTimeout(() => this.loadingLlamar.set(false), 800);
     }
@@ -335,9 +478,13 @@ export class PedidoComponent implements OnInit {
   async pedirCuenta() {
     this.loadingCuenta.set(true);
     try {
-      await this.signalrService.sendPedirCuenta(this.id);
-      this.yaPidioCuenta.set(true);
-      localStorage.setItem(`mesa_${this.restaurante}_${this.numero}_cuenta`, Date.now().toString());
+      const taskId = await this.signalrService.sendPedirCuenta(this.id);
+      if (taskId && taskId !== '00000000-0000-0000-0000-000000000000') {
+        this.yaPidioCuenta.set(true);
+        this.activeCuentaTaskId.set(taskId);
+        localStorage.setItem('mozo_go_cuenta_task_id', taskId);
+        localStorage.setItem(`mesa_${this.restaurante}_${this.numero}_cuenta`, Date.now().toString());
+      }
     } finally {
       setTimeout(() => this.loadingCuenta.set(false), 800);
     }
@@ -349,7 +496,13 @@ export class PedidoComponent implements OnInit {
       const detailsArray = this.cart.items().map(i => `${i.quantity}x ${i.nombre}`);
       const fullDetails = detailsArray.join(', ');
 
-      await this.signalrService.sendNuevoPedido(this.id, fullDetails);
+      const taskId = await this.signalrService.sendNuevoPedido(this.id, fullDetails);
+      if (taskId && taskId !== '00000000-0000-0000-0000-000000000000') {
+        this.activePedidoTaskId.set(taskId);
+        this.activePedidoDetails.set(fullDetails);
+        localStorage.setItem('mozo_go_pedido_task_id', taskId);
+        localStorage.setItem('mozo_go_pedido_details', fullDetails);
+      }
       
       this.showCartModal.set(false);
       this.cart.clearCart();
@@ -360,6 +513,51 @@ export class PedidoComponent implements OnInit {
       console.error('Error enviando el pedido:', err);
     } finally {
       this.loadingPedido.set(false);
+    }
+  }
+
+  async cancelarLlamado() {
+    const taskId = this.activeLlamoTaskId();
+    if (!taskId) return;
+    this.loadingCancelarLlamar.set(true);
+    try {
+      await this.signalrService.cancelTask(taskId);
+      this.yaLlamo.set(false);
+      this.activeLlamoTaskId.set(null);
+      localStorage.removeItem('mozo_go_llamo_task_id');
+      localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
+    } finally {
+      this.loadingCancelarLlamar.set(false);
+    }
+  }
+
+  async cancelarCuenta() {
+    const taskId = this.activeCuentaTaskId();
+    if (!taskId) return;
+    this.loadingCancelarCuenta.set(true);
+    try {
+      await this.signalrService.cancelTask(taskId);
+      this.yaPidioCuenta.set(false);
+      this.activeCuentaTaskId.set(null);
+      localStorage.removeItem('mozo_go_cuenta_task_id');
+      localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`);
+    } finally {
+      this.loadingCancelarCuenta.set(false);
+    }
+  }
+
+  async cancelarPedido() {
+    const taskId = this.activePedidoTaskId();
+    if (!taskId) return;
+    this.loadingCancelarPedido.set(true);
+    try {
+      await this.signalrService.cancelTask(taskId);
+      this.activePedidoTaskId.set(null);
+      this.activePedidoDetails.set(null);
+      localStorage.removeItem('mozo_go_pedido_task_id');
+      localStorage.removeItem('mozo_go_pedido_details');
+    } finally {
+      this.loadingCancelarPedido.set(false);
     }
   }
 }

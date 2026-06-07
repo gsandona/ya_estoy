@@ -186,8 +186,10 @@ public class MesasConfigController : ControllerBase
 
         var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
         var mesaTasks = pendingTasks.Where(t => t.TableId == mesa.Numero && t.RestauranteId == mesa.RestauranteId).ToList();
-        var hasLlamado = mesaTasks.Any(t => t.Type == "Llamado");
-        var hasCuenta = mesaTasks.Any(t => t.Type == "Cuenta");
+        
+        var llamoTask = mesaTasks.FirstOrDefault(t => t.Type == "Llamado");
+        var cuentaTask = mesaTasks.FirstOrDefault(t => t.Type == "Cuenta");
+        var pedidoTask = mesaTasks.FirstOrDefault(t => t.Type == "Pedido");
 
         return Ok(new { 
             mesaId = mesa.Id, 
@@ -195,8 +197,12 @@ public class MesasConfigController : ControllerBase
             numero = mesa.Numero, 
             estado = mesa.Estado, 
             validado = true,
-            hasLlamado,
-            hasCuenta
+            hasLlamado = llamoTask != null,
+            hasCuenta = cuentaTask != null,
+            llamoTaskId = llamoTask?.Id,
+            cuentaTaskId = cuentaTask?.Id,
+            pedidoTaskId = pedidoTask?.Id,
+            pedidoDetails = pedidoTask?.Details
         });
     }
 }
