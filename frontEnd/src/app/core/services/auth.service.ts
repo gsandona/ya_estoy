@@ -95,6 +95,7 @@ export class AuthService {
     this._currentUser.set(null);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
+    this.tenantContext.setTenantId(null);
   }
 
   getToken(): string | null {

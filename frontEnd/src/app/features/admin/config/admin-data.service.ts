@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { TenantContextService } from '../../../core/services/tenant-context.service';
 
 export interface AdminUser { id: string; email: string; role: 'Admin' | 'Mozo' | 'SuperAdmin'; password?: string; }
 export interface AdminMesa { id: string; numero: number; ubicacion: string; mozoId: string; codigoAcceso?: string; estado?: number; }
@@ -16,6 +17,7 @@ export interface AdminMenuItem {
 @Injectable({ providedIn: 'root' })
 export class AdminDataService {
   private http = inject(HttpClient);
+  private tenantContext = inject(TenantContextService);
 
   // Sin mocks reales, inicializan vacío
   public users = signal<AdminUser[]>([]);
@@ -26,7 +28,17 @@ export class AdminDataService {
   public mozos = computed(() => this.users().filter(u => u.role === 'Mozo'));
 
   constructor() {
-    this.refreshAll();
+    this.tenantContext.tenantId$.subscribe(tenantId => {
+      if (tenantId) {
+        this.refreshAll();
+      } else {
+        // Limpiar datos si no hay inquilino activo (logout)
+        this.users.set([]);
+        this.mesas.set([]);
+        this.menuItems.set([]);
+        this.isLoading.set(false);
+      }
+    });
   }
 
   // Trae todo nuevamente
