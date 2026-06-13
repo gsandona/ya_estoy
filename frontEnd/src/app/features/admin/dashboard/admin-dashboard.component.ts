@@ -1,12 +1,13 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SignalrService } from '../../../core/services/signalr.service';
-import { AdminDataService } from '../config/admin-data.service';
+import { AdminDataService, AdminMesa } from '../config/admin-data.service';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
-
 import { FormsModule } from '@angular/forms';
+import { RestauranteService } from '../../../core/services/restaurante.service';
+import { TenantContextService } from '../../../core/services/tenant-context.service';
 
 @Component({
 // ... (omitted changing imports array to not overwrite metadata incorrectly)
@@ -22,24 +23,146 @@ import { FormsModule } from '@angular/forms';
         </div>
       }
       
-      <!-- Panel de Mesas (Control de PIN) -->
+      <!-- Panel de Mesas (Control y Administración) -->
       <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
-        <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-4 flex items-center gap-2">🕹️ Control de Mesas</h2>
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-          @for(mesa of myMesas(); track mesa.id) {
-            <div class="border rounded-2xl p-4 flex flex-col items-center justify-center text-center gap-2 relative overflow-hidden transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
-                 [ngClass]="mesa.codigoAcceso ? 'bg-green-50/50 border-green-200' : 'bg-gray-50/50 border-gray-200'">
-              <span class="text-sm font-bold text-gray-700">Mesa {{ mesa.numero }}</span>
-              @if(mesa.codigoAcceso) {
-                <span class="text-2xl font-black tracking-widest text-green-600 drop-shadow-sm">{{ mesa.codigoAcceso }}</span>
-                <button (click)="cerrarMesa(mesa.id)" class="bg-red-100 text-red-600 px-4 py-1.5 rounded-xl text-xs font-bold hover:bg-red-200 w-full transition-colors">Cerrar</button>
-              } @else {
-                <span class="text-xs font-medium text-gray-400 py-1.5">Inactiva</span>
-                <button (click)="abrirMesa(mesa.id)" class="bg-primary text-white px-4 py-1.5 rounded-xl text-xs font-bold hover:bg-primary/90 w-full shadow-sm transition-colors">Abrir</button>
-              }
-            </div>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div>
+            <h2 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">🕹️ Control de Mesas</h2>
+            <p class="text-xs text-gray-400 font-medium mt-0.5">Administra los códigos QR, meseros asignados y estado de atención</p>
+          </div>
+          @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+            <button (click)="openCreateForm()" class="bg-primary text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:bg-[#1a233b] transition-all flex items-center gap-1">
+              <span>+</span> Crear Mesa
+            </button>
           }
         </div>
+
+        @if (showForm()) {
+          <div class="bg-surface p-5 rounded-3xl mb-6 border border-gray-200 shadow-inner animate-fade-in">
+            <h3 class="text-sm font-black text-gray-700 mb-3 flex items-center gap-1">
+              <span>📝</span> {{ editingId() ? 'Editar Mesa' : 'Nueva Mesa' }}
+            </h3>
+            <form #mesaForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
+              <div class="w-full md:w-32 relative">
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Número</label>
+                <input type="number" [(ngModel)]="formData.numero" name="numero" #numCtrl="ngModel" 
+                       min="1" max="999"
+                       class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-bold" required>
+                @if (numCtrl.invalid && numCtrl.touched) {
+                  <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Rango 1-999</span>
+                }
+              </div>
+              <div class="flex-1 w-full relative">
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Ubicación / Detalles</label>
+                <input type="text" [(ngModel)]="formData.ubicacion" name="ubicacion" #ubicCtrl="ngModel"
+                       maxlength="100" placeholder="Ej: Terraza Norte" 
+                       class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
+              </div>
+              <div class="flex-1 w-full relative">
+                <label class="block text-xs font-semibold text-gray-500 mb-1">Mozo Asignado</label>
+                <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
+                  <option [value]="null">Sin asignar</option>
+                  @for (mozo of dataService.mozos(); track mozo.id) {
+                    <option [value]="mozo.id">{{ mozo.email }}</option>
+                  }
+                </select>
+              </div>
+              <div class="flex gap-2 w-full md:w-auto">
+                <button type="button" (click)="showForm.set(false)" class="flex-1 md:flex-none bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-colors">Cancelar</button>
+                <button type="submit" [disabled]="mesaForm.invalid" class="flex-1 md:flex-none bg-accent text-white px-6 py-2.5 rounded-xl font-bold shadow-sm hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                  {{ editingId() ? 'Actualizar' : 'Guardar' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          @for(mesa of myMesas(); track mesa.id) {
+            <div class="border border-gray-200 rounded-3xl p-4 flex flex-col justify-between hover:border-accent transition relative group bg-white shadow-sm"
+                 [ngClass]="mesa.codigoAcceso ? 'ring-2 ring-green-500/10 border-green-200 bg-green-50/5' : ''">
+              
+              <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                <button (click)="openQrModal(mesa)" class="text-green-600 hover:text-green-800 font-bold text-[10px] bg-green-50 px-2 py-1 rounded-lg transition-colors">🖨️ QR</button>
+                @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+                  <button (click)="openEditForm(mesa)" class="text-indigo-500 hover:text-indigo-700 font-bold text-[10px] bg-indigo-50 px-2 py-1 rounded-lg transition-colors">Editar</button>
+                  <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-400 hover:text-red-600 font-bold text-[10px] bg-red-50 px-2 py-1 rounded-lg transition-colors">Borrar</button>
+                }
+              </div>
+
+              <div>
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="h-10 w-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner"
+                       [ngClass]="mesa.codigoAcceso ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
+                    {{ mesa.numero }}
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
+                    <p class="text-[11px] text-gray-400 font-medium truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
+                  </div>
+                </div>
+
+                <div class="my-3 flex items-center justify-between bg-surface/50 rounded-xl p-2.5 border border-gray-50">
+                  <div class="flex flex-col">
+                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Estado</span>
+                    <span class="text-[10px] font-bold" [ngClass]="mesa.codigoAcceso ? 'text-green-600' : 'text-gray-400'">
+                      {{ mesa.codigoAcceso ? 'Activa' : 'Inactiva' }}
+                    </span>
+                  </div>
+                  @if (mesa.codigoAcceso) {
+                    <div class="flex flex-col items-end">
+                      <span class="text-[9px] font-black text-green-500 uppercase tracking-wider">PIN</span>
+                      <span class="text-base font-black tracking-widest text-green-600">{{ mesa.codigoAcceso }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div>
+                <div class="pt-2.5 border-t border-gray-100 flex justify-between items-center mb-3">
+                  <span class="text-[10px] font-semibold text-gray-400">Mozo:</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 bg-surface rounded-md text-primary truncate max-w-[120px]">
+                    {{ getMozoEmail(mesa.mozoId) }}
+                  </span>
+                </div>
+
+                @if(mesa.codigoAcceso) {
+                  <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
+                    Cerrar Mesa 🔒
+                  </button>
+                } @else {
+                  <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
+                    Abrir Mesa 🛎️
+                  </button>
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="col-span-full text-center py-6 text-gray-400 text-sm">No hay mesas creadas.</p>
+          }
+        </div>
+
+        @if(auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+          <div class="mt-6 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-gray-400 font-medium text-center sm:text-left">Reorganiza el salón en memoria y súbelo al servidor para aplicar los cambios a los códigos QR y mozos asignados.</p>
+            <div class="flex items-center gap-3">
+              @if (saveSuccess()) {
+                <span class="text-green-500 font-bold text-xs bg-green-50 px-3 py-1.5 rounded-xl animate-pulse">✅ ¡Guardado!</span>
+              }
+              <button 
+                (click)="syncBackend()"
+                [disabled]="isSaving()"
+                class="bg-[#10b981] text-white px-6 py-2.5 rounded-xl font-black shadow-[0_4px_15px_rgb(16,185,129,0.3)] hover:bg-[#0da473] transition-all active:scale-[0.98] disabled:opacity-75 flex items-center gap-2 text-xs">
+                @if (isSaving()) {
+                  <span class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></span>
+                  Sincronizando...
+                } @else {
+                  ☁️ Guardar y Publicar
+                }
+              </button>
+            </div>
+          </div>
+        }
       </div>
 
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
@@ -144,6 +267,37 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     }
+
+    <!-- Modal QR -->
+    @if (showQrModal()) {
+      <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl relative text-center border border-white/20">
+          <button (click)="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+          <h2 class="text-2xl font-black text-gray-800 mb-1">Mesa {{ showQrModal()?.numero }}</h2>
+          <p class="text-sm text-gray-500 font-medium mb-6">{{ showQrModal()?.ubicacion || 'Sin ubicación' }}</p>
+          
+          <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-6 inline-block shadow-inner">
+            <img [src]="getQrImageUrl(showQrModal()!)" alt="Código QR de la mesa" class="w-48 h-48 mx-auto rounded-lg" />
+          </div>
+
+          <p class="text-xs text-primary bg-surface py-2 px-4 rounded-xl mb-6 font-bold truncate">
+            URL: /mesa/{{ restauranteNombre() }}/{{ showQrModal()?.numero }}
+          </p>
+
+          <div class="flex flex-col gap-3">
+            <a [href]="getQrImageUrl(showQrModal()!)" download="Mesa_QR.png" target="_blank"
+               class="w-full bg-primary text-white py-3 rounded-xl font-bold shadow-sm hover:bg-[#1a233b] transition-all text-center text-xs text-sm">
+              ↓ Descargar Imagen QR
+            </a>
+            <button (click)="imprimirQr()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all text-xs text-sm">
+              🖨️ Imprimir Cartel
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
   styles: [`
     @keyframes fade-in {
@@ -160,6 +314,8 @@ export class AdminDashboardComponent {
   dataService = inject(AdminDataService);
   auth = inject(AuthService);
   http = inject(HttpClient);
+  private restauranteService = inject(RestauranteService);
+  private tenantContext = inject(TenantContextService);
   
   currentDate = new Date();
 
@@ -168,8 +324,15 @@ export class AdminDashboardComponent {
   filterMesa = signal<string>('All');
   filterMozo = signal<string>('All');
 
-  // Asignaciones
+  // Asignaciones e inline abm
   showReassignModal = signal<string | null>(null);
+  showForm = signal(false);
+  editingId = signal<string | null>(null);
+  isSaving = signal(false);
+  saveSuccess = signal(false);
+  formData: AdminMesa = { id: '', numero: 1, ubicacion: '', mozoId: 'Sin asignar' };
+  showQrModal = signal<AdminMesa | null>(null);
+  restauranteNombre = signal<string>('restaurante');
 
   myPendingTasks = computed(() => {
     let allTasks = this.service.pendingTasks();
@@ -199,6 +362,129 @@ export class AdminDashboardComponent {
     setInterval(() => {
       this.currentDate = new Date();
     }, 60000);
+
+    const currentUser = this.auth.currentUser();
+    if (currentUser && currentUser.restauranteNombre) {
+      this.restauranteNombre.set(this.slugify(currentUser.restauranteNombre));
+    }
+
+    this.tenantContext.tenantId$.subscribe(tenantId => {
+      if (tenantId) {
+        if (currentUser && currentUser.restauranteId === tenantId && currentUser.restauranteNombre) {
+          this.restauranteNombre.set(this.slugify(currentUser.restauranteNombre));
+          return;
+        }
+
+        this.restauranteService.getById(tenantId).subscribe({
+          next: (rest) => {
+            if (rest && rest.nombre) {
+              this.restauranteNombre.set(this.slugify(rest.nombre));
+            }
+          },
+          error: (err) => {
+            console.error('Error al obtener restaurante por id, usando fallback:', err);
+            if (currentUser && currentUser.restauranteNombre) {
+              this.restauranteNombre.set(this.slugify(currentUser.restauranteNombre));
+            }
+          }
+        });
+      } else {
+        this.restauranteNombre.set('restaurante');
+      }
+    });
+  }
+
+  slugify(text: string): string {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
+
+  openQrModal(mesa: AdminMesa) {
+    this.showQrModal.set(mesa);
+  }
+
+  closeQrModal() {
+    this.showQrModal.set(null);
+  }
+
+  getQrImageUrl(mesa: AdminMesa) {
+    const baseUrl = window.location.origin;
+    const targetUrl = `${baseUrl}/mesa/${this.restauranteNombre()}/${mesa.numero}`;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
+  }
+
+  imprimirQr() {
+    if (!this.showQrModal()) return;
+    const imgUrl = this.getQrImageUrl(this.showQrModal()!);
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head><title>Imprimir QR Mesa ${this.showQrModal()?.numero}</title></head>
+          <body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
+            <h1>Mesa ${this.showQrModal()?.numero}</h1>
+            <p>${this.showQrModal()?.ubicacion || 'Sin ubicación'}</p>
+            <img src="${imgUrl}" style="width: 300px; height: 300px; border: 2px solid #000; padding: 10px; border-radius: 10px;" />
+            <br/><br/>
+            <p style="color: #666;">Escanea para pedir</p>
+            <script>
+              window.onload = function() { window.print(); window.close(); }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  }
+
+  openCreateForm() {
+    this.editingId.set(null);
+    this.formData = { id: '', numero: 1, ubicacion: '', mozoId: 'Sin asignar' };
+    this.showForm.set(true);
+  }
+
+  openEditForm(mesa: AdminMesa) {
+    this.editingId.set(mesa.id);
+    this.formData = { ...mesa };
+    this.showForm.set(true);
+  }
+
+  saveForm(e: Event) {
+    e.preventDefault();
+    if (this.editingId()) {
+      this.dataService.updateMesa(this.formData);
+    } else {
+      this.dataService.addMesa({ ...this.formData, id: crypto.randomUUID() });
+    }
+    this.showForm.set(false);
+  }
+
+  syncBackend() {
+    this.isSaving.set(true);
+    const payload = this.dataService.mesas();
+    
+    this.http.post(`${environment.apiUrl}/api/mesas/bulk`, payload).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.saveSuccess.set(true);
+        setTimeout(() => this.saveSuccess.set(false), 3000);
+      },
+      error: (err: any) => {
+        console.error('El backend rechazó el guardado:', err);
+        this.isSaving.set(false);
+        alert('❌ Error: El Backend (' + environment.apiUrl + '/api/mesas/bulk) rechazó tu pedido de resincronización.');
+      }
+    });
+  }
+
+  getMozoEmail(mozoId: string | null): string {
+    if (!mozoId) return 'Sin asignar';
+    const mozo = this.dataService.mozos().find(m => m.id === mozoId);
+    return mozo?.email || 'Sin asignar';
   }
 
   getMinutesElapsed(date: Date): number {

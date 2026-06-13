@@ -305,19 +305,20 @@ export class PedidoComponent implements OnInit {
     effect(() => {
       const completedTaskId = this.signalrService.taskCompleted();
       if (completedTaskId) {
-        if (completedTaskId === this.activeLlamoTaskId()) {
+        const completedLower = completedTaskId.toLowerCase();
+        if (completedLower === this.activeLlamoTaskId()?.toLowerCase()) {
           this.yaLlamo.set(false);
           this.activeLlamoTaskId.set(null);
           localStorage.removeItem('mozo_go_llamo_task_id');
           localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
         }
-        if (completedTaskId === this.activeCuentaTaskId()) {
+        if (completedLower === this.activeCuentaTaskId()?.toLowerCase()) {
           this.yaPidioCuenta.set(false);
           this.activeCuentaTaskId.set(null);
           localStorage.removeItem('mozo_go_cuenta_task_id');
           localStorage.removeItem(`mesa_${this.restaurante}_${this.numero}_cuenta`);
         }
-        if (completedTaskId === this.activePedidoTaskId()) {
+        if (completedLower === this.activePedidoTaskId()?.toLowerCase()) {
           this.activePedidoTaskId.set(null);
           this.activePedidoDetails.set(null);
           localStorage.removeItem('mozo_go_pedido_task_id');

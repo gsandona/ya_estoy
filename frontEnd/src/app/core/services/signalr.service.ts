@@ -123,10 +123,10 @@ export class SignalrService {
 
     this.hubConnection.on('TareaReasignada', (taskId: string, newMozoId: string) => {
       this._tasks.update(tasks => tasks.map(t => 
-        t.id === taskId ? { ...t, assignedMozoId: newMozoId } : t
+        t.id.toLowerCase() === taskId.toLowerCase() ? { ...t, assignedMozoId: newMozoId } : t
       ));
       // Update the local waiter assignment for this table
-      const task = this._tasks().find(t => t.id === taskId);
+      const task = this._tasks().find(t => t.id.toLowerCase() === taskId.toLowerCase());
       if (task) {
         this.adminDataService.mesas.update(mesas => mesas.map(m => 
           m.numero === task.tableId ? { ...m, mozoId: newMozoId } : m
@@ -136,9 +136,9 @@ export class SignalrService {
 
     this.hubConnection.on('TareaCompletada', (taskId: string) => {
       this._tasks.update(tasks => tasks.map(t => 
-        t.id === taskId ? { ...t, status: 'Completed' } : t
+        t.id.toLowerCase() === taskId.toLowerCase() ? { ...t, status: 'Completed' } : t
       ));
-      this.taskCompleted.set(taskId);
+      this.taskCompleted.set(taskId.toLowerCase());
     });
   }
 
@@ -268,9 +268,9 @@ export class SignalrService {
     } else {
       console.warn('SignalR not connected, mock cancel locally.');
       this._tasks.update(tasks => tasks.map(t => 
-        t.id === taskId ? { ...t, status: 'Completed' } : t
+        t.id.toLowerCase() === taskId.toLowerCase() ? { ...t, status: 'Completed' } : t
       ));
-      this.taskCompleted.set(taskId);
+      this.taskCompleted.set(taskId.toLowerCase());
     }
   }
 }
