@@ -26,225 +26,242 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
       <!-- Panel de Mesas (Control y Administración) -->
       <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div>
-            <h2 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">🕹️ Control de Mesas</h2>
-            <p class="text-xs text-gray-400 font-medium mt-0.5">Administra los códigos QR, meseros asignados y estado de atención</p>
+          <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseMesas.set(!collapseMesas())">
+            <div>
+              <h2 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
+                🕹️ Control de Mesas
+                <span class="text-xs text-gray-400 inline-block transition-transform duration-300" [class.rotate-180]="collapseMesas()">▲</span>
+              </h2>
+              <p class="text-xs text-gray-400 font-medium mt-0.5">Administra los códigos QR, meseros asignados y estado de atención</p>
+            </div>
           </div>
-          @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+          @if (!collapseMesas() && (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin')) {
             <button (click)="openCreateForm()" class="bg-primary text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:bg-[#1a233b] transition-all flex items-center gap-1">
               <span>+</span> Crear Mesa
             </button>
           }
         </div>
 
-        @if (showForm()) {
-          <div class="bg-surface p-5 rounded-3xl mb-6 border border-gray-200 shadow-inner animate-fade-in">
-            <h3 class="text-sm font-black text-gray-700 mb-3 flex items-center gap-1">
-              <span>📝</span> {{ editingId() ? 'Editar Mesa' : 'Nueva Mesa' }}
-            </h3>
-            <form #mesaForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
-              <div class="w-full md:w-32 relative">
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Número</label>
-                <input type="number" [(ngModel)]="formData.numero" name="numero" #numCtrl="ngModel" 
-                       min="1" max="999"
-                       class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-bold" required>
-                @if (numCtrl.invalid && numCtrl.touched) {
-                  <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Rango 1-999</span>
-                }
-              </div>
-              <div class="flex-1 w-full relative">
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Ubicación / Detalles</label>
-                <input type="text" [(ngModel)]="formData.ubicacion" name="ubicacion" #ubicCtrl="ngModel"
-                       maxlength="100" placeholder="Ej: Terraza Norte" 
-                       class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
-              </div>
-              <div class="flex-1 w-full relative">
-                <label class="block text-xs font-semibold text-gray-500 mb-1">Mozo Asignado</label>
-                <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
-                  <option [value]="null">Sin asignar</option>
-                  @for (mozo of dataService.mozos(); track mozo.id) {
-                    <option [value]="mozo.id">{{ mozo.email }}</option>
+        @if (!collapseMesas()) {
+          @if (showForm()) {
+            <div class="bg-surface p-5 rounded-3xl mb-6 border border-gray-200 shadow-inner animate-fade-in">
+              <h3 class="text-sm font-black text-gray-700 mb-3 flex items-center gap-1">
+                <span>📝</span> {{ editingId() ? 'Editar Mesa' : 'Nueva Mesa' }}
+              </h3>
+              <form #mesaForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
+                <div class="w-full md:w-32 relative">
+                  <label class="block text-xs font-semibold text-gray-500 mb-1">Número</label>
+                  <input type="number" [(ngModel)]="formData.numero" name="numero" #numCtrl="ngModel" 
+                         min="1" max="999"
+                         class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-bold" required>
+                  @if (numCtrl.invalid && numCtrl.touched) {
+                    <span class="text-red-500 text-[10px] absolute -bottom-4 left-1 font-bold">Rango 1-999</span>
                   }
-                </select>
-              </div>
-              <div class="flex gap-2 w-full md:w-auto">
-                <button type="button" (click)="showForm.set(false)" class="flex-1 md:flex-none bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-colors">Cancelar</button>
-                <button type="submit" [disabled]="mesaForm.invalid" class="flex-1 md:flex-none bg-accent text-white px-6 py-2.5 rounded-xl font-bold shadow-sm hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                  {{ editingId() ? 'Actualizar' : 'Guardar' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        }
+                </div>
+                <div class="flex-1 w-full relative">
+                  <label class="block text-xs font-semibold text-gray-500 mb-1">Ubicación / Detalles</label>
+                  <input type="text" [(ngModel)]="formData.ubicacion" name="ubicacion" #ubicCtrl="ngModel"
+                         maxlength="100" placeholder="Ej: Terraza Norte" 
+                         class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
+                </div>
+                <div class="flex-1 w-full relative">
+                  <label class="block text-xs font-semibold text-gray-500 mb-1">Mozo Asignado</label>
+                  <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
+                    <option [value]="null">Sin asignar</option>
+                    @for (mozo of dataService.mozos(); track mozo.id) {
+                      <option [value]="mozo.id">{{ mozo.email }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="flex gap-2 w-full md:w-auto">
+                  <button type="button" (click)="showForm.set(false)" class="flex-1 md:flex-none bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-colors">Cancelar</button>
+                  <button type="submit" [disabled]="mesaForm.invalid" class="flex-1 md:flex-none bg-accent text-white px-6 py-2.5 rounded-xl font-bold shadow-sm hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    {{ editingId() ? 'Actualizar' : 'Guardar' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          }
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          @for(mesa of myMesas(); track mesa.id) {
-            <div class="border border-gray-200 rounded-3xl p-4 flex flex-col justify-between hover:border-accent transition relative group bg-white shadow-sm"
-                 [ngClass]="mesa.codigoAcceso ? 'ring-2 ring-green-500/10 border-green-200 bg-green-50/5' : ''">
-              
-              <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                <button (click)="openQrModal(mesa)" class="text-green-600 hover:text-green-800 font-bold text-[10px] bg-green-50 px-2 py-1 rounded-lg transition-colors">🖨️ QR</button>
-                @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
-                  <button (click)="openEditForm(mesa)" class="text-indigo-500 hover:text-indigo-700 font-bold text-[10px] bg-indigo-50 px-2 py-1 rounded-lg transition-colors">Editar</button>
-                  <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-400 hover:text-red-600 font-bold text-[10px] bg-red-50 px-2 py-1 rounded-lg transition-colors">Borrar</button>
-                }
-              </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            @for(mesa of myMesas(); track mesa.id) {
+              <div class="border border-gray-200 rounded-3xl p-4 flex flex-col justify-between hover:border-accent transition relative group bg-white shadow-sm"
+                   [ngClass]="mesa.codigoAcceso ? 'ring-2 ring-green-500/10 border-green-200 bg-green-50/5' : ''">
+                
+                <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                  <button (click)="openQrModal(mesa)" class="text-green-600 hover:text-green-800 font-bold text-[10px] bg-green-50 px-2 py-1 rounded-lg transition-colors">🖨️ QR</button>
+                  @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+                    <button (click)="openEditForm(mesa)" class="text-indigo-500 hover:text-indigo-700 font-bold text-[10px] bg-indigo-50 px-2 py-1 rounded-lg transition-colors">Editar</button>
+                    <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-400 hover:text-red-600 font-bold text-[10px] bg-red-50 px-2 py-1 rounded-lg transition-colors">Borrar</button>
+                  }
+                </div>
 
-              <div>
-                <div class="flex items-center gap-3 mb-3">
-                  <div class="h-10 w-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner"
-                       [ngClass]="mesa.codigoAcceso ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
-                    {{ mesa.numero }}
+                <div>
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="h-10 w-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner"
+                         [ngClass]="mesa.codigoAcceso ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
+                      {{ mesa.numero }}
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
+                      <p class="text-[11px] text-gray-400 font-medium truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 class="font-bold text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
-                    <p class="text-[11px] text-gray-400 font-medium truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
+
+                  <div class="my-3 flex items-center justify-between bg-surface/50 rounded-xl p-2.5 border border-gray-50">
+                    <div class="flex flex-col">
+                      <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Estado</span>
+                      <span class="text-[10px] font-bold" [ngClass]="mesa.codigoAcceso ? 'text-green-600' : 'text-gray-400'">
+                        {{ mesa.codigoAcceso ? 'Activa' : 'Inactiva' }}
+                      </span>
+                    </div>
+                    @if (mesa.codigoAcceso) {
+                      <div class="flex flex-col items-end">
+                        <span class="text-[9px] font-black text-green-500 uppercase tracking-wider">PIN</span>
+                        <span class="text-base font-black tracking-widest text-green-600">{{ mesa.codigoAcceso }}</span>
+                      </div>
+                    }
                   </div>
                 </div>
 
-                <div class="my-3 flex items-center justify-between bg-surface/50 rounded-xl p-2.5 border border-gray-50">
-                  <div class="flex flex-col">
-                    <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Estado</span>
-                    <span class="text-[10px] font-bold" [ngClass]="mesa.codigoAcceso ? 'text-green-600' : 'text-gray-400'">
-                      {{ mesa.codigoAcceso ? 'Activa' : 'Inactiva' }}
+                <div>
+                  <div class="pt-2.5 border-t border-gray-100 flex justify-between items-center mb-3">
+                    <span class="text-[10px] font-semibold text-gray-400">Mozo:</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 bg-surface rounded-md text-primary truncate max-w-[120px]">
+                      {{ getMozoEmail(mesa.mozoId) }}
                     </span>
                   </div>
-                  @if (mesa.codigoAcceso) {
-                    <div class="flex flex-col items-end">
-                      <span class="text-[9px] font-black text-green-500 uppercase tracking-wider">PIN</span>
-                      <span class="text-base font-black tracking-widest text-green-600">{{ mesa.codigoAcceso }}</span>
-                    </div>
+
+                  @if(mesa.codigoAcceso) {
+                    <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
+                      Cerrar Mesa 🔒
+                    </button>
+                  } @else {
+                    <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
+                      Abrir Mesa 🛎️
+                    </button>
                   }
                 </div>
               </div>
+            } @empty {
+              <p class="col-span-full text-center py-6 text-gray-400 text-sm">No hay mesas creadas.</p>
+            }
+          </div>
 
-              <div>
-                <div class="pt-2.5 border-t border-gray-100 flex justify-between items-center mb-3">
-                  <span class="text-[10px] font-semibold text-gray-400">Mozo:</span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 bg-surface rounded-md text-primary truncate max-w-[120px]">
-                    {{ getMozoEmail(mesa.mozoId) }}
-                  </span>
-                </div>
-
-                @if(mesa.codigoAcceso) {
-                  <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
-                    Cerrar Mesa 🔒
-                  </button>
-                } @else {
-                  <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
-                    Abrir Mesa 🛎️
-                  </button>
+          @if(auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+            <div class="mt-6 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+              <p class="text-xs text-gray-400 font-medium text-center sm:text-left">Reorganiza el salón en memoria y súbelo al servidor para aplicar los cambios a los códigos QR y mozos asignados.</p>
+              <div class="flex items-center gap-3">
+                @if (saveSuccess()) {
+                  <span class="text-green-500 font-bold text-xs bg-green-50 px-3 py-1.5 rounded-xl animate-pulse">✅ ¡Guardado!</span>
                 }
+                <button 
+                  (click)="syncBackend()"
+                  [disabled]="isSaving()"
+                  class="bg-[#10b981] text-white px-6 py-2.5 rounded-xl font-black shadow-[0_4px_15px_rgb(16,185,129,0.3)] hover:bg-[#0da473] transition-all active:scale-[0.98] disabled:opacity-75 flex items-center gap-2 text-xs">
+                  @if (isSaving()) {
+                    <span class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></span>
+                    Sincronizando...
+                  } @else {
+                    ☁️ Guardar y Publicar
+                  }
+                </button>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Panel de Solicitudes Activas -->
+      <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseTasks.set(!collapseTasks())">
+            <div>
+              <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
+                🔔 Solicitudes Activas
+                <span class="text-xs text-gray-400 inline-block transition-transform duration-300" [class.rotate-180]="collapseTasks()">▲</span>
+              </h1>
+              <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
+            </div>
+          </div>
+          
+          <!-- Filtros (Solo Admin) -->
+          @if(!collapseTasks() && auth.currentUser()?.role === 'Admin') {
+            <div class="flex flex-wrap items-center gap-3 bg-surface/50 px-4 py-2 rounded-2xl border border-gray-200 backdrop-blur-sm">
+              <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
+                <option value="All">Todos los Tipos</option>
+                <option value="Llamado">Llamado</option>
+                <option value="Pedido">Pedido</option>
+                <option value="Cuenta">Cuenta</option>
+              </select>
+              <select [ngModel]="filterMesa()" (ngModelChange)="filterMesa.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
+                <option value="All">Todas las Mesas</option>
+                @for(m of dataService.mesas(); track m.id) { <option [value]="m.numero">Mesa {{m.numero}}</option> }
+              </select>
+              <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
+                <option value="All">Todos los Mozos</option>
+                @for(mz of dataService.mozos(); track mz.id) { <option [value]="mz.id">{{mz.email}}</option> }
+              </select>
+            </div>
+          }
+        </div>
+      </div>
+
+      @if (!collapseTasks()) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (task of myPendingTasks(); track task.id) {
+            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md border border-gray-100 p-4 flex flex-col relative overflow-hidden transition-all group hover:-translate-y-1">
+              
+              <!-- Barra superior indicadora -->
+              <div class="absolute top-0 left-0 w-full h-1.5" [ngClass]="getSideBarClass(task.type)"></div>
+
+              <div class="flex justify-between items-start mb-3 pt-1">
+                <div class="flex items-center gap-3">
+                   <div class="w-12 h-12 rounded-2xl flex flex-col justify-center items-center font-black shadow-inner" [ngClass]="getTypeBgClass(task.type)">
+                     <span class="text-xs opacity-80 leading-none mb-0.5">Mesa</span>
+                     <span class="text-xl leading-none">{{ task.tableId }}</span>
+                   </div>
+                   <div>
+                     <span class="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md" [ngClass]="getTypeTagClass(task.type)">{{task.type}}</span>
+                     <div class="text-[10px] font-bold text-gray-400 mt-1 flex items-center gap-1">
+                       ⏱ Hace {{ getMinutesElapsed(task.timestamp) }} min
+                     </div>
+                   </div>
+                </div>
+                
+                @if(auth.currentUser()?.role === 'Admin') {
+                  <button (click)="openReassignModal(task.id)" class="text-[10px] text-indigo-600 hover:text-white font-bold bg-indigo-50 hover:bg-indigo-500 px-2.5 py-1 rounded-lg transition-colors border border-indigo-100">Reasignar</button>
+                }
+              </div>
+
+              <div class="flex-1 bg-surface/50 rounded-xl p-3 mb-4 border border-gray-50">
+                 @if (task.details) {
+                   <p class="text-gray-600 text-sm font-medium line-clamp-2 leading-snug">{{ task.details }}</p>
+                 } @else {
+                   <p class="text-gray-400 text-sm italic">Atención requerida en la mesa.</p>
+                 }
+              </div>
+
+              <div class="flex gap-2 mt-auto">
+                <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
+                  Ver 👁️
+                </button>
+                <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
+                  Completar ✔
+                </button>
               </div>
             </div>
           } @empty {
-            <p class="col-span-full text-center py-6 text-gray-400 text-sm">No hay mesas creadas.</p>
+            <div class="col-span-full py-16 flex flex-col items-center justify-center text-gray-400 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
+              <div class="h-20 w-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-gray-100">
+                <span class="text-3xl filter grayscale opacity-40">✨</span>
+              </div>
+              <h3 class="text-xl font-black text-gray-600 mb-1">Todo al día</h3>
+              <p class="text-gray-400 font-medium text-sm">No hay solicitudes pendientes en este momento.</p>
+            </div>
           }
         </div>
-
-        @if(auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
-          <div class="mt-6 pt-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p class="text-xs text-gray-400 font-medium text-center sm:text-left">Reorganiza el salón en memoria y súbelo al servidor para aplicar los cambios a los códigos QR y mozos asignados.</p>
-            <div class="flex items-center gap-3">
-              @if (saveSuccess()) {
-                <span class="text-green-500 font-bold text-xs bg-green-50 px-3 py-1.5 rounded-xl animate-pulse">✅ ¡Guardado!</span>
-              }
-              <button 
-                (click)="syncBackend()"
-                [disabled]="isSaving()"
-                class="bg-[#10b981] text-white px-6 py-2.5 rounded-xl font-black shadow-[0_4px_15px_rgb(16,185,129,0.3)] hover:bg-[#0da473] transition-all active:scale-[0.98] disabled:opacity-75 flex items-center gap-2 text-xs">
-                @if (isSaving()) {
-                  <span class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></span>
-                  Sincronizando...
-                } @else {
-                  ☁️ Guardar y Publicar
-                }
-              </button>
-            </div>
-          </div>
-        }
-      </div>
-
-      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
-        <div>
-          <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">🔔 Solicitudes Activas</h1>
-          <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
-        </div>
-        
-        <!-- Filtros (Solo Admin) -->
-        @if(auth.currentUser()?.role === 'Admin') {
-          <div class="flex flex-wrap items-center gap-3 bg-surface/50 px-4 py-2 rounded-2xl border border-gray-200 backdrop-blur-sm">
-            <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
-              <option value="All">Todos los Tipos</option>
-              <option value="Llamado">Llamado</option>
-              <option value="Pedido">Pedido</option>
-              <option value="Cuenta">Cuenta</option>
-            </select>
-            <select [ngModel]="filterMesa()" (ngModelChange)="filterMesa.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
-              <option value="All">Todas las Mesas</option>
-              @for(m of dataService.mesas(); track m.id) { <option [value]="m.numero">Mesa {{m.numero}}</option> }
-            </select>
-            <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
-              <option value="All">Todos los Mozos</option>
-              @for(mz of dataService.mozos(); track mz.id) { <option [value]="mz.id">{{mz.email}}</option> }
-            </select>
-          </div>
-        }
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        @for (task of myPendingTasks(); track task.id) {
-          <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm hover:shadow-md border border-gray-100 p-4 flex flex-col relative overflow-hidden transition-all group hover:-translate-y-1">
-            
-            <!-- Barra superior indicadora -->
-            <div class="absolute top-0 left-0 w-full h-1.5" [ngClass]="getSideBarClass(task.type)"></div>
-
-            <div class="flex justify-between items-start mb-3 pt-1">
-              <div class="flex items-center gap-3">
-                 <div class="w-12 h-12 rounded-2xl flex flex-col justify-center items-center font-black shadow-inner" [ngClass]="getTypeBgClass(task.type)">
-                   <span class="text-xs opacity-80 leading-none mb-0.5">Mesa</span>
-                   <span class="text-xl leading-none">{{ task.tableId }}</span>
-                 </div>
-                 <div>
-                   <span class="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md" [ngClass]="getTypeTagClass(task.type)">{{task.type}}</span>
-                   <div class="text-[10px] font-bold text-gray-400 mt-1 flex items-center gap-1">
-                     ⏱ Hace {{ getMinutesElapsed(task.timestamp) }} min
-                   </div>
-                 </div>
-              </div>
-              
-              @if(auth.currentUser()?.role === 'Admin') {
-                <button (click)="openReassignModal(task.id)" class="text-[10px] text-indigo-600 hover:text-white font-bold bg-indigo-50 hover:bg-indigo-500 px-2.5 py-1 rounded-lg transition-colors border border-indigo-100">Reasignar</button>
-              }
-            </div>
-
-            <div class="flex-1 bg-surface/50 rounded-xl p-3 mb-4 border border-gray-50">
-               @if (task.details) {
-                 <p class="text-gray-600 text-sm font-medium line-clamp-2 leading-snug">{{ task.details }}</p>
-               } @else {
-                 <p class="text-gray-400 text-sm italic">Atención requerida en la mesa.</p>
-               }
-            </div>
-
-            <div class="flex gap-2 mt-auto">
-              <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
-                Ver 👁️
-              </button>
-              <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
-                Completar ✔
-              </button>
-            </div>
-          </div>
-        } @empty {
-          <div class="col-span-full py-16 flex flex-col items-center justify-center text-gray-400 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
-            <div class="h-20 w-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-gray-100">
-              <span class="text-3xl filter grayscale opacity-40">✨</span>
-            </div>
-            <h3 class="text-xl font-black text-gray-600 mb-1">Todo al día</h3>
-            <p class="text-gray-400 font-medium text-sm">No hay solicitudes pendientes en este momento.</p>
-          </div>
-        }
-      </div>
+      }
     </div>
 
     <!-- Modal Reasignar -->
@@ -333,6 +350,8 @@ export class AdminDashboardComponent {
   formData: AdminMesa = { id: '', numero: 1, ubicacion: '', mozoId: 'Sin asignar' };
   showQrModal = signal<AdminMesa | null>(null);
   restauranteNombre = signal<string>('restaurante');
+  collapseMesas = signal(false);
+  collapseTasks = signal(false);
 
   myPendingTasks = computed(() => {
     let allTasks = this.service.pendingTasks();
