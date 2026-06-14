@@ -30,4 +30,12 @@ public class TareasController : ControllerBase
             assignedMozoId = t.AssignedMozoId
         }));
     }
+
+    [HttpGet("estadisticas")]
+    [Authorize(Roles = "Admin,SuperAdmin")]
+    public async Task<IActionResult> GetEstadisticas()
+    {
+        var stats = await _taskRepository.GetAnalyticsStatsAsync();
+        return Ok(stats);
+    }
 }

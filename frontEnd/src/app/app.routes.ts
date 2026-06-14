@@ -32,8 +32,14 @@ export const routes: Routes = [
         data: { roles: ['SuperAdmin'] }
       },
       {
+        path: 'inicio',
+        loadComponent: () => import('./features/admin/dashboard/admin-inicio.component').then(m => m.AdminInicioComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'SuperAdmin'] }
+      },
+      {
         path: '',
-        redirectTo: 'dashboard',
+        loadComponent: () => import('./features/admin/layout/admin-landing.component').then(m => m.AdminLandingComponent),
         pathMatch: 'full'
       }
     ]

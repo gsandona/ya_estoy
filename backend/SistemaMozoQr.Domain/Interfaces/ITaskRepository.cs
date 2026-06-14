@@ -10,4 +10,5 @@ public interface ITaskRepository
     Task<MesaTask?> GetByIdIgnoreQueryFiltersAsync(Guid id);
     Task AddAsync(MesaTask task);
     Task UpdateAsync(MesaTask task);
+    Task<object> GetAnalyticsStatsAsync();
 }

@@ -25,9 +25,16 @@ import { AdminDataService } from '../config/admin-data.service';
           <p class="text-slate-400 text-sm mt-1 font-medium select-none">Gestión Staff • {{ auth.currentUser()?.role }}</p>
         </div>
         <nav class="flex-1 p-6 space-y-3">
+          @if (auth.isAdmin() || auth.isSuperAdmin()) {
+            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">📈</span>
+              Métricas y Datos
+            </a>
+          }
+
           <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
             <span class="p-1.5 bg-accent/20 text-accent rounded-lg">📋</span>
-            Task List
+            Mesas y Tareas
           </a>
 
           @if (auth.isAdmin()) {
@@ -126,9 +133,16 @@ import { AdminDataService } from '../config/admin-data.service';
             </div>
             
             <nav class="flex-1 p-6 space-y-4">
+              @if (auth.isAdmin() || auth.isSuperAdmin()) {
+                <a routerLink="/admin/inicio" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">📈</span>
+                  Métricas y Datos
+                </a>
+              }
+
               <a routerLink="/admin/dashboard" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                 <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">📋</span>
-                Mesas / Tareas
+                Mesas y Tareas
               </a>
 
               @if (auth.isAdmin()) {

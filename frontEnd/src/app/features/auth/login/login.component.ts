@@ -186,7 +186,7 @@ export class LoginComponent {
       this.authService.login(this.email, this.password).subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.router.navigate(['/admin/dashboard']);
+          this.router.navigate(['/admin']);
         },
         error: (err) => {
           console.error(err);
