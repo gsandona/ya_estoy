@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using SistemaMozoQr.Domain.Entities;
 using SistemaMozoQr.Domain.Interfaces;
 using SistemaMozoQr.Application.DTOs;
+using Microsoft.AspNetCore.SignalR;
+using SistemaMozoQr.Infrastructure.SignalR;
+using SistemaMozoQr.Application.Interfaces;
 
 namespace SistemaMozoQr.WebApi.Controllers;
 
@@ -15,17 +18,20 @@ public class MesasConfigController : ControllerBase
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly ITaskRepository _taskRepository;
     private readonly IPedidoRepository _pedidoRepository;
+    private readonly IHubContext<RestauranteHub, IRestauranteHubClient> _hubContext;
 
     public MesasConfigController(
         IMesaRepository mesaRepository, 
         IUsuarioRepository usuarioRepository, 
         ITaskRepository taskRepository,
-        IPedidoRepository pedidoRepository)
+        IPedidoRepository pedidoRepository,
+        IHubContext<RestauranteHub, IRestauranteHubClient> hubContext)
     {
         _mesaRepository = mesaRepository;
         _usuarioRepository = usuarioRepository;
         _taskRepository = taskRepository;
         _pedidoRepository = pedidoRepository;
+        _hubContext = hubContext;
     }
 
     [HttpGet]
@@ -145,9 +151,34 @@ public class MesasConfigController : ControllerBase
 
         mesa.Estado = SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible;
         mesa.CodigoAcceso = null; // Se invalida el PIN
+        mesa.MontoConsumo = null; // Reset billing amount for new customers
         
         await _mesaRepository.UpdateAsync(mesa);
-        return Ok(new { mesa.Id, mesa.Numero, mesa.Estado, mesa.CodigoAcceso });
+
+        // 1. Clear/complete all pending tasks for this table in DB & notify via SignalR in real-time
+        var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
+        var mesaTasks = pendingTasks.Where(t => t.TableId == mesa.Numero && t.RestauranteId == mesa.RestauranteId).ToList();
+        foreach (var task in mesaTasks)
+        {
+            task.Status = "Completed";
+            await _taskRepository.UpdateAsync(task);
+            await _hubContext.Clients.All.TareaCompletada(task.Id.ToString());
+        }
+
+        // 2. Mark all active/pending orders for this table as delivered
+        var orders = await _pedidoRepository.GetByMesaIdAsync(mesa.Id);
+        foreach (var order in orders)
+        {
+            if (order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Recibido ||
+                order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.EnPreparacion ||
+                order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Listo)
+            {
+                order.Estado = SistemaMozoQr.Domain.Enums.EstadoPedido.Entregado;
+                await _pedidoRepository.UpdateAsync(order);
+            }
+        }
+
+        return Ok(new { mesa.Id, mesa.Numero, mesa.Estado, mesa.CodigoAcceso, mesa.MontoConsumo });
     }
 
     [HttpGet("verify")]

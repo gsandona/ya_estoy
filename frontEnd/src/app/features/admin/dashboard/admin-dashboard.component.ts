@@ -83,82 +83,105 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
             </div>
           }
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             @for(mesa of myMesas(); track mesa.id) {
-              <div class="border border-gray-200 rounded-3xl p-4 flex flex-col justify-between hover:border-accent transition relative group bg-white shadow-sm"
-                   [ngClass]="mesa.codigoAcceso ? 'ring-2 ring-green-500/10 border-green-200 bg-green-50/5' : ''">
-                
-                <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                  <button (click)="openQrModal(mesa)" class="text-green-600 hover:text-green-800 font-bold text-[10px] bg-green-50 px-2 py-1 rounded-lg transition-colors">🖨️ QR</button>
-                  @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
-                    <button (click)="openEditForm(mesa)" class="text-indigo-500 hover:text-indigo-700 font-bold text-[10px] bg-indigo-50 px-2 py-1 rounded-lg transition-colors">Editar</button>
-                    <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-400 hover:text-red-600 font-bold text-[10px] bg-red-50 px-2 py-1 rounded-lg transition-colors">Borrar</button>
-                  }
-                </div>
-
-                <div>
-                  <div class="flex items-center gap-3 mb-3">
-                    <div class="h-10 w-10 rounded-xl flex items-center justify-center font-black text-sm shadow-inner"
-                         [ngClass]="mesa.codigoAcceso ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'">
-                      {{ mesa.numero }}
-                    </div>
-                    <div>
-                      <h3 class="font-bold text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
-                      <p class="text-[11px] text-gray-400 font-medium truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
-                    </div>
-                  </div>
-
-                  <div class="my-3 flex items-center justify-between bg-surface/50 rounded-xl p-2.5 border border-gray-50">
-                    <div class="flex flex-col">
-                      <span class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Estado</span>
-                      <span class="text-[10px] font-bold" [ngClass]="mesa.codigoAcceso ? 'text-green-600' : 'text-gray-400'">
-                        {{ mesa.codigoAcceso ? 'Activa' : 'Inactiva' }}
-                      </span>
-                    </div>
-                    @if (mesa.codigoAcceso) {
-                      <div class="flex flex-col items-end">
-                        <span class="text-[9px] font-black text-green-500 uppercase tracking-wider">PIN</span>
-                        <span class="text-base font-black tracking-widest text-green-600">{{ mesa.codigoAcceso }}</span>
-                      </div>
+              @if (mesa.codigoAcceso) {
+                <!-- Active Mesa Card -->
+                <div class="border border-green-200/80 rounded-3xl p-5 flex flex-col justify-between hover:border-green-400 transition relative group bg-white shadow-sm ring-4 ring-green-500/5">
+                  <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <button (click)="openQrModal(mesa)" class="text-green-700 hover:text-green-900 font-bold text-[10px] bg-green-100/60 px-2.5 py-1 rounded-xl transition-colors border border-green-200/50">🖨️ QR</button>
+                    @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+                      <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">Editar</button>
+                      <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">Borrar</button>
                     }
                   </div>
 
-                  <!-- Monto Consumo (Solo si está activa/ocupada) -->
-                  @if (mesa.codigoAcceso) {
-                    <div class="my-3 pt-2.5 border-t border-dashed border-gray-100 flex flex-col gap-1">
-                      <label class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Monto Consumido ($)</label>
-                      <div class="flex gap-1.5 items-center">
-                        <span class="text-xs text-gray-500 font-bold">$</span>
-                        <input type="number" 
-                               [value]="mesa.montoConsumo"
-                               (blur)="actualizarMontoConsumo(mesa.id, $event)"
-                               (keyup.enter)="actualizarMontoConsumo(mesa.id, $event)"
-                               placeholder="Ej: 4500" 
-                               class="w-full px-2 py-1 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 font-bold bg-white text-gray-700">
+                  <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                      <div class="h-12 w-12 rounded-2xl flex items-center justify-center font-black text-lg bg-green-500/10 text-green-700 shadow-inner">
+                        {{ mesa.numero }}
+                      </div>
+                      <div>
+                        <h3 class="font-black text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
+                        <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
                       </div>
                     </div>
-                  }
-                </div>
 
-                <div>
-                  <div class="pt-2.5 border-t border-gray-100 flex justify-between items-center mb-3">
-                    <span class="text-[10px] font-semibold text-gray-400">Mozo:</span>
-                    <span class="text-[10px] font-bold px-2 py-0.5 bg-surface rounded-md text-primary truncate max-w-[120px]">
-                      {{ getMozoEmail(mesa.mozoId) }}
-                    </span>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-2 flex flex-col justify-center items-center">
+                        <span class="text-[8px] font-black text-emerald-600 uppercase tracking-wider">PIN ACCESO</span>
+                        <span class="text-sm font-black tracking-wider text-emerald-700">{{ mesa.codigoAcceso }}</span>
+                      </div>
+
+                      <div class="bg-slate-50 border border-slate-100 rounded-2xl p-2 flex flex-col justify-center">
+                        <span class="text-[8px] font-black text-gray-400 uppercase tracking-wider text-center">CONSUMIDO</span>
+                        <div class="flex gap-1 items-center justify-center mt-0.5">
+                          <span class="text-[10px] text-gray-500 font-black">$</span>
+                          <input type="number" 
+                                 [value]="mesa.montoConsumo"
+                                 (blur)="actualizarMontoConsumo(mesa.id, $event)"
+                                 (keyup.enter)="actualizarMontoConsumo(mesa.id, $event)"
+                                 placeholder="0" 
+                                 class="w-14 text-center text-xs font-black bg-transparent border-none focus:outline-none text-gray-800 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  @if(mesa.codigoAcceso) {
-                    <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
+                  <div class="mt-4 pt-3 border-t border-slate-100/80 space-y-3">
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="font-semibold text-gray-400">Mozo:</span>
+                      <span class="font-bold px-2 py-0.5 bg-slate-100 rounded-md text-primary truncate max-w-[120px]">
+                        {{ getMozoEmail(mesa.mozoId) }}
+                      </span>
+                    </div>
+
+                    <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
                       Cerrar Mesa 🔒
                     </button>
-                  } @else {
-                    <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 w-full">
+                  </div>
+                </div>
+              } @else {
+                <!-- Inactive Mesa Card -->
+                <div class="border border-slate-200 rounded-3xl p-5 flex flex-col justify-between hover:border-slate-300 transition relative group bg-white shadow-sm hover:shadow-md">
+                  <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <button (click)="openQrModal(mesa)" class="text-slate-600 hover:text-slate-800 font-bold text-[10px] bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">🖨️ QR</button>
+                    @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
+                      <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">Editar</button>
+                      <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">Borrar</button>
+                    }
+                  </div>
+
+                  <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                      <div class="h-12 w-12 rounded-2xl flex items-center justify-center font-black text-lg bg-slate-100 text-slate-400">
+                        {{ mesa.numero }}
+                      </div>
+                      <div>
+                        <h3 class="font-black text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
+                        <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
+                      </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-100 rounded-2xl p-3 text-center">
+                      <span class="text-[10px] font-bold text-slate-400">Disponible / Libre</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-4 pt-3 border-t border-slate-100 space-y-3">
+                    <div class="flex justify-between items-center text-[10px]">
+                      <span class="font-semibold text-gray-400">Mozo:</span>
+                      <span class="font-bold px-2 py-0.5 bg-slate-100 rounded-md text-primary truncate max-w-[120px]">
+                        {{ getMozoEmail(mesa.mozoId) }}
+                      </span>
+                    </div>
+
+                    <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(15,23,42,0.15)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
                       Abrir Mesa 🛎️
                     </button>
-                  }
+                  </div>
                 </div>
-              </div>
+              }
             } @empty {
               <p class="col-span-full text-center py-6 text-gray-400 text-sm">No hay mesas creadas.</p>
             }
