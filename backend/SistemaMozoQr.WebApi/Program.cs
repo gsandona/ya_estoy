@@ -91,6 +91,20 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<RestauranteDbContext>();
     // context.Database.EnsureCreated(); // <- Esto era para InMemory
+    
+    // Auto-fix for PostgreSQL column type if migration was previously run with wrong TEXT type
+    if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+    {
+        try
+        {
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Mesas\" ALTER COLUMN \"MontoConsumo\" TYPE numeric USING \"MontoConsumo\"::numeric;");
+        }
+        catch (Exception)
+        {
+            // Ignore if column doesn't exist yet
+        }
+    }
+
     try
     {
         context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations

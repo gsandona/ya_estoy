@@ -12,11 +12,22 @@ namespace SistemaMozoQr.Infrastructure.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<decimal>(
-                name: "MontoConsumo",
-                table: "Mesas",
-                type: "TEXT",
-                nullable: true);
+            if (migrationBuilder.ActiveProvider == "Npgsql.EntityFrameworkCore.PostgreSQL")
+            {
+                migrationBuilder.AddColumn<decimal>(
+                    name: "MontoConsumo",
+                    table: "Mesas",
+                    type: "numeric",
+                    nullable: true);
+            }
+            else
+            {
+                migrationBuilder.AddColumn<decimal>(
+                    name: "MontoConsumo",
+                    table: "Mesas",
+                    type: "TEXT",
+                    nullable: true);
+            }
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
