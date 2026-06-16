@@ -14,12 +14,18 @@ public class MesasConfigController : ControllerBase
     private readonly IMesaRepository _mesaRepository;
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly ITaskRepository _taskRepository;
+    private readonly IPedidoRepository _pedidoRepository;
 
-    public MesasConfigController(IMesaRepository mesaRepository, IUsuarioRepository usuarioRepository, ITaskRepository taskRepository)
+    public MesasConfigController(
+        IMesaRepository mesaRepository, 
+        IUsuarioRepository usuarioRepository, 
+        ITaskRepository taskRepository,
+        IPedidoRepository pedidoRepository)
     {
         _mesaRepository = mesaRepository;
         _usuarioRepository = usuarioRepository;
         _taskRepository = taskRepository;
+        _pedidoRepository = pedidoRepository;
     }
 
     [HttpGet]
@@ -191,18 +197,42 @@ public class MesasConfigController : ControllerBase
         var cuentaTask = mesaTasks.FirstOrDefault(t => t.Type == "Cuenta");
         var pedidoTask = mesaTasks.FirstOrDefault(t => t.Type == "Pedido");
 
+        string? pedidoEstado = null;
+        if (pedidoTask != null)
+        {
+            var pedido = await _pedidoRepository.GetByIdAsync(pedidoTask.Id);
+            if (pedido != null)
+            {
+                pedidoEstado = pedido.Estado.ToString();
+            }
+        }
+
         return Ok(new { 
             mesaId = mesa.Id, 
             restauranteId = mesa.RestauranteId,
             numero = mesa.Numero, 
             estado = mesa.Estado, 
+            montoConsumo = mesa.MontoConsumo,
             validado = true,
             hasLlamado = llamoTask != null,
             hasCuenta = cuentaTask != null,
             llamoTaskId = llamoTask?.Id,
             cuentaTaskId = cuentaTask?.Id,
             pedidoTaskId = pedidoTask?.Id,
-            pedidoDetails = pedidoTask?.Details
+            pedidoDetails = pedidoTask?.Details,
+            pedidoEstado = pedidoEstado
         });
+    }
+
+    [HttpPost("{id:guid}/monto")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+    public async Task<IActionResult> ActualizarMonto(Guid id, [FromBody] decimal? monto)
+    {
+        var mesa = await _mesaRepository.GetByIdAsync(id);
+        if (mesa == null) return NotFound();
+
+        mesa.MontoConsumo = monto;
+        await _mesaRepository.UpdateAsync(mesa);
+        return Ok(new { mesa.Id, mesa.Numero, mesa.MontoConsumo });
     }
 }

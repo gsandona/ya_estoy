@@ -32,6 +32,13 @@ import { AdminDataService } from '../config/admin-data.service';
             </a>
           }
 
+          @if (auth.isAdmin() || auth.isSuperAdmin() || auth.isCocina()) {
+            <a routerLink="/admin/cocina" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">🍳</span>
+              Cocina
+            </a>
+          }
+
           <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
             <span class="p-1.5 bg-accent/20 text-accent rounded-lg">📋</span>
             Mesas y Tareas
@@ -137,6 +144,13 @@ import { AdminDataService } from '../config/admin-data.service';
                 <a routerLink="/admin/inicio" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">📈</span>
                   Métricas y Datos
+                </a>
+              }
+
+              @if (auth.isAdmin() || auth.isSuperAdmin() || auth.isCocina()) {
+                <a routerLink="/admin/cocina" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">🍳</span>
+                  Cocina
                 </a>
               }
 

@@ -122,6 +122,22 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                       </div>
                     }
                   </div>
+
+                  <!-- Monto Consumo (Solo si está activa/ocupada) -->
+                  @if (mesa.codigoAcceso) {
+                    <div class="my-3 pt-2.5 border-t border-dashed border-gray-100 flex flex-col gap-1">
+                      <label class="text-[9px] font-black text-gray-400 uppercase tracking-wider">Monto Consumido ($)</label>
+                      <div class="flex gap-1.5 items-center">
+                        <span class="text-xs text-gray-500 font-bold">$</span>
+                        <input type="number" 
+                               [value]="mesa.montoConsumo"
+                               (blur)="actualizarMontoConsumo(mesa.id, $event)"
+                               (keyup.enter)="actualizarMontoConsumo(mesa.id, $event)"
+                               placeholder="Ej: 4500" 
+                               class="w-full px-2 py-1 text-xs border border-gray-200 rounded-lg focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 font-bold bg-white text-gray-700">
+                      </div>
+                    </div>
+                  }
                 </div>
 
                 <div>
@@ -246,9 +262,15 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                 <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
                   Ver 👁️
                 </button>
-                <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
-                  Completar ✔
-                </button>
+                @if (task.type === 'Pedido') {
+                  <button (click)="aprobarPedido(task.id)" class="flex-[2] bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
+                    Aprobar 👍
+                  </button>
+                } @else {
+                  <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
+                    Completar ✔
+                  </button>
+                }
               </div>
             </div>
           } @empty {
@@ -540,6 +562,42 @@ export class AdminDashboardComponent {
 
   completar(taskId: string) {
     this.service.completeTask(taskId);
+  }
+
+  aprobarPedido(taskId: string) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    this.http.post(`${environment.apiUrl}/api/pedido/${taskId}/aprobar`, {}, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        // Tarea completada y retirada automáticamente por SignalR
+      },
+      error: (err) => console.error('Error al aprobar pedido:', err)
+    });
+  }
+
+  actualizarMontoConsumo(mesaId: string, event: any) {
+    const valueStr = event.target.value;
+    const monto = valueStr === '' ? null : parseFloat(valueStr);
+    
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/monto`, monto, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json' 
+      }
+    }).subscribe({
+      next: (res: any) => {
+        // Actualizar localmente la mesa en el dataService
+        this.dataService.mesas.update(mesas => 
+          mesas.map(m => m.id === mesaId ? { ...m, montoConsumo: res.montoConsumo } : m)
+        );
+      },
+      error: (err) => console.error('Error al actualizar monto consumo:', err)
+    });
   }
 
   async abrirMesa(mesaId: string) {

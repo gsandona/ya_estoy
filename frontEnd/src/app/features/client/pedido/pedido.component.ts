@@ -68,11 +68,19 @@ import { FormsModule } from '@angular/forms';
 
     } @else {
       <div class="min-h-screen bg-surface flex flex-col items-center py-12 px-4 pb-32 animate-fade-in">
-        <div class="mb-10 text-center">
+        <div class="mb-10 text-center w-full max-w-sm">
           <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary text-white text-3xl font-bold mb-4 shadow-lg ring-4 ring-primary/20">
             {{ numeroMesa() || '...' }}
           </div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-2 tracking-tight">Menú Interactivo</h1>
+          <h1 class="text-3xl font-bold text-gray-800 mb-1 tracking-tight">Menú Interactivo</h1>
+          <p class="text-slate-400 text-xs font-semibold mb-4">Mesa {{ numeroMesa() }}</p>
+          
+          @if (montoConsumo() !== null && montoConsumo() !== undefined) {
+            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 shadow-inner mb-2 animate-fade-in">
+              <span class="text-xs uppercase font-black text-emerald-600 tracking-wider">Consumo Acumulado de la Mesa</span>
+              <h2 class="text-2xl font-black text-emerald-700 mt-1">\${{ formatCurrency(montoConsumo()) }}</h2>
+            </div>
+          }
         </div>
 
         <div class="w-full max-w-sm space-y-4">
@@ -147,27 +155,52 @@ import { FormsModule } from '@angular/forms';
 
         <!-- Pending Order Card -->
         @if (activePedidoTaskId()) {
-          <div class="w-full max-w-sm bg-blue-50/50 border border-blue-100 rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3">
+          <div class="w-full max-w-sm rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3 border"
+               [ngClass]="{
+                 'bg-blue-50/50 border-blue-100 text-blue-800': activePedidoEstado() === 'Recibido',
+                 'bg-amber-50/50 border-amber-100 text-amber-800': activePedidoEstado() === 'EnPreparacion',
+                 'bg-green-50/50 border-green-100 text-green-800': activePedidoEstado() === 'Listo'
+               }">
             <div class="flex justify-between items-start">
               <div class="flex items-center gap-2">
-                <span class="text-xl">🍳</span>
+                <span class="text-xl">
+                  @if (activePedidoEstado() === 'Recibido') { 🍳 }
+                  @if (activePedidoEstado() === 'EnPreparacion') { 🔥 }
+                  @if (activePedidoEstado() === 'Listo') { 🛎️ }
+                </span>
                 <div>
-                  <h3 class="font-bold text-gray-800 text-sm">Pedido en Cocina</h3>
-                  <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-wider">Pendiente de Aprobación</p>
+                  <h3 class="font-bold text-gray-800 text-sm">Estado de tu Pedido</h3>
+                  <p class="text-[10px] font-black uppercase tracking-wider"
+                     [ngClass]="{
+                       'text-blue-500': activePedidoEstado() === 'Recibido',
+                       'text-amber-600': activePedidoEstado() === 'EnPreparacion',
+                       'text-green-600 animate-pulse': activePedidoEstado() === 'Listo'
+                     }">
+                    @if (activePedidoEstado() === 'Recibido') { Pendiente de Aprobación }
+                    @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
+                    @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
+                  </p>
                 </div>
               </div>
-              <button 
-                (click)="cancelarPedido()"
-                [disabled]="loadingCancelarPedido()"
-                class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center gap-1">
-                @if (loadingCancelarPedido()) {
-                  <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full"></span>
-                } @else {
-                  Cancelar Pedido
-                }
-              </button>
+              @if (activePedidoEstado() === 'Recibido') {
+                <button 
+                  (click)="cancelarPedido()"
+                  [disabled]="loadingCancelarPedido()"
+                  class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center gap-1">
+                  @if (loadingCancelarPedido()) {
+                    <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full"></span>
+                  } @else {
+                    Cancelar Pedido
+                  }
+                </button>
+              }
             </div>
-            <div class="bg-white/80 p-3 rounded-2xl text-xs font-semibold text-gray-600 border border-blue-50/50 line-clamp-3">
+            <div class="bg-white/80 p-3 rounded-2xl text-xs font-semibold text-gray-600 border line-clamp-3"
+                 [ngClass]="{
+                   'border-blue-50/50': activePedidoEstado() === 'Recibido',
+                   'border-amber-50/50': activePedidoEstado() === 'EnPreparacion',
+                   'border-green-50/50': activePedidoEstado() === 'Listo'
+                 }">
               {{ activePedidoDetails() }}
             </div>
           </div>
@@ -184,9 +217,9 @@ import { FormsModule } from '@angular/forms';
           <div class="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-40 animate-fade-in">
             <button 
               (click)="showCartModal.set(true)"
-              class="w-full max-w-md bg-gray-900 text-white rounded-2xl shadow-2xl p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-gray-700">
+              class="w-full max-w-md bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-emerald-500/20">
               <div class="flex items-center gap-3">
-                 <div class="bg-gray-800 rounded-full h-8 w-8 flex items-center justify-center font-bold text-sm">
+                 <div class="bg-white/20 rounded-full h-8 w-8 flex items-center justify-center font-black text-sm">
                    {{ cart.totalItems() }}
                  </div>
                  <span class="font-bold">Ver Canasto</span>
@@ -296,6 +329,8 @@ export class PedidoComponent implements OnInit {
   activeCuentaTaskId = signal<string | null>(null);
   activePedidoTaskId = signal<string | null>(null);
   activePedidoDetails = signal<string | null>(null);
+  activePedidoEstado = signal<string>('Recibido');
+  montoConsumo = signal<number | null>(null);
 
   showMenu = signal(false);
   showCartModal = signal(false);
@@ -323,7 +358,22 @@ export class PedidoComponent implements OnInit {
           this.activePedidoDetails.set(null);
           localStorage.removeItem('mozo_go_pedido_task_id');
           localStorage.removeItem('mozo_go_pedido_details');
+          localStorage.removeItem('mozo_go_pedido_estado');
         }
+      }
+    });
+
+    effect(() => {
+      const change = this.signalrService.comandaChanged();
+      if (change) {
+        this.verifyMesa(localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`) || undefined);
+      }
+    });
+
+    effect(() => {
+      const update = this.signalrService.mesaMontoConsumo();
+      if (update && update.mesaId.toLowerCase() === this.id.toLowerCase()) {
+        this.montoConsumo.set(update.monto);
       }
     });
   }
@@ -345,6 +395,7 @@ export class PedidoComponent implements OnInit {
     if (pedidoTaskId) {
       this.activePedidoTaskId.set(pedidoTaskId);
       this.activePedidoDetails.set(localStorage.getItem('mozo_go_pedido_details'));
+      this.activePedidoEstado.set(localStorage.getItem('mozo_go_pedido_estado') || 'Recibido');
     }
 
     const llamoTime = localStorage.getItem(`mesa_${this.restaurante}_${this.numero}_llamo`);
@@ -409,18 +460,30 @@ export class PedidoComponent implements OnInit {
           this.activeCuentaTaskId.set(null);
         }
 
+        if (res.montoConsumo !== undefined) {
+          this.montoConsumo.set(res.montoConsumo);
+        } else {
+          this.montoConsumo.set(null);
+        }
+
         if (res.pedidoTaskId) {
           this.activePedidoTaskId.set(res.pedidoTaskId);
           this.activePedidoDetails.set(res.pedidoDetails);
+          this.activePedidoEstado.set(res.pedidoEstado || 'Recibido');
           localStorage.setItem('mozo_go_pedido_task_id', res.pedidoTaskId);
           if (res.pedidoDetails) {
             localStorage.setItem('mozo_go_pedido_details', res.pedidoDetails);
           }
+          if (res.pedidoEstado) {
+            localStorage.setItem('mozo_go_pedido_estado', res.pedidoEstado);
+          }
         } else {
           this.activePedidoTaskId.set(null);
           this.activePedidoDetails.set(null);
+          this.activePedidoEstado.set('Recibido');
           localStorage.removeItem('mozo_go_pedido_task_id');
           localStorage.removeItem('mozo_go_pedido_details');
+          localStorage.removeItem('mozo_go_pedido_estado');
         }
 
         if (res.numero) {
@@ -493,28 +556,36 @@ export class PedidoComponent implements OnInit {
 
   async enviarPedido() {
     this.loadingPedido.set(true);
-    try {
-      const detailsArray = this.cart.items().map(i => `${i.quantity}x ${i.nombre}`);
-      const fullDetails = detailsArray.join(', ');
+    const detailsArray = this.cart.items().map(i => `${i.quantity}x ${i.nombre}`);
+    const fullDetails = detailsArray.join(', ');
 
-      const taskId = await this.signalrService.sendNuevoPedido(this.id, fullDetails);
-      if (taskId && taskId !== '00000000-0000-0000-0000-000000000000') {
+    const body = {
+      mesaId: this.id,
+      items: this.cart.items().map(i => ({ menuItemId: i.id, cantidad: i.quantity }))
+    };
+
+    this.http.post<any>(`${environment.apiUrl}/api/pedido`, body).subscribe({
+      next: (res) => {
+        const taskId = res.taskId || res.pedidoId;
         this.activePedidoTaskId.set(taskId);
         this.activePedidoDetails.set(fullDetails);
+        this.activePedidoEstado.set('Recibido');
+        
         localStorage.setItem('mozo_go_pedido_task_id', taskId);
         localStorage.setItem('mozo_go_pedido_details', fullDetails);
+        localStorage.setItem('mozo_go_pedido_estado', 'Recibido');
+        
+        this.showCartModal.set(false);
+        this.cart.clearCart();
+        this.loadingPedido.set(false);
+        this.showSuccessToast.set(true);
+        setTimeout(() => this.showSuccessToast.set(false), 3000);
+      },
+      error: (err) => {
+        console.error('Error enviando el pedido:', err);
+        this.loadingPedido.set(false);
       }
-      
-      this.showCartModal.set(false);
-      this.cart.clearCart();
-      
-      this.showSuccessToast.set(true);
-      setTimeout(() => this.showSuccessToast.set(false), 3000);
-    } catch (err) {
-      console.error('Error enviando el pedido:', err);
-    } finally {
-      this.loadingPedido.set(false);
-    }
+    });
   }
 
   async cancelarLlamado() {
@@ -560,5 +631,9 @@ export class PedidoComponent implements OnInit {
     } finally {
       this.loadingCancelarPedido.set(false);
     }
+  }
+  formatCurrency(value: number | null): string {
+    if (value === null) return '0';
+    return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
 }

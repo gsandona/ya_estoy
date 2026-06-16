@@ -4,5 +4,6 @@ public enum Rol
 {
     Admin,
     Mozo,
-    SuperAdmin
+    SuperAdmin,
+    Cocina
 }

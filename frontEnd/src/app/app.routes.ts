@@ -38,6 +38,12 @@ export const routes: Routes = [
         data: { roles: ['Admin', 'SuperAdmin'] }
       },
       {
+        path: 'cocina',
+        loadComponent: () => import('./features/admin/dashboard/admin-cocina.component').then(m => m.AdminCocinaComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'SuperAdmin', 'Cocina'] }
+      },
+      {
         path: '',
         loadComponent: () => import('./features/admin/layout/admin-landing.component').then(m => m.AdminLandingComponent),
         pathMatch: 'full'

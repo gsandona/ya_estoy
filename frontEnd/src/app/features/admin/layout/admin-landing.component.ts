@@ -14,6 +14,8 @@ export class AdminLandingComponent implements OnInit {
     const role = this.auth.currentUser()?.role;
     if (role === 'Admin' || role === 'SuperAdmin') {
       this.router.navigate(['/admin/inicio']);
+    } else if (role === 'Cocina') {
+      this.router.navigate(['/admin/cocina']);
     } else {
       this.router.navigate(['/admin/dashboard']);
     }

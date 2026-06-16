@@ -17,6 +17,8 @@ export class SignalrService {
   public readonly pendingTasks = computed(() => this._tasks().filter(t => t.status === 'Pending'));
   public readonly isConnected = signal<boolean>(false);
   public readonly taskCompleted = signal<string | null>(null);
+  public readonly comandaChanged = signal<string | null>(null);
+  public readonly mesaMontoConsumo = signal<{ mesaId: string, monto: number | null } | null>(null);
 
   constructor() {
     this.buildConnection();
@@ -139,6 +141,27 @@ export class SignalrService {
         t.id.toLowerCase() === taskId.toLowerCase() ? { ...t, status: 'Completed' } : t
       ));
       this.taskCompleted.set(taskId.toLowerCase());
+    });
+
+    this.hubConnection.on('NotificarPedidoAprobado', (pedidoId: string, numeroMesa: number, details: string) => {
+      this.comandaChanged.set(pedidoId + '_' + Date.now());
+    });
+
+    this.hubConnection.on('NotificarPedidoListo', (pedidoId: string, taskId: string, numeroMesa: number) => {
+      this.playAudioAlert();
+      this.addTask({
+        id: taskId,
+        tableId: numeroMesa,
+        type: 'Pedido Listo',
+        timestamp: new Date(),
+        status: 'Pending',
+        details: '¡Pedido listo para retirar y entregar!'
+      });
+      this.comandaChanged.set(pedidoId + '_' + Date.now());
+    });
+
+    this.hubConnection.on('NotificarMontoConsumoActualizado', (mesaId: string, monto: number | null) => {
+      this.mesaMontoConsumo.set({ mesaId, monto });
     });
   }
 

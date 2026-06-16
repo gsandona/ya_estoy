@@ -4,7 +4,7 @@ import { environment } from '../../../../environments/environment';
 import { TenantContextService } from '../../../core/services/tenant-context.service';
 
 export interface AdminUser { id: string; email: string; role: 'Admin' | 'Mozo' | 'SuperAdmin'; password?: string; }
-export interface AdminMesa { id: string; numero: number; ubicacion: string; mozoId: string; codigoAcceso?: string; estado?: number; }
+export interface AdminMesa { id: string; numero: number; ubicacion: string; mozoId: string; codigoAcceso?: string; estado?: number; montoConsumo?: number; }
 export interface AdminMenuItem { 
   id: string; 
   categoria: string;

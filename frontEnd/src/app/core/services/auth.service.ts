@@ -9,7 +9,7 @@ import { TenantContextService } from './tenant-context.service';
 export interface User {
   id: string;
   email: string;
-  role: 'Admin' | 'Mozo' | 'SuperAdmin';
+  role: 'Admin' | 'Mozo' | 'SuperAdmin' | 'Cocina';
   token: string;
   restauranteId?: string;
   restauranteNombre?: string;
@@ -28,6 +28,7 @@ export class AuthService {
   public isAdmin = computed(() => this._currentUser()?.role === 'Admin' || this._currentUser()?.role === 'SuperAdmin');
   public isSuperAdmin = computed(() => this._currentUser()?.role === 'SuperAdmin');
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
+  public isCocina = computed(() => this._currentUser()?.role === 'Cocina');
 
   private parseJwt(token: string): any {
     try {
@@ -50,7 +51,7 @@ export class AuthService {
       const user = JSON.parse(savedUser) as User;
 
       // Auto-recover missing properties from JWT token if needed
-      if ((user.role === 'Admin' || user.role === 'Mozo') && !user.restauranteId) {
+      if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && !user.restauranteId) {
         const decoded = this.parseJwt(savedToken);
         if (decoded && decoded.TenantId) {
           user.restauranteId = decoded.TenantId;
@@ -61,7 +62,7 @@ export class AuthService {
       this._currentUser.set(user);
 
       // Auto-set the active tenant ID for Admin and Mozo
-      if ((user.role === 'Admin' || user.role === 'Mozo') && user.restauranteId) {
+      if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && user.restauranteId) {
         if (!this.tenantContext.currentTenantId) {
           this.tenantContext.setTenantId(user.restauranteId);
         }
@@ -81,7 +82,7 @@ export class AuthService {
         localStorage.setItem('auth_user', JSON.stringify(user));
 
         // Auto-set the active tenant ID for Admin and Mozo
-        if ((user.role === 'Admin' || user.role === 'Mozo') && user.restauranteId) {
+        if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && user.restauranteId) {
           this.tenantContext.setTenantId(user.restauranteId);
         }
 

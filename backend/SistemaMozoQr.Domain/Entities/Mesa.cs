@@ -25,6 +25,8 @@ public class Mesa : IMustHaveTenant
     [MaxLength(10)]
     public string? CodigoAcceso { get; set; } // PIN de acceso generado cuando se abre la mesa
 
+    public decimal? MontoConsumo { get; set; }
+
     public Guid RestauranteId { get; set; }
     public Restaurante? Restaurante { get; set; }
 }

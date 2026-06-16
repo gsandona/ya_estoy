@@ -178,6 +178,10 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Admin");
         }
+        else if (role == "Cocina")
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, "Cocina");
+        }
         else if (role == "Mozo" && !string.IsNullOrEmpty(userId))
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"Mozo_{userId}");

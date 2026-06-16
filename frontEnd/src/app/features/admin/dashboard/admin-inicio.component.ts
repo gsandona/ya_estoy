@@ -102,7 +102,7 @@ import { AuthService } from '../../../core/services/auth.service';
               </h3>
               <p class="text-xs text-gray-400 font-medium mb-6">Tareas resueltas e indicadores de carga de trabajo por mesero</p>
               
-              <div class="space-y-5">
+              <div class="space-y-5 max-h-96 overflow-y-auto pr-2">
                 @for(mozo of stats()?.mozoPerformance; track mozo.mozoEmail) {
                   <div class="flex flex-col gap-2 p-4 bg-surface rounded-2xl border border-gray-100 transition-transform hover:translate-x-1 duration-200">
                     <div class="flex justify-between items-center">

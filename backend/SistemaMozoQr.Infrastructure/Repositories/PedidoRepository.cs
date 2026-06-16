@@ -37,6 +37,18 @@ public class PedidoRepository : IPedidoRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Pedido>> GetActiveOrdersAsync()
+    {
+        return await _context.Pedidos
+            .Include(p => p.Items)
+                .ThenInclude(i => i.MenuItem)
+            .Include(p => p.Mesa)
+                .ThenInclude(m => m.Mozo)
+            .Where(p => p.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.EnPreparacion || p.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Listo)
+            .OrderBy(p => p.Fecha)
+            .ToListAsync();
+    }
+
     public async Task UpdateAsync(Pedido pedido)
     {
         _context.Pedidos.Update(pedido);
