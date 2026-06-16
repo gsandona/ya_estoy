@@ -31,7 +31,7 @@ public class MenuItemRepository : IMenuItemRepository
 
     public async Task<MenuItem?> GetByIdAsync(Guid id)
     {
-        return await _context.MenuItems.FindAsync(id);
+        return await _context.MenuItems.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == id);
     }
 
     public async Task<MenuItem> AddAsync(MenuItem item)

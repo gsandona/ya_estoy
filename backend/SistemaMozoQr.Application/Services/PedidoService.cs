@@ -37,6 +37,7 @@ public class PedidoService : IPedidoService
         {
             Id = Guid.NewGuid(),
             MesaId = mesa.Id,
+            RestauranteId = mesa.RestauranteId,
             Estado = EstadoPedido.Recibido,
             Fecha = DateTime.UtcNow,
             Items = new List<PedidoItem>()
