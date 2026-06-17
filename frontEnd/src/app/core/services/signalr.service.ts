@@ -230,7 +230,12 @@ export class SignalrService {
   }
 
   private addTask(task: MesaTask) {
-    this._tasks.update(tasks => [...tasks, task]);
+    this._tasks.update(tasks => {
+      if (tasks.some(t => t.id.toLowerCase() === task.id.toLowerCase())) {
+        return tasks;
+      }
+      return [...tasks, task];
+    });
   }
 
   public async completeTask(taskId: string) {
