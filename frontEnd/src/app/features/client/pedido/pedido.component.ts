@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, OnInit, effect } from '@angular/core';
+import { Component, Input, inject, signal, OnInit, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { SignalrService } from '../../../core/services/signalr.service';
@@ -76,9 +76,16 @@ import { FormsModule } from '@angular/forms';
           <p class="text-slate-400 text-xs font-semibold mb-4">Mesa {{ numeroMesa() }}</p>
           
           @if (montoConsumo() !== null && montoConsumo() !== undefined) {
-            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 shadow-inner mb-2 animate-fade-in">
-              <span class="text-xs uppercase font-black text-emerald-600 tracking-wider">Consumo Acumulado de la Mesa</span>
-              <h2 class="text-2xl font-black text-emerald-700 mt-1">\${{ formatCurrency(montoConsumo()) }}</h2>
+            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 shadow-inner mb-2 animate-fade-in flex justify-between items-center w-full">
+              <div class="text-left">
+                <span class="text-[10px] uppercase font-black text-emerald-600 tracking-wider">Consumo Acumulado</span>
+                <h2 class="text-2xl font-black text-emerald-700 mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
+              </div>
+              <button 
+                (click)="showSplitModal.set(true)"
+                class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                🥞 Dividir Cuenta
+              </button>
             </div>
           }
         </div>
@@ -279,6 +286,147 @@ import { FormsModule } from '@angular/forms';
           </div>
         }
 
+        @if (showSplitModal()) {
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center animate-fade-in p-4 backdrop-blur-sm">
+             <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+                <button (click)="showSplitModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                
+                <h2 class="text-2xl font-black text-gray-800 mb-2 flex items-center gap-2">
+                  <span>🥞</span> Dividir Cuenta
+                </h2>
+                <p class="text-xs text-slate-500 mb-4">Administrá los comensales de la mesa y calcula el consumo correspondiente.</p>
+                
+                <!-- Scrollable Content Container -->
+                <div class="flex-1 overflow-y-auto space-y-5 pr-1 py-1">
+                  
+                  <!-- Formulario Agregar Comensal -->
+                  <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-3">Agregar Comensal</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                      <input type="text" [(ngModel)]="nuevoComensalNombre" placeholder="Nombre" 
+                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:outline-none transition-all">
+                      <input type="text" [(ngModel)]="nuevoComensalApellido" placeholder="Apellido" 
+                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:outline-none transition-all">
+                    </div>
+                    <button (click)="agregarComensal()" 
+                            [disabled]="!nuevoComensalNombre.trim() || !nuevoComensalApellido.trim()"
+                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-2 rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100">
+                      + Agregar Comensal
+                    </button>
+                  </div>
+
+                  <!-- Lista de Comensales Agregados -->
+                  @if (comensales().length > 0) {
+                    <div>
+                      <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-2 flex justify-between">
+                        <span>Comensales ({{ comensales().length }})</span>
+                      </h3>
+                      <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                        @for (c of comensales(); track c.id) {
+                          <span class="inline-flex items-center gap-1 bg-white border border-slate-200 px-2.5 py-1 rounded-full text-xs font-bold text-slate-700">
+                            {{ c.nombre }} {{ c.apellido }}
+                            <button (click)="removerComensal(c.id)" class="text-red-500 hover:text-red-700 ml-0.5 font-bold transition-colors">×</button>
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  @if (comensales().length > 0) {
+                    <!-- Selector de Modo de División -->
+                    <div>
+                      <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Modo de División</h3>
+                      <div class="flex bg-slate-100 p-1 rounded-xl">
+                        <button 
+                          (click)="changeSplitMode('equitativa')" 
+                          [ngClass]="{'bg-white shadow-sm font-bold text-emerald-600': splitMode() === 'equitativa', 'text-slate-500 font-semibold': splitMode() !== 'equitativa'}"
+                          class="flex-1 py-2 text-xs rounded-lg transition-all">
+                          🟰 División Equitativa
+                        </button>
+                        <button 
+                          (click)="changeSplitMode('items')" 
+                          [ngClass]="{'bg-white shadow-sm font-bold text-emerald-600': splitMode() === 'items', 'text-slate-500 font-semibold': splitMode() !== 'items'}"
+                          class="flex-1 py-2 text-xs rounded-lg transition-all">
+                          🛒 Por Consumos
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Asignación de Items (si es Por Consumos) -->
+                    @if (splitMode() === 'items') {
+                      <div>
+                        <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Asignar Consumos</h3>
+                        <p class="text-[10px] text-slate-400 mb-3 italic">Los consumos que dejes sin asignar se dividirán en partes iguales entre todos.</p>
+                        
+                        <div class="max-h-48 overflow-y-auto space-y-2 pr-1">
+                          @for (unit of itemUnits(); track unit.unitId) {
+                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                              <div class="text-left">
+                                <p class="text-xs font-bold text-slate-800 leading-tight">{{ unit.nombre }}</p>
+                                <p class="text-[10px] text-slate-500 font-semibold">\${{ formatCurrency(unit.precio) }}</p>
+                              </div>
+                              <select 
+                                [value]="itemAssignments()[unit.unitId] || ''"
+                                (change)="assignItem(unit.unitId, $event)"
+                                class="bg-white border border-slate-200 rounded-lg text-xs py-1 px-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/25 outline-none font-semibold text-slate-700 max-w-[150px]">
+                                <option value="">Compartido / Todos</option>
+                                @for (c of comensales(); track c.id) {
+                                  <option [value]="c.id">{{ c.nombre }}</option>
+                                }
+                              </select>
+                            </div>
+                          } @empty {
+                            <p class="text-center text-xs text-slate-400 py-4 font-medium">No hay consumos entregados en esta mesa todavía.</p>
+                          }
+                        </div>
+                      </div>
+                    }
+
+                    <!-- Resumen de Totales a Pagar -->
+                    <div class="border-t border-slate-100 pt-4">
+                      <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-3">Resumen de Cuenta</h3>
+                      <div class="space-y-2">
+                        @for (c of comensalesTotals(); track c.id) {
+                          <div class="bg-emerald-50/50 border border-emerald-100/50 p-3 rounded-xl flex justify-between items-start">
+                            <div class="text-left max-w-[70%]">
+                              <p class="text-sm font-bold text-slate-800">{{ c.nombre }} {{ c.apellido }}</p>
+                              @if (splitMode() === 'items') {
+                                <p class="text-[10px] text-slate-500 font-medium leading-tight truncate" [title]="c.details">
+                                  {{ c.details }}
+                                </p>
+                              }
+                            </div>
+                            <span class="font-black text-sm text-emerald-700 font-mono">\${{ formatCurrency(c.total) }}</span>
+                          </div>
+                        }
+                      </div>
+
+                      <!-- Botón de compartir WhatsApp -->
+                      <button 
+                        (click)="compartirWhatsApp()"
+                        class="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-green-500/10 active:scale-[0.98]">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.197 1.45 4.817 1.451 5.432 0 9.851-4.42 9.855-9.852.002-2.63-1.023-5.101-2.887-6.966a9.78 9.78 0 0 0-6.96-2.873c-5.433 0-9.853 4.42-9.858 9.853-.001 1.75.457 3.456 1.328 4.965l-1.017 3.714 3.822-1.002z"/>
+                        </svg>
+                        Compartir por WhatsApp
+                      </button>
+                    </div>
+
+                  } @else {
+                    <div class="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                      <span class="text-3xl block mb-2">👥</span>
+                      <p class="text-sm font-bold text-slate-700">Comenzá por agregar comensales</p>
+                      <p class="text-xs text-slate-400 mt-1 max-w-[200px] mx-auto">Agrega los nombres y apellidos de las personas en la mesa para poder dividir la cuenta.</p>
+                    </div>
+                  }
+
+                </div>
+             </div>
+          </div>
+        }
+
         @if (showSuccessToast()) {
           <div class="fixed top-6 left-0 right-0 flex justify-center z-50 animate-[slide-down_0.5s_ease-out] pointer-events-none">
              <div class="bg-green-500 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(16,185,129,0.4)] font-black flex items-center gap-3 backdrop-blur-md">
@@ -313,6 +461,15 @@ export class PedidoComponent implements OnInit {
   validatingPin = signal(false);
   numeroMesa = signal<string>('');
   restauranteId = signal<string>('');
+
+  // Split bill states
+  showSplitModal = signal(false);
+  nuevoComensalNombre = '';
+  nuevoComensalApellido = '';
+  comensales = signal<{ id: string; nombre: string; apellido: string }[]>([]);
+  splitMode = signal<'equitativa' | 'items'>('equitativa');
+  itemsConsumidos = signal<any[]>([]);
+  itemAssignments = signal<{ [key: string]: string }>({});
 
   loadingLlamar = signal(false);
   loadingCuenta = signal(false);
@@ -374,12 +531,15 @@ export class PedidoComponent implements OnInit {
       const update = this.signalrService.mesaMontoConsumo();
       if (update && update.mesaId.toLowerCase() === this.id.toLowerCase()) {
         this.montoConsumo.set(update.monto);
+        // Refresh items list and other table status
+        this.verifyMesa(localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`) || undefined);
       }
     });
   }
 
   ngOnInit() {
     this.checkCooldowns();
+    this.loadSplitState();
     const savedPin = localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`);
     this.verifyMesa(savedPin || undefined);
   }
@@ -466,6 +626,12 @@ export class PedidoComponent implements OnInit {
           this.montoConsumo.set(null);
         }
 
+        if (res.itemsConsumidos) {
+          this.itemsConsumidos.set(res.itemsConsumidos);
+        } else {
+          this.itemsConsumidos.set([]);
+        }
+
         if (res.pedidoTaskId) {
           this.activePedidoTaskId.set(res.pedidoTaskId);
           this.activePedidoDetails.set(res.pedidoDetails);
@@ -494,6 +660,7 @@ export class PedidoComponent implements OnInit {
       },
       error: (err) => {
         if(pinParam) this.validatingPin.set(false);
+        this.clearSplitState();
         if (err.status === 401) {
           // Requiere PIN
           localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
@@ -632,6 +799,205 @@ export class PedidoComponent implements OnInit {
       this.loadingCancelarPedido.set(false);
     }
   }
+  // Split bill computed signals and methods
+  itemUnits = computed(() => {
+    const units: { unitId: string; itemId: string; nombre: string; precio: number }[] = [];
+    for (const item of this.itemsConsumidos()) {
+      for (let i = 0; i < item.cantidad; i++) {
+        units.push({
+          unitId: `${item.id}_unit_${i}`,
+          itemId: item.id,
+          nombre: item.cantidad > 1 ? `${item.nombre} (${i + 1}/${item.cantidad})` : item.nombre,
+          precio: item.precioUnitario
+        });
+      }
+    }
+    return units;
+  });
+
+  comensalesTotals = computed(() => {
+    const list = this.comensales();
+    const mode = this.splitMode();
+    const totalMesa = this.montoConsumo() || 0;
+    
+    if (list.length === 0) return [];
+    
+    if (mode === 'equitativa') {
+      const share = totalMesa / list.length;
+      return list.map(c => ({
+        ...c,
+        total: share,
+        details: 'División equitativa'
+      }));
+    } else {
+      const assignments = this.itemAssignments();
+      const units = this.itemUnits();
+      
+      const assignedTotals: { [comensalId: string]: number } = {};
+      const assignedDetails: { [comensalId: string]: string[] } = {};
+      list.forEach(c => {
+        assignedTotals[c.id] = 0;
+        assignedDetails[c.id] = [];
+      });
+      
+      let unassignedTotal = 0;
+      
+      for (const unit of units) {
+        const assigneeId = assignments[unit.unitId];
+        if (assigneeId && assignedTotals[assigneeId] !== undefined) {
+          assignedTotals[assigneeId] += unit.precio;
+          assignedDetails[assigneeId].push(unit.nombre);
+        } else {
+          unassignedTotal += unit.precio;
+        }
+      }
+      
+      const unassignedShare = unassignedTotal / list.length;
+      
+      return list.map(c => {
+        const ownTotal = assignedTotals[c.id];
+        const finalTotal = ownTotal + unassignedShare;
+        const detailsParts = [...assignedDetails[c.id]];
+        if (unassignedShare > 0) {
+          detailsParts.push(`Compartido ($${this.formatCurrency(unassignedShare)})`);
+        }
+        return {
+          ...c,
+          total: finalTotal,
+          details: detailsParts.join(', ') || 'Sin consumos asignados'
+        };
+      });
+    }
+  });
+
+  loadSplitState() {
+    const keyComensales = `mozo_go_comensales_${this.restaurante}_${this.numero}`;
+    const savedComensales = localStorage.getItem(keyComensales);
+    if (savedComensales) {
+      try {
+        this.comensales.set(JSON.parse(savedComensales));
+      } catch (e) {
+        console.error('Error loading comensales', e);
+      }
+    }
+    
+    const keyAssignments = `mozo_go_assignments_${this.restaurante}_${this.numero}`;
+    const savedAssignments = localStorage.getItem(keyAssignments);
+    if (savedAssignments) {
+      try {
+        this.itemAssignments.set(JSON.parse(savedAssignments));
+      } catch (e) {
+        console.error('Error loading assignments', e);
+      }
+    }
+    
+    const keyMode = `mozo_go_splitmode_${this.restaurante}_${this.numero}`;
+    const savedMode = localStorage.getItem(keyMode);
+    if (savedMode === 'equitativa' || savedMode === 'items') {
+      this.splitMode.set(savedMode);
+    }
+  }
+
+  saveSplitState() {
+    const keyComensales = `mozo_go_comensales_${this.restaurante}_${this.numero}`;
+    localStorage.setItem(keyComensales, JSON.stringify(this.comensales()));
+    
+    const keyAssignments = `mozo_go_assignments_${this.restaurante}_${this.numero}`;
+    localStorage.setItem(keyAssignments, JSON.stringify(this.itemAssignments()));
+    
+    const keyMode = `mozo_go_splitmode_${this.restaurante}_${this.numero}`;
+    localStorage.setItem(keyMode, this.splitMode());
+  }
+
+  clearSplitState() {
+    localStorage.removeItem(`mozo_go_comensales_${this.restaurante}_${this.numero}`);
+    localStorage.removeItem(`mozo_go_assignments_${this.restaurante}_${this.numero}`);
+    localStorage.removeItem(`mozo_go_splitmode_${this.restaurante}_${this.numero}`);
+    this.comensales.set([]);
+    this.itemAssignments.set({});
+    this.splitMode.set('equitativa');
+  }
+
+  agregarComensal() {
+    const nom = this.nuevoComensalNombre.trim();
+    const ape = this.nuevoComensalApellido.trim();
+    if (!nom || !ape) return;
+    
+    const nuevo = {
+      id: 'c_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+      nombre: nom,
+      apellido: ape
+    };
+    
+    this.comensales.update(list => [...list, nuevo]);
+    this.nuevoComensalNombre = '';
+    this.nuevoComensalApellido = '';
+    this.saveSplitState();
+  }
+
+  removerComensal(id: string) {
+    this.comensales.update(list => list.filter(c => c.id !== id));
+    
+    const currentAssignments = { ...this.itemAssignments() };
+    let changed = false;
+    for (const key in currentAssignments) {
+      if (currentAssignments[key] === id) {
+        delete currentAssignments[key];
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.itemAssignments.set(currentAssignments);
+    }
+    this.saveSplitState();
+  }
+
+  assignItem(unitId: string, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const comensalId = select.value;
+    
+    const currentAssignments = { ...this.itemAssignments() };
+    if (comensalId) {
+      currentAssignments[unitId] = comensalId;
+    } else {
+      delete currentAssignments[unitId];
+    }
+    this.itemAssignments.set(currentAssignments);
+    this.saveSplitState();
+  }
+
+  changeSplitMode(mode: 'equitativa' | 'items') {
+    this.splitMode.set(mode);
+    this.saveSplitState();
+  }
+
+  compartirWhatsApp() {
+    const list = this.comensalesTotals();
+    if (list.length === 0) return;
+    
+    const totalMesaFormatted = this.formatCurrency(this.montoConsumo());
+    let text = `📋 *MozoGo - División de Cuenta*\n`;
+    text += `🍽️ *Mesa:* ${this.numeroMesa()}\n`;
+    text += `💵 *Total Mesa:* $${totalMesaFormatted}\n`;
+    text += `⚙️ *Modo:* ${this.splitMode() === 'equitativa' ? 'División Equitativa' : 'Por Consumos'}\n\n`;
+    text += `👥 *Detalle por Comensal:*\n`;
+    text += `---------------------------------\n`;
+    
+    list.forEach(c => {
+      const totalFormatted = this.formatCurrency(c.total);
+      text += `• *${c.nombre} ${c.apellido}*: $${totalFormatted}\n`;
+      if (this.splitMode() === 'items') {
+        text += `  _Detalle:_ ${c.details}\n`;
+      }
+      text += `---------------------------------\n`;
+    });
+    
+    text += `\n¡Gracias por usar MozoGo! 🚀`;
+    
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  }
+
   formatCurrency(value: number | null): string {
     if (value === null) return '0';
     return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });

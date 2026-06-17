@@ -8,4 +8,5 @@ public interface INotificacionService
     Task NotificarPedidoAprobadoAsync(Guid pedidoId, int numeroMesa, string details, Guid? mozoId);
     Task NotificarPedidoListoAsync(Guid pedidoId, Guid taskId, int numeroMesa, Guid? mozoId);
     Task NotificarTareaCompletadaAsync(Guid taskId);
+    Task NotificarMontoConsumoActualizadoAsync(Guid mesaId, decimal? monto);
 }

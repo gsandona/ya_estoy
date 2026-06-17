@@ -124,6 +124,21 @@ public class PedidoService : IPedidoService
                 await _taskRepository.UpdateAsync(task);
             }
             await _notificacionService.NotificarTareaCompletadaAsync(pedidoId);
+
+            // Si se entrega el pedido, sumar su monto al consumido de la mesa
+            if (nuevoEstado == EstadoPedido.Entregado)
+            {
+                var mesa = await _mesaRepository.GetByIdAsync(pedido.MesaId);
+                if (mesa != null)
+                {
+                    decimal totalPedido = pedido.Items.Sum(i => i.Cantidad * i.PrecioUnitario);
+                    mesa.MontoConsumo = (mesa.MontoConsumo ?? 0) + totalPedido;
+                    await _mesaRepository.UpdateAsync(mesa);
+
+                    // Notificar consumo actualizado a los comensales
+                    await _notificacionService.NotificarMontoConsumoActualizadoAsync(mesa.Id, mesa.MontoConsumo);
+                }
+            }
         }
     }
 }

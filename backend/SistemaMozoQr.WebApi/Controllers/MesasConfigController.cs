@@ -238,6 +238,17 @@ public class MesasConfigController : ControllerBase
             }
         }
 
+        // Obtener todos los items consumidos en la mesa (excluyendo cancelados)
+        var orders = await _pedidoRepository.GetByMesaIdAsync(mesa.Id);
+        var activeOrders = orders.Where(o => o.Estado != SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado).ToList();
+        var itemsRes = activeOrders.SelectMany(o => o.Items).Select(i => new {
+            id = i.Id,
+            nombre = i.MenuItem?.Nombre ?? "Item",
+            cantidad = i.Cantidad,
+            precioUnitario = i.PrecioUnitario,
+            total = i.Cantidad * i.PrecioUnitario
+        }).ToList();
+
         return Ok(new { 
             mesaId = mesa.Id, 
             restauranteId = mesa.RestauranteId,
@@ -251,7 +262,8 @@ public class MesasConfigController : ControllerBase
             cuentaTaskId = cuentaTask?.Id,
             pedidoTaskId = pedidoTask?.Id,
             pedidoDetails = pedidoTask?.Details,
-            pedidoEstado = pedidoEstado
+            pedidoEstado = pedidoEstado,
+            itemsConsumidos = itemsRes
         });
     }
 
@@ -264,6 +276,10 @@ public class MesasConfigController : ControllerBase
 
         mesa.MontoConsumo = monto;
         await _mesaRepository.UpdateAsync(mesa);
+
+        // Notificar en tiempo real a los comensales
+        await _hubContext.Clients.All.NotificarMontoConsumoActualizado(id.ToString(), monto);
+
         return Ok(new { mesa.Id, mesa.Numero, mesa.MontoConsumo });
     }
 }

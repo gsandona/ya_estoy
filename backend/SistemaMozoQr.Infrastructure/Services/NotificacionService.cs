@@ -62,4 +62,9 @@ public class NotificacionService : INotificacionService
     {
         await _hubContext.Clients.All.TareaCompletada(taskId.ToString());
     }
+
+    public async Task NotificarMontoConsumoActualizadoAsync(Guid mesaId, decimal? monto)
+    {
+        await _hubContext.Clients.All.NotificarMontoConsumoActualizado(mesaId.ToString(), monto);
+    }
 }

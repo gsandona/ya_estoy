@@ -9,4 +9,5 @@ public interface IRestauranteHubClient
     Task TareaCompletada(string taskId);
     Task NotificarPedidoAprobado(Guid pedidoId, int numeroMesa, string details);
     Task NotificarPedidoListo(Guid pedidoId, Guid taskId, int numeroMesa);
+    Task NotificarMontoConsumoActualizado(string mesaId, decimal? monto);
 }
