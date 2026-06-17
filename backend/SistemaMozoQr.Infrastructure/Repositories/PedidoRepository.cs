@@ -33,6 +33,7 @@ public class PedidoRepository : IPedidoRepository
     {
         return await _context.Pedidos
             .Include(p => p.Items)
+                .ThenInclude(i => i.MenuItem)
             .Where(p => p.MesaId == mesaId)
             .ToListAsync();
     }

@@ -4,6 +4,30 @@
 
 @layer base {
   body {
-    @apply bg-surface text-gray-800 font-sans antialiased m-0 p-0;
+    @apply bg-surface text-primary font-sans antialiased m-0 p-0;
+    color: #2C201C;
   }
+  h1, h2, h3 {
+    @apply font-serif tracking-tight;
+    color: #2C201C;
+  }
+  input, select, textarea {
+    @apply focus:border-accent/40 focus:ring-accent/10;
+  }
+}
+
+/* Warm, elegant custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #EFEAE2;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #D8CEBE;
 }

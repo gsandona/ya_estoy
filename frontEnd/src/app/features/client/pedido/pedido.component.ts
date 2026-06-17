@@ -16,20 +16,20 @@ import { FormsModule } from '@angular/forms';
     @if (requirePin()) {
       <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center">
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full border border-gray-100">
-          <div class="h-20 w-20 bg-green-50 text-green-600 rounded-full mx-auto flex items-center justify-center text-3xl mb-6">🔒</div>
-          <h2 class="text-2xl font-black text-gray-800 mb-2">Mesa Protegida</h2>
-          <p class="text-gray-500 text-sm mb-6">Por favor ingrese el PIN de acceso proporcionado por su Mozo para ver el menú.</p>
+          <div class="h-20 w-20 bg-accent/10 text-accent rounded-full mx-auto flex items-center justify-center text-3xl mb-6">🔒</div>
+          <h2 class="text-2xl font-serif font-black text-primary mb-2">Mesa Protegida</h2>
+          <p class="text-primary/60 text-sm mb-6">Por favor ingrese el PIN de acceso proporcionado por su Mozo para ver el menú.</p>
           
           <input type="tel" #pinInputRef (focus)="pinInputRef.scrollIntoView({behavior: 'smooth', block: 'center'})" 
                  [(ngModel)]="pinInput" name="pin"
                  placeholder="Ej: 4921" maxlength="4" pattern="[0-9]*"
-                 class="w-full text-center text-3xl font-black tracking-widest px-4 py-4 rounded-xl border-2 border-gray-200 focus:border-green-500 focus:ring-4 focus:ring-green-100 outline-none transition-all mb-4">
+                 class="w-full text-center text-3xl font-black tracking-widest px-4 py-4 rounded-xl border-2 border-[#E2DACF] focus:border-accent focus:ring-4 focus:ring-accent/10 outline-none transition-all mb-4">
           
           @if(pinError()) {
-            <p class="text-red-500 text-sm font-bold mb-4 animate-fade-in">{{ pinError() }}</p>
+            <p class="text-red-700 text-sm font-bold mb-4 animate-fade-in">{{ pinError() }}</p>
           }
 
-          <button (click)="submitPin()" [disabled]="validatingPin()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 transition active:scale-95 flex justify-center items-center">
+          <button (click)="submitPin()" [disabled]="validatingPin()" class="w-full bg-accent text-white font-bold py-4 rounded-xl shadow-lg hover:bg-accent/90 transition active:scale-95 flex justify-center items-center">
             @if(validatingPin()) {
                <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
             } @else {
@@ -69,21 +69,21 @@ import { FormsModule } from '@angular/forms';
     } @else {
       <div class="min-h-screen bg-surface flex flex-col items-center py-12 px-4 pb-32 animate-fade-in">
         <div class="mb-10 text-center w-full max-w-sm">
-          <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary text-white text-3xl font-bold mb-4 shadow-lg ring-4 ring-primary/20">
+          <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary text-white text-3xl font-bold mb-4 shadow-lg ring-4 ring-primary/10">
             {{ numeroMesa() || '...' }}
           </div>
-          <h1 class="text-3xl font-bold text-gray-800 mb-1 tracking-tight">Menú Interactivo</h1>
-          <p class="text-slate-400 text-xs font-semibold mb-4">Mesa {{ numeroMesa() }}</p>
+          <h1 class="text-3xl font-serif font-black text-primary mb-1 tracking-tight">Menú Interactivo</h1>
+          <p class="text-primary/40 text-xs font-semibold mb-4">Mesa {{ numeroMesa() }}</p>
           
           @if (montoConsumo() !== null && montoConsumo() !== undefined) {
-            <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 shadow-inner mb-2 animate-fade-in flex justify-between items-center w-full">
+            <div class="bg-sand border border-[#E2DACF] rounded-2xl p-4 shadow-inner mb-2 animate-fade-in flex justify-between items-center w-full">
               <div class="text-left">
-                <span class="text-[10px] uppercase font-black text-emerald-600 tracking-wider">Consumo Acumulado</span>
-                <h2 class="text-2xl font-black text-emerald-700 mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
+                <span class="text-[10px] uppercase font-black text-primary/60 tracking-wider">Consumo Acumulado</span>
+                <h2 class="text-2xl font-black text-accent mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
               </div>
               <button 
                 (click)="showSplitModal.set(true)"
-                class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
+                class="bg-accent hover:bg-accent/90 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
                 🥞 Dividir Cuenta
               </button>
             </div>
@@ -224,7 +224,7 @@ import { FormsModule } from '@angular/forms';
           <div class="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-40 animate-fade-in">
             <button 
               (click)="showCartModal.set(true)"
-              class="w-full max-w-md bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-emerald-500/20">
+              class="w-full max-w-md bg-accent text-white rounded-2xl shadow-[0_10px_30px_rgba(128,26,45,0.15)] p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-accent/20">
               <div class="flex items-center gap-3">
                  <div class="bg-white/20 rounded-full h-8 w-8 flex items-center justify-center font-black text-sm">
                    {{ cart.totalItems() }}
@@ -267,14 +267,14 @@ import { FormsModule } from '@angular/forms';
                 @if (cart.totalItems() > 0) {
                   <div class="border-t border-gray-100 pt-4 mb-6">
                     <div class="flex justify-between items-center">
-                       <span class="font-bold text-gray-500">Total a pagar</span>
-                       <span class="font-black text-2xl text-primary">\${{ cart.totalPrice() }}</span>
+                       <span class="font-bold text-primary/60">Total a pagar</span>
+                       <span class="font-black text-2xl text-accent">\${{ cart.totalPrice() }}</span>
                     </div>
                   </div>
                   <button 
                     (click)="enviarPedido()"
                     [disabled]="loadingPedido()"
-                    class="w-full bg-accent text-white py-4 rounded-2xl font-bold text-lg hover:bg-[#0da473] active:scale-[0.98] transition-all shadow-[0_8px_30px_rgb(16,185,129,0.3)] flex justify-center items-center">
+                    class="w-full bg-accent text-white py-4 rounded-2xl font-bold text-lg hover:bg-accent/90 active:scale-[0.98] transition-all shadow-[0_8px_30px_rgba(128,26,45,0.15)] flex justify-center items-center">
                     @if (loadingPedido()) {
                       <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
                     } @else {
@@ -306,13 +306,13 @@ import { FormsModule } from '@angular/forms';
                     <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-3">Agregar Comensal</h3>
                     <div class="grid grid-cols-2 gap-2 mb-2">
                       <input type="text" [(ngModel)]="nuevoComensalNombre" placeholder="Nombre" 
-                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:outline-none transition-all">
+                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-accent focus:outline-none transition-all">
                       <input type="text" [(ngModel)]="nuevoComensalApellido" placeholder="Apellido" 
-                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:outline-none transition-all">
+                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-accent focus:outline-none transition-all">
                     </div>
                     <button (click)="agregarComensal()" 
                             [disabled]="!nuevoComensalNombre.trim() || !nuevoComensalApellido.trim()"
-                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-2 rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100">
+                            class="w-full bg-accent hover:bg-accent/90 text-white font-bold text-sm py-2 rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100">
                       + Agregar Comensal
                     </button>
                   </div>
@@ -341,13 +341,13 @@ import { FormsModule } from '@angular/forms';
                       <div class="flex bg-slate-100 p-1 rounded-xl">
                         <button 
                           (click)="changeSplitMode('equitativa')" 
-                          [ngClass]="{'bg-white shadow-sm font-bold text-emerald-600': splitMode() === 'equitativa', 'text-slate-500 font-semibold': splitMode() !== 'equitativa'}"
+                          [ngClass]="{'bg-white shadow-sm font-bold text-accent': splitMode() === 'equitativa', 'text-slate-500 font-semibold': splitMode() !== 'equitativa'}"
                           class="flex-1 py-2 text-xs rounded-lg transition-all">
                           🟰 División Equitativa
                         </button>
                         <button 
                           (click)="changeSplitMode('items')" 
-                          [ngClass]="{'bg-white shadow-sm font-bold text-emerald-600': splitMode() === 'items', 'text-slate-500 font-semibold': splitMode() !== 'items'}"
+                          [ngClass]="{'bg-white shadow-sm font-bold text-accent': splitMode() === 'items', 'text-slate-500 font-semibold': splitMode() !== 'items'}"
                           class="flex-1 py-2 text-xs rounded-lg transition-all">
                           🛒 Por Consumos
                         </button>
@@ -368,12 +368,12 @@ import { FormsModule } from '@angular/forms';
                                 <p class="text-[10px] text-slate-500 font-semibold">\${{ formatCurrency(unit.precio) }}</p>
                               </div>
                               <select 
-                                [value]="itemAssignments()[unit.unitId] || ''"
-                                (change)="assignItem(unit.unitId, $event)"
-                                class="bg-white border border-slate-200 rounded-lg text-xs py-1 px-2 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/25 outline-none font-semibold text-slate-700 max-w-[150px]">
+                                [ngModel]="itemAssignments()[unit.unitId] || ''"
+                                (ngModelChange)="assignItem(unit.unitId, $event)"
+                                class="bg-white border border-slate-200 rounded-lg text-xs py-1 px-2 focus:border-accent focus:ring-1 focus:ring-accent/10 outline-none font-semibold text-slate-700 max-w-[150px]">
                                 <option value="">Compartido / Todos</option>
                                 @for (c of comensales(); track c.id) {
-                                  <option [value]="c.id">{{ c.nombre }}</option>
+                                  <option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</option>
                                 }
                               </select>
                             </div>
@@ -389,16 +389,16 @@ import { FormsModule } from '@angular/forms';
                       <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-3">Resumen de Cuenta</h3>
                       <div class="space-y-2">
                         @for (c of comensalesTotals(); track c.id) {
-                          <div class="bg-emerald-50/50 border border-emerald-100/50 p-3 rounded-xl flex justify-between items-start">
+                          <div class="bg-sand/40 border border-[#E2DACF] p-3 rounded-xl flex justify-between items-start">
                             <div class="text-left max-w-[70%]">
-                              <p class="text-sm font-bold text-slate-800">{{ c.nombre }} {{ c.apellido }}</p>
+                              <p class="text-sm font-bold text-primary">{{ c.nombre }} {{ c.apellido }}</p>
                               @if (splitMode() === 'items') {
-                                <p class="text-[10px] text-slate-500 font-medium leading-tight truncate" [title]="c.details">
+                                <p class="text-[10px] text-primary/60 font-medium leading-tight truncate" [title]="c.details">
                                   {{ c.details }}
                                 </p>
                               }
                             </div>
-                            <span class="font-black text-sm text-emerald-700 font-mono">\${{ formatCurrency(c.total) }}</span>
+                            <span class="font-black text-sm text-accent font-serif">\${{ formatCurrency(c.total) }}</span>
                           </div>
                         }
                       </div>
@@ -952,10 +952,7 @@ export class PedidoComponent implements OnInit {
     this.saveSplitState();
   }
 
-  assignItem(unitId: string, event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const comensalId = select.value;
-    
+  assignItem(unitId: string, comensalId: string) {
     const currentAssignments = { ...this.itemAssignments() };
     if (comensalId) {
       currentAssignments[unitId] = comensalId;

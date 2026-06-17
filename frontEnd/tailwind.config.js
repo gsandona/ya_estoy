@@ -6,9 +6,14 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#0f172a', // Dark blue (elegant modern base)
-        accent: '#10b981',  // Emerald green (Action accent)
-        surface: '#f8fafc'  // Light gray (minimalist background)
+        primary: '#2C201C', // Deep warm coffee/espresso (traditional wood parrillada warmth)
+        accent: '#801A2D',  // Tannat burgundy red (Uruguayan wine elegance)
+        surface: '#FAF6F0', // Soft warm linen cream (classic bistro paper menu)
+        sand: '#EFEAE2',    // Warm sand tone for secondary containers
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
       }
     },
   },

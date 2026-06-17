@@ -10,7 +10,7 @@ import { environment } from '../../../../../environments/environment';
   imports: [CommonModule],
   template: `
     <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 border border-gray-100">
-      <h2 class="text-2xl font-black text-gray-800 mb-4 tracking-tight">Nuestro Menú</h2>
+      <h2 class="text-2xl font-serif font-black text-primary mb-4 tracking-tight">Nuestro Menú</h2>
       
       <div class="space-y-4">
         @for (cat of categories(); track cat.name; let isFirst = $first) {
@@ -37,7 +37,7 @@ import { environment } from '../../../../../environments/environment';
                        <span class="font-black text-primary mb-3 text-lg">\${{ item.precio }}</span>
                        <button 
                          (click)="cartService.addToCart(item)"
-                         class="bg-accent text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-[#0da473] transition-all active:scale-[0.96] shadow-md shadow-accent/20 flex items-center gap-1.5">
+                         class="bg-accent text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-accent/90 transition-all active:scale-[0.96] shadow-md shadow-accent/10 flex items-center gap-1.5">
                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                          Agregar
                        </button>
