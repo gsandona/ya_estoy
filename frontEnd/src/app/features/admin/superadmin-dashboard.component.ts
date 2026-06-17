@@ -110,8 +110,8 @@ interface Log {
                   <span class="text-sm font-bold text-red-800">{{ err.fechaHora | date:'medium' }}</span>
                   <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">ERROR</span>
                 </div>
-                <!-- Bloque de código estilo terminal para la excepción -->
-                <pre class="bg-[#1a1b26] text-[#a9b1d6] p-4 rounded-xl text-xs overflow-x-auto font-mono whitespace-pre-wrap leading-relaxed shadow-inner border border-gray-800">{{ err.detalles }}</pre>
+                <!-- Detalle legible de la excepción -->
+                <pre class="bg-red-50/40 text-red-900/90 p-4 rounded-xl text-xs overflow-x-auto font-mono whitespace-pre-wrap leading-relaxed border border-red-100/50">{{ err.detalles }}</pre>
               </div>
             } @empty {
               <div class="py-12 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">

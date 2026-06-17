@@ -78,18 +78,55 @@ public class RestauranteDbContext : DbContext
                 }
             }
 
-            if (entry.Entity is AuditoriaLog || entry.Entity is ErrorLog || entry.Entity is MesaTask || entry.Entity is SystemSetting)
+            // Excluir entidades de control e items individuales de pedido (evita sobrecargar el log)
+            if (entry.Entity is AuditoriaLog || entry.Entity is ErrorLog || entry.Entity is MesaTask || entry.Entity is SystemSetting || entry.Entity is PedidoItem)
                 continue;
 
             if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted)
             {
+                string detalles = $"Cambio de estado de entidad a {entry.State}";
+
+                if (entry.Entity is Restaurante rest)
+                {
+                    detalles = entry.State == EntityState.Added ? $"Se creó el restaurante '{rest.Nombre}'"
+                             : entry.State == EntityState.Deleted ? $"Se eliminó el restaurante '{rest.Nombre}'"
+                             : $"Se modificaron datos del restaurante '{rest.Nombre}'";
+                }
+                else if (entry.Entity is Usuario user)
+                {
+                    detalles = entry.State == EntityState.Added ? $"Se creó el usuario '{user.Email}' (Rol: {user.Rol})"
+                             : entry.State == EntityState.Deleted ? $"Se eliminó el usuario '{user.Email}'"
+                             : $"Se actualizaron datos del usuario '{user.Email}'";
+                }
+                else if (entry.Entity is Mesa mesa)
+                {
+                    detalles = entry.State == EntityState.Added ? $"Se creó la Mesa {mesa.Numero} ({mesa.Ubicacion})"
+                             : entry.State == EntityState.Deleted ? $"Se eliminó la Mesa {mesa.Numero}"
+                             : $"Se actualizó la Mesa {mesa.Numero} (Estado: {mesa.Estado}, PIN: {mesa.CodigoAcceso ?? "N/A"})";
+                }
+                else if (entry.Entity is MenuItem item)
+                {
+                    detalles = entry.State == EntityState.Added ? $"Se agregó el item de menú '{item.Nombre}' (${item.Precio})"
+                             : entry.State == EntityState.Deleted ? $"Se eliminó el item de menú '{item.Nombre}'"
+                             : $"Se modificó el item de menú '{item.Nombre}' (${item.Precio})";
+                }
+                else if (entry.Entity is Pedido pedido)
+                {
+                    var mesaEntity = entry.Context.Set<Mesa>().Local.FirstOrDefault(m => m.Id == pedido.MesaId);
+                    int? tableNum = mesaEntity?.Numero;
+                    detalles = entry.State == EntityState.Added 
+                        ? $"Nuevo pedido ingresado para la Mesa {(tableNum.HasValue ? tableNum.Value.ToString() : "ID: " + pedido.MesaId)}"
+                        : entry.State == EntityState.Deleted ? $"Se eliminó/canceló el pedido"
+                        : $"Pedido actualizado (Estado: {pedido.Estado})";
+                }
+
                 var auditLog = new AuditoriaLog
                 {
                     UsuarioEmail = userEmail,
                     Entidad = entry.Entity.GetType().Name,
                     Accion = entry.State.ToString(),
                     FechaHora = DateTime.UtcNow,
-                    Detalles = $"Entity state changed to {entry.State}",
+                    Detalles = detalles,
                     RestauranteId = entry.Entity is IMustHaveTenant t ? t.RestauranteId 
                                     : (entry.Entity is Restaurante r ? r.Id 
                                     : (CurrentTenantId ?? Guid.Parse("11111111-1111-1111-1111-111111111111")))
