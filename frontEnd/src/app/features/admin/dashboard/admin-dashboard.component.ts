@@ -1,6 +1,7 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SignalrService } from '../../../core/services/signalr.service';
+import { MesaTask } from '../../../core/models/task.model';
 import { AdminDataService, AdminMesa } from '../config/admin-data.service';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
@@ -261,8 +262,17 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                      <span class="text-xl leading-none">{{ task.tableId }}</span>
                    </div>
                    <div>
-                     <span class="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md" [ngClass]="getTypeTagClass(task.type)">{{task.type}}</span>
-                     <div class="text-[10px] font-bold text-gray-400 mt-1 flex items-center gap-1">
+                     <span class="text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded-md animate-fade-in" [ngClass]="getTypeTagClass(task.type)">{{task.type}}</span>
+                     @if (task.type === 'Pedido') {
+                       @if (task.pedidoEstado === 'Recibido' || !task.pedidoEstado) {
+                         <span class="ml-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100">Por Aprobar</span>
+                       } @else if (task.pedidoEstado === 'EnPreparacion') {
+                         <span class="ml-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100">En Cocina 🍳</span>
+                       } @else if (task.pedidoEstado === 'Listo') {
+                         <span class="ml-1.5 text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 animate-pulse">¡Listo! 🛎️</span>
+                       }
+                     }
+                     <div class="text-[10px] font-bold text-gray-400 mt-1.5 flex items-center gap-1">
                        ⏱ Hace {{ getMinutesElapsed(task.timestamp) }} min
                      </div>
                    </div>
@@ -286,9 +296,19 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                   Ver 👁️
                 </button>
                 @if (task.type === 'Pedido') {
-                  <button (click)="aprobarPedido(task.id)" class="flex-[2] bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
-                    Aprobar 👍
-                  </button>
+                  @if (task.pedidoEstado === 'Recibido' || !task.pedidoEstado) {
+                    <button (click)="aprobarPedido(task.id)" class="flex-[2] bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
+                      Aprobar 👍
+                    </button>
+                  } @else if (task.pedidoEstado === 'EnPreparacion') {
+                    <button (click)="entregarPedido(task.id)" class="flex-[2] bg-slate-700 text-white py-2 rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm transition-transform active:scale-95">
+                      Cerrar Pedido 🚪
+                    </button>
+                  } @else if (task.pedidoEstado === 'Listo') {
+                    <button (click)="entregarPedido(task.id)" class="flex-[2] bg-[#10b981] text-white py-2 rounded-xl text-xs font-black hover:bg-[#0da473] shadow-[0_4px_12px_rgba(16,185,129,0.3)] transition-transform active:scale-95">
+                      🛎️ Entregar y Cerrar
+                    </button>
+                  }
                 } @else {
                   <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
                     Completar ✔
@@ -408,11 +428,30 @@ export class AdminDashboardComponent {
     if (this.filterMesa() !== 'All') allTasks = allTasks.filter(t => t.tableId.toString() === this.filterMesa());
     if (this.filterMozo() !== 'All') allTasks = allTasks.filter(t => t.assignedMozoId === this.filterMozo() || (!t.assignedMozoId && this.dataService.mesas().find(m => m.numero === t.tableId)?.mozoId === this.filterMozo()));
 
-    if (userRole === 'Admin') return allTasks;
+    let filtered = allTasks;
+    if (userRole !== 'Admin') {
+      // Filtro de Mozo (mis mesas o tareas reasignadas a mí)
+      const myMesasNumeros = this.myMesas().map(m => m.numero);
+      filtered = allTasks.filter(t => t.assignedMozoId === userId || (!t.assignedMozoId && myMesasNumeros.includes(t.tableId)));
+    }
 
-    // Filtro de Mozo (mis mesas o tareas reasignadas a mí)
-    const myMesasNumeros = this.myMesas().map(m => m.numero);
-    return allTasks.filter(t => t.assignedMozoId === userId || (!t.assignedMozoId && myMesasNumeros.includes(t.tableId)));
+    // Ordenar con prioridad: Listo -> Recibido/SinEstado -> Cuenta -> Llamado -> EnPreparacion
+    return [...filtered].sort((a, b) => {
+      const getPriority = (t: MesaTask) => {
+        if (t.type === 'Pedido') {
+          if (t.pedidoEstado === 'Listo') return 1;
+          if (t.pedidoEstado === 'Recibido' || !t.pedidoEstado) return 2;
+          if (t.pedidoEstado === 'EnPreparacion') return 5;
+        }
+        if (t.type === 'Cuenta') return 3;
+        if (t.type === 'Llamado') return 4;
+        return 6;
+      };
+      const prioA = getPriority(a);
+      const prioB = getPriority(b);
+      if (prioA !== prioB) return prioA - prioB;
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    });
   });
 
   myMesas = computed(() => {
@@ -597,6 +636,19 @@ export class AdminDashboardComponent {
         // Tarea completada y retirada automáticamente por SignalR
       },
       error: (err) => console.error('Error al aprobar pedido:', err)
+    });
+  }
+
+  entregarPedido(pedidoId: string) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    this.http.post(`${environment.apiUrl}/api/pedido/${pedidoId}/estado`, { estado: 'Entregado' }, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        // La actualización de SignalR retirará la tarea automáticamente
+      },
+      error: (err) => console.error('Error al entregar pedido:', err)
     });
   }
 

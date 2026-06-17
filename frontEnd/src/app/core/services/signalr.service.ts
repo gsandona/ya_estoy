@@ -41,7 +41,8 @@ export class SignalrService {
           details: t.details,
           status: t.status,
           timestamp: new Date(t.timestamp),
-          assignedMozoId: t.assignedMozoId
+          assignedMozoId: t.assignedMozoId,
+          pedidoEstado: t.pedidoEstado
         })));
       },
       error: (e) => console.error('Error fetching tasks on load', e)
@@ -108,7 +109,8 @@ export class SignalrService {
         type: 'Pedido',
         timestamp: new Date(),
         status: 'Pending',
-        details: details || 'Nuevos items solicitados'
+        details: details || 'Nuevos items solicitados',
+        pedidoEstado: 'Recibido'
       });
     });
 
@@ -144,19 +146,31 @@ export class SignalrService {
     });
 
     this.hubConnection.on('NotificarPedidoAprobado', (pedidoId: string, numeroMesa: number, details: string) => {
+      this.playAudioAlert();
+      this._tasks.update(tasks => tasks.map(t => 
+        t.id.toLowerCase() === pedidoId.toLowerCase() ? { ...t, pedidoEstado: 'EnPreparacion' } : t
+      ));
       this.comandaChanged.set(pedidoId + '_' + Date.now());
     });
 
     this.hubConnection.on('NotificarPedidoListo', (pedidoId: string, taskId: string, numeroMesa: number) => {
       this.playAudioAlert();
-      this.addTask({
-        id: taskId,
-        tableId: numeroMesa,
-        type: 'Pedido Listo',
-        timestamp: new Date(),
-        status: 'Pending',
-        details: '¡Pedido listo para retirar y entregar!'
-      });
+      const exists = this._tasks().some(t => t.id.toLowerCase() === pedidoId.toLowerCase());
+      if (exists) {
+        this._tasks.update(tasks => tasks.map(t => 
+          t.id.toLowerCase() === pedidoId.toLowerCase() ? { ...t, pedidoEstado: 'Listo' } : t
+        ));
+      } else {
+        this.addTask({
+          id: pedidoId,
+          tableId: numeroMesa,
+          type: 'Pedido',
+          timestamp: new Date(),
+          status: 'Pending',
+          details: '¡Pedido listo para retirar y entregar!',
+          pedidoEstado: 'Listo'
+        });
+      }
       this.comandaChanged.set(pedidoId + '_' + Date.now());
     });
 

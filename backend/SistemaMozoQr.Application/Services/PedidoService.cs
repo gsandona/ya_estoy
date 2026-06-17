@@ -95,17 +95,9 @@ public class PedidoService : IPedidoService
         pedido.Estado = EstadoPedido.EnPreparacion;
         await _pedidoRepository.UpdateAsync(pedido);
 
-        // Completar la tarea original de aprobación
-        var task = await _taskRepository.GetByIdIgnoreQueryFiltersAsync(pedidoId);
-        if (task != null)
-        {
-            task.Status = "Completed";
-            await _taskRepository.UpdateAsync(task);
-        }
-
         var resultDetails = string.Join(", ", pedido.Items.Select(i => $"{i.Cantidad}x {i.MenuItem?.Nombre ?? "Item"}"));
 
-        // Notificar por SignalR a la cocina y al administrador
+        // Notificar por SignalR a la cocina y al administrador/mozo
         await _notificacionService.NotificarPedidoAprobadoAsync(pedido.Id, pedido.Mesa?.Numero ?? 0, resultDetails, pedido.Mesa?.MozoId);
     }
 
@@ -117,40 +109,21 @@ public class PedidoService : IPedidoService
         pedido.Estado = nuevoEstado;
         await _pedidoRepository.UpdateAsync(pedido);
 
-        var resultDetails = string.Join(", ", pedido.Items.Select(i => $"{i.Cantidad}x {i.MenuItem?.Nombre ?? "Item"}"));
-
         if (nuevoEstado == EstadoPedido.Listo)
         {
-            // Crear nueva tarea para el mozo indicando que el pedido está listo
-            var taskId = Guid.NewGuid();
-            var task = new MesaTask
-            {
-                Id = taskId,
-                TableId = pedido.Mesa?.Numero ?? 0,
-                Type = "Pedido Listo",
-                Details = $"Pedido listo para retirar: {resultDetails}",
-                Status = "Pending",
-                AssignedMozoId = pedido.Mesa?.MozoId?.ToString(),
-                RestauranteId = pedido.RestauranteId
-            };
-            await _taskRepository.AddAsync(task);
-
-            // Notificar al mozo
-            await _notificacionService.NotificarPedidoListoAsync(pedido.Id, taskId, pedido.Mesa?.Numero ?? 0, pedido.Mesa?.MozoId);
+            // Notificar al mozo que el pedido está listo
+            await _notificacionService.NotificarPedidoListoAsync(pedido.Id, pedido.Id, pedido.Mesa?.Numero ?? 0, pedido.Mesa?.MozoId);
         }
-        else if (nuevoEstado == EstadoPedido.Entregado)
+        else if (nuevoEstado == EstadoPedido.Entregado || nuevoEstado == EstadoPedido.Cancelado)
         {
-            // Si el pedido se entregó, completar las tareas del tipo "Pedido Listo" para esta mesa
-            var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
-            var tableReadyTasks = pendingTasks
-                .Where(t => t.TableId == (pedido.Mesa?.Numero ?? 0) && t.Type == "Pedido Listo" && t.RestauranteId == pedido.RestauranteId)
-                .ToList();
-
-            foreach (var t in tableReadyTasks)
+            // Completar la tarea original de la mesa
+            var task = await _taskRepository.GetByIdIgnoreQueryFiltersAsync(pedidoId);
+            if (task != null)
             {
-                t.Status = "Completed";
-                await _taskRepository.UpdateAsync(t);
+                task.Status = "Completed";
+                await _taskRepository.UpdateAsync(task);
             }
+            await _notificacionService.NotificarTareaCompletadaAsync(pedidoId);
         }
     }
 }

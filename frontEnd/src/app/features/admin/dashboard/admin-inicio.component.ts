@@ -47,47 +47,47 @@ import { AuthService } from '../../../core/services/auth.service';
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           
           <!-- Ventas Facturadas -->
-          <div class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all">
-            <div class="absolute -right-4 -bottom-4 text-white/10 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">$</div>
+          <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
+            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">$</div>
             <div class="flex justify-between items-start mb-4">
-              <span class="text-xs uppercase font-black tracking-widest text-emerald-100">Ventas Facturadas</span>
-              <span class="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">💰</span>
+              <span class="text-xs uppercase font-black tracking-widest text-slate-400">Ventas Facturadas</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">💰</span>
             </div>
-            <h2 class="text-3xl font-black tracking-tight mb-2">\${{ formatCurrency(stats()?.totalVentasFacturadas) }}</h2>
-            <p class="text-xs text-emerald-100 font-bold">Estimado de pedidos confirmados</p>
+            <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">\${{ formatCurrency(stats()?.totalVentasFacturadas) }}</h2>
+            <p class="text-xs text-slate-400 font-semibold">Estimado de pedidos confirmados</p>
           </div>
 
           <!-- Pedidos a Cocina -->
-          <div class="bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all">
-            <div class="absolute -right-4 -bottom-4 text-white/10 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">🍳</div>
+          <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
+            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">🍳</div>
             <div class="flex justify-between items-start mb-4">
-              <span class="text-xs uppercase font-black tracking-widest text-blue-100">Pedidos Cocina</span>
-              <span class="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">🍔</span>
+              <span class="text-xs uppercase font-black tracking-widest text-slate-400">Pedidos Cocina</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">🍔</span>
             </div>
-            <h2 class="text-3xl font-black tracking-tight mb-2">{{ stats()?.totalPedidosCocina }}</h2>
-            <p class="text-xs text-blue-100 font-bold">Total órdenes de comida enviadas</p>
+            <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">{{ stats()?.totalPedidosCocina }}</h2>
+            <p class="text-xs text-slate-400 font-semibold">Total órdenes de comida enviadas</p>
           </div>
 
           <!-- Alertas Completadas -->
-          <div class="bg-gradient-to-br from-violet-500 to-purple-600 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all">
-            <div class="absolute -right-4 -bottom-4 text-white/10 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">✓</div>
+          <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
+            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">✓</div>
             <div class="flex justify-between items-start mb-4">
-              <span class="text-xs uppercase font-black tracking-widest text-violet-100">Llamados Atendidos</span>
-              <span class="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">🛎️</span>
+              <span class="text-xs uppercase font-black tracking-widest text-slate-400">Llamados Atendidos</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">🛎️</span>
             </div>
-            <h2 class="text-3xl font-black tracking-tight mb-2">{{ stats()?.totalTareasCerradas }}</h2>
-            <p class="text-xs text-violet-100 font-bold">Llamados y cuentas cerradas</p>
+            <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">{{ stats()?.totalTareasCerradas }}</h2>
+            <p class="text-xs text-slate-400 font-semibold">Llamados y cuentas cerradas</p>
           </div>
 
           <!-- Tareas Activas -->
-          <div class="bg-gradient-to-br from-rose-500 to-pink-600 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden group hover:-translate-y-1 transition-all">
-            <div class="absolute -right-4 -bottom-4 text-white/10 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">⏳</div>
+          <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
+            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">⏳</div>
             <div class="flex justify-between items-start mb-4">
-              <span class="text-xs uppercase font-black tracking-widest text-rose-100">Alertas Activas</span>
-              <span class="h-8 w-8 rounded-xl bg-white/20 flex items-center justify-center text-sm">🚨</span>
+              <span class="text-xs uppercase font-black tracking-widest text-slate-400">Alertas Activas</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">🚨</span>
             </div>
-            <h2 class="text-3xl font-black tracking-tight mb-2">{{ stats()?.totalTareasPendientes }}</h2>
-            <p class="text-xs text-rose-100 font-bold">Pendientes de atención inmediata</p>
+            <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">{{ stats()?.totalTareasPendientes }}</h2>
+            <p class="text-xs text-slate-400 font-semibold">Pendientes de atención inmediata</p>
           </div>
         </div>
 
@@ -122,8 +122,8 @@ import { AuthService } from '../../../core/services/auth.service';
                         <span>Carga actual (mesas ocupadas asignadas)</span>
                         <span>{{ mozo.mesasAsignadasActualmente }} mesas</span>
                       </div>
-                      <div class="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-                        <div class="bg-accent h-full rounded-full transition-all duration-500" [style.width.%]="getPercentWidth(mozo.mesasAsignadasActualmente, 10)"></div>
+                      <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden border border-gray-200/40">
+                        <div class="bg-slate-700 h-full rounded-full transition-all duration-500" [style.width.%]="getPercentWidth(mozo.mesasAsignadasActualmente, 10)"></div>
                       </div>
                     </div>
                   </div>
@@ -179,10 +179,13 @@ import { AuthService } from '../../../core/services/auth.service';
             @for(h of filterPeakHours(); track h.hora) {
               <div class="flex items-center gap-3">
                 <span class="w-16 text-right text-xs font-black text-gray-500 shrink-0">{{ h.label }}</span>
-                <div class="flex-1 bg-gray-100 h-6 rounded-lg overflow-hidden border border-gray-50 relative">
-                  <div class="bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] h-full rounded-lg transition-all duration-700" 
+                <div class="flex-1 bg-slate-50 h-6 rounded-lg overflow-hidden border border-slate-200/60 relative">
+                  <div class="bg-slate-700 h-full rounded-lg transition-all duration-700" 
                        [style.width.%]="getPercentWidth(h.totalServicios, getMaxHourCount())"></div>
-                  <span class="absolute left-3 top-0 bottom-0 flex items-center text-[10px] font-black text-gray-700">{{ h.totalServicios }} llamadas</span>
+                  <span class="absolute left-3 top-0 bottom-0 flex items-center text-[10px] font-black"
+                        [ngClass]="getPercentWidth(h.totalServicios, getMaxHourCount()) > 20 ? 'text-white' : 'text-slate-700'">
+                    {{ h.totalServicios }} llamadas
+                  </span>
                 </div>
               </div>
             } @empty {
@@ -248,10 +251,10 @@ export class AdminInicioComponent implements OnInit {
 
   getBadgeColor(index: number): string {
     switch (index) {
-      case 0: return 'bg-yellow-100 text-yellow-800';
-      case 1: return 'bg-slate-100 text-slate-800';
-      case 2: return 'bg-amber-100 text-amber-800';
-      default: return 'bg-gray-100 text-gray-700';
+      case 0: return 'bg-slate-800 text-white';
+      case 1: return 'bg-slate-600 text-white';
+      case 2: return 'bg-slate-400 text-slate-900';
+      default: return 'bg-slate-100 text-slate-600';
     }
   }
 

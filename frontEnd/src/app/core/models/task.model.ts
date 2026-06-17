@@ -6,4 +6,5 @@ export interface MesaTask {
   status: 'Pending' | 'Completed';
   details?: string;
   assignedMozoId?: string;
+  pedidoEstado?: string;
 }

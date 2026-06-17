@@ -1,7 +1,9 @@
 import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { SignalrService } from '../../../core/services/signalr.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
 interface CocinaPedido {
@@ -19,8 +21,34 @@ interface CocinaPedido {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto">
+    <div class="space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto p-4 md:p-8">
       
+      <!-- Standalone Header for kitchen screen -->
+      <header class="bg-white shadow-sm border border-gray-100 px-6 py-4 rounded-[2rem] flex justify-between items-center bg-white/80 backdrop-blur-md mb-2">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl overflow-hidden shadow-md border border-gray-200/50 flex">
+            <img src="logo.png" class="w-full h-full object-cover" />
+          </div>
+          <div>
+            <span class="font-black text-lg text-slate-800 tracking-tight">{{ auth.currentUser()?.restauranteNombre || 'MozoGo' }}</span>
+            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Módulo Cocina</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:flex flex-col items-end">
+            <span class="font-bold text-xs text-slate-600">{{ auth.currentUser()?.email }}</span>
+            <span class="text-[10px] text-green-500 font-semibold flex items-center gap-1 mt-0.5">
+              <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+              Cocina Conectada
+            </span>
+          </div>
+          <button (click)="logout()" class="flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 font-bold transition-all text-xs border border-red-100/40">
+            <span>🚪</span> Salir
+          </button>
+        </div>
+      </header>
+
       <!-- Encabezado -->
       <div class="bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -179,6 +207,13 @@ interface CocinaPedido {
 export class AdminCocinaComponent implements OnInit {
   private http = inject(HttpClient);
   private signalrService = inject(SignalrService);
+  auth = inject(AuthService);
+  router = inject(Router);
+
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 
   pedidos = signal<CocinaPedido[]>([]);
   cookingOrderIds = signal<string[]>([]); // Lista local de IDs de comanda en preparación

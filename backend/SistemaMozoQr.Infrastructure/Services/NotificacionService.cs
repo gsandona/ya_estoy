@@ -57,4 +57,9 @@ public class NotificacionService : INotificacionService
     {
         await ObtenerDestinatariosConCocina(mozoId).NotificarPedidoListo(pedidoId, taskId, numeroMesa);
     }
+
+    public async Task NotificarTareaCompletadaAsync(Guid taskId)
+    {
+        await _hubContext.Clients.All.TareaCompletada(taskId.ToString());
+    }
 }
