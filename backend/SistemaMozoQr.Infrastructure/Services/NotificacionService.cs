@@ -50,12 +50,12 @@ public class NotificacionService : INotificacionService
 
     public async Task NotificarPedidoAprobadoAsync(Guid pedidoId, int numeroMesa, string details, Guid? mozoId)
     {
-        await ObtenerDestinatariosConCocina(mozoId).NotificarPedidoAprobado(pedidoId, numeroMesa, details);
+        await _hubContext.Clients.All.NotificarPedidoAprobado(pedidoId, numeroMesa, details);
     }
 
     public async Task NotificarPedidoListoAsync(Guid pedidoId, Guid taskId, int numeroMesa, Guid? mozoId)
     {
-        await ObtenerDestinatariosConCocina(mozoId).NotificarPedidoListo(pedidoId, taskId, numeroMesa);
+        await _hubContext.Clients.All.NotificarPedidoListo(pedidoId, taskId, numeroMesa);
     }
 
     public async Task NotificarTareaCompletadaAsync(Guid taskId)

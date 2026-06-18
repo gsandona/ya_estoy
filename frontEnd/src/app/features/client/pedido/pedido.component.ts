@@ -82,7 +82,7 @@ import { FormsModule } from '@angular/forms';
                 <h2 class="text-2xl font-black text-accent mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
               </div>
               <button 
-                (click)="showSplitModal.set(true)"
+                (click)="abrirDividirCuenta()"
                 class="bg-accent hover:bg-accent/90 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
                 🥞 Dividir Cuenta
               </button>
@@ -165,6 +165,7 @@ import { FormsModule } from '@angular/forms';
           <div class="w-full max-w-sm rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3 border"
                [ngClass]="{
                  'bg-blue-50/50 border-blue-100 text-blue-800': activePedidoEstado() === 'Recibido',
+                 'bg-sand border-[#E2DACF] text-primary': activePedidoEstado() === 'Aprobado',
                  'bg-amber-50/50 border-amber-100 text-amber-800': activePedidoEstado() === 'EnPreparacion',
                  'bg-green-50/50 border-green-100 text-green-800': activePedidoEstado() === 'Listo'
                }">
@@ -172,6 +173,7 @@ import { FormsModule } from '@angular/forms';
               <div class="flex items-center gap-2">
                 <span class="text-xl">
                   @if (activePedidoEstado() === 'Recibido') { 🍳 }
+                  @if (activePedidoEstado() === 'Aprobado') { 👍 }
                   @if (activePedidoEstado() === 'EnPreparacion') { 🔥 }
                   @if (activePedidoEstado() === 'Listo') { 🛎️ }
                 </span>
@@ -180,10 +182,12 @@ import { FormsModule } from '@angular/forms';
                   <p class="text-[10px] font-black uppercase tracking-wider"
                      [ngClass]="{
                        'text-blue-500': activePedidoEstado() === 'Recibido',
+                       'text-primary/70': activePedidoEstado() === 'Aprobado',
                        'text-amber-600': activePedidoEstado() === 'EnPreparacion',
                        'text-green-600 animate-pulse': activePedidoEstado() === 'Listo'
                      }">
                     @if (activePedidoEstado() === 'Recibido') { Pendiente de Aprobación }
+                    @if (activePedidoEstado() === 'Aprobado') { Aprobado }
                     @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
                     @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
                   </p>
@@ -746,6 +750,7 @@ export class PedidoComponent implements OnInit {
         this.cart.clearCart();
         this.loadingPedido.set(false);
         this.showSuccessToast.set(true);
+        this.verifyMesa(localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`) || undefined);
         setTimeout(() => this.showSuccessToast.set(false), 3000);
       },
       error: (err) => {
@@ -993,6 +998,11 @@ export class PedidoComponent implements OnInit {
     
     const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
+  }
+
+  abrirDividirCuenta() {
+    this.verifyMesa(localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`) || undefined);
+    this.showSplitModal.set(true);
   }
 
   formatCurrency(value: number | null): string {

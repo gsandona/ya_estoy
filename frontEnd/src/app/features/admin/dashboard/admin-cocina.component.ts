@@ -11,7 +11,7 @@ interface CocinaPedido {
   mesaId: string;
   numeroMesa: number;
   mozoEmail: string;
-  estado: 'Recibido' | 'EnPreparacion' | 'Listo' | 'Entregado' | 'Cancelado';
+  estado: 'Recibido' | 'EnPreparacion' | 'Listo' | 'Entregado' | 'Cancelado' | 'Aprobado';
   fecha: string;
   items: { nombre: string; cantidad: number }[];
 }
@@ -220,11 +220,11 @@ export class AdminCocinaComponent implements OnInit {
 
   // Computados para cada columna
   pedidosEnEspera = computed(() => {
-    return this.pedidos().filter(p => p.estado === 'EnPreparacion' && !this.cookingOrderIds().includes(p.id));
+    return this.pedidos().filter(p => p.estado === 'Aprobado');
   });
 
   pedidosPreparando = computed(() => {
-    return this.pedidos().filter(p => p.estado === 'EnPreparacion' && this.cookingOrderIds().includes(p.id));
+    return this.pedidos().filter(p => p.estado === 'EnPreparacion');
   });
 
   pedidosListos = computed(() => {
@@ -267,18 +267,40 @@ export class AdminCocinaComponent implements OnInit {
   }
 
   empezarAPreparar(pedidoId: string) {
-    this.cookingOrderIds.update(ids => {
-      const newIds = [...ids, pedidoId];
-      localStorage.setItem('cocina_cooking_order_ids', JSON.stringify(newIds));
-      return newIds;
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    this.http.post(`${environment.apiUrl}/api/pedido/${pedidoId}/estado`, { estado: 'EnPreparacion' }, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        this.cookingOrderIds.update(ids => {
+          const newIds = [...ids, pedidoId];
+          localStorage.setItem('cocina_cooking_order_ids', JSON.stringify(newIds));
+          return newIds;
+        });
+        this.loadPedidos();
+      },
+      error: (err) => console.error('Error al iniciar preparación:', err)
     });
   }
 
   devolverAEspera(pedidoId: string) {
-    this.cookingOrderIds.update(ids => {
-      const newIds = ids.filter(id => id !== pedidoId);
-      localStorage.setItem('cocina_cooking_order_ids', JSON.stringify(newIds));
-      return newIds;
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    this.http.post(`${environment.apiUrl}/api/pedido/${pedidoId}/estado`, { estado: 'Aprobado' }, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        this.cookingOrderIds.update(ids => {
+          const newIds = ids.filter(id => id !== pedidoId);
+          localStorage.setItem('cocina_cooking_order_ids', JSON.stringify(newIds));
+          return newIds;
+        });
+        this.loadPedidos();
+      },
+      error: (err) => console.error('Error al regresar pedido a la cola:', err)
     });
   }
 

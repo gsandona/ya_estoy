@@ -92,7 +92,7 @@ public class PedidoService : IPedidoService
         var pedido = await _pedidoRepository.GetByIdAsync(pedidoId);
         if (pedido == null) throw new Exception("Pedido no encontrado.");
 
-        pedido.Estado = EstadoPedido.EnPreparacion;
+        pedido.Estado = EstadoPedido.Aprobado;
         await _pedidoRepository.UpdateAsync(pedido);
 
         var resultDetails = string.Join(", ", pedido.Items.Select(i => $"{i.Cantidad}x {i.MenuItem?.Nombre ?? "Item"}"));
@@ -113,6 +113,11 @@ public class PedidoService : IPedidoService
         {
             // Notificar al mozo que el pedido está listo
             await _notificacionService.NotificarPedidoListoAsync(pedido.Id, pedido.Id, pedido.Mesa?.Numero ?? 0, pedido.Mesa?.MozoId);
+        }
+        else if (nuevoEstado == EstadoPedido.EnPreparacion)
+        {
+            // Notificar a todos que el pedido está en preparación
+            await _notificacionService.NotificarPedidoAprobadoAsync(pedido.Id, pedido.Mesa?.Numero ?? 0, "", pedido.Mesa?.MozoId);
         }
         else if (nuevoEstado == EstadoPedido.Entregado || nuevoEstado == EstadoPedido.Cancelado)
         {

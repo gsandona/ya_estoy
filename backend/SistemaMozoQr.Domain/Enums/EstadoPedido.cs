@@ -6,5 +6,6 @@ public enum EstadoPedido
     EnPreparacion,
     Listo,
     Entregado,
-    Cancelado
+    Cancelado,
+    Aprobado
 }
