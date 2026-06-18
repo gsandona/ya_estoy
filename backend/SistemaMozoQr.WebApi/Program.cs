@@ -105,6 +105,23 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    // Auto-add column CodigoAcceso to Pedidos table if not present (SQLite & PostgreSQL compatible)
+    try
+    {
+        if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+        {
+            context.Database.ExecuteSqlRaw("ALTER TABLE \"Pedidos\" ADD COLUMN \"CodigoAcceso\" varchar(10);");
+        }
+        else
+        {
+            context.Database.ExecuteSqlRaw("ALTER TABLE Pedidos ADD COLUMN CodigoAcceso TEXT;");
+        }
+    }
+    catch (Exception)
+    {
+        // Column already exists or error ignored
+    }
+
     try
     {
         context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations

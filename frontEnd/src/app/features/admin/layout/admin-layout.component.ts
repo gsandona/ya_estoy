@@ -27,32 +27,43 @@ import { AdminDataService } from '../config/admin-data.service';
         <nav class="flex-1 p-6 space-y-3">
           @if (auth.isAdmin() || auth.isSuperAdmin()) {
             <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">📈</span>
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
               Métricas y Datos
             </a>
           }
           <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-            <span class="p-1.5 bg-accent/20 text-accent rounded-lg">📋</span>
+            <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
+            </span>
             Mesas y Tareas
           </a>
 
           @if (auth.isAdmin()) {
             <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">👥</span>
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
               Config. Personal
             </a>
           }
           
           @if (auth.isSuperAdmin()) {
             <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg">⚙️</span>
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
               Sistema
             </a>
           }
         </nav>
         <div class="p-6">
           <button (click)="logout()" class="w-full flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent">
-            <span>🚪</span> Cerrar Sesión
+            <span class="flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Cerrar Sesión
           </button>
         </div>
       </aside>
@@ -134,25 +145,33 @@ import { AdminDataService } from '../config/admin-data.service';
             <nav class="flex-1 p-6 space-y-4">
               @if (auth.isAdmin() || auth.isSuperAdmin()) {
                 <a routerLink="/admin/inicio" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">📈</span>
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
                   Métricas y Datos
                 </a>
               }
               <a routerLink="/admin/dashboard" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">📋</span>
+                <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
+                </span>
                 Mesas y Tareas
               </a>
 
               @if (auth.isAdmin()) {
                 <a routerLink="/admin/configuracion" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">👥</span>
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
                   Config. Personal
                 </a>
               }
               
               @if (auth.isSuperAdmin()) {
                 <a routerLink="/admin/sistema" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl">⚙️</span>
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
                   Sistema
                 </a>
               }
@@ -160,7 +179,10 @@ import { AdminDataService } from '../config/admin-data.service';
             
             <div class="p-6 pb-10">
               <button (click)="logout()" class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-red-500 text-white font-bold active:bg-red-600 transition-all shadow-lg shadow-red-500/30 text-lg">
-                <span>🚪</span> Cerrar Sesión
+                <span class="flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                Cerrar Sesión
               </button>
             </div>
           </aside>

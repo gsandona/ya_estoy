@@ -238,9 +238,9 @@ public class MesasConfigController : ControllerBase
             }
         }
 
-        // Obtener todos los items consumidos en la mesa (excluyendo cancelados)
+        // Obtener todos los items consumidos en la mesa de la sesión actual (mismo PIN)
         var orders = await _pedidoRepository.GetByMesaIdAsync(mesa.Id);
-        var activeOrders = orders.Where(o => o.Estado != SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado).ToList();
+        var activeOrders = orders.Where(o => o.Estado != SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado && o.CodigoAcceso == pin).ToList();
         var itemsRes = activeOrders.SelectMany(o => o.Items).Select(i => new {
             id = i.Id,
             nombre = i.MenuItem?.Nombre ?? "Item",

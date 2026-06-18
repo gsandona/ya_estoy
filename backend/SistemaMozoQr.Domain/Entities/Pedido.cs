@@ -18,6 +18,9 @@ public class Pedido : IMustHaveTenant
     [Required]
     public DateTime Fecha { get; set; } = DateTime.UtcNow;
     
+    [MaxLength(10)]
+    public string? CodigoAcceso { get; set; }
+    
     public List<PedidoItem> Items { get; set; } = new();
 
     public Guid RestauranteId { get; set; }

@@ -35,14 +35,20 @@ import { environment } from '../../../../../environments/environment';
                      </div>
                      <div class="flex flex-col items-end justify-between h-full">
                        <span class="font-black text-primary mb-3 text-lg">\${{ item.precio }}</span>
-                       <button 
-                         (click)="cartService.addToCart(item)"
-                         class="bg-accent text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-accent/90 transition-all active:scale-[0.96] shadow-md shadow-accent/10 flex items-center gap-1.5">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                         Agregar
-                       </button>
-                     </div>
-                   </div>
+                        <button 
+                          (click)="agregarAlCarrito(item)"
+                          [ngClass]="{ 'bg-green-600 scale-105 shadow-green-500/20': addedItemIds()[item.id], 'bg-accent shadow-accent/10': !addedItemIds()[item.id] }"
+                          class="text-white px-5 py-2 rounded-xl text-sm font-bold hover:opacity-90 transition-all transform active:scale-[0.96] shadow-md flex items-center gap-1.5 duration-200">
+                          @if (addedItemIds()[item.id]) {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                            Agregado
+                          } @else {
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                            Agregar
+                          }
+                        </button>
+                      </div>
+                    </div>
                  }
                }
             </div>
@@ -69,6 +75,19 @@ export class MenuComponent implements OnInit {
   http = inject(HttpClient);
 
   categories = signal<{name: string, items: MenuItem[]}[]>([]);
+  addedItemIds = signal<Record<string, boolean>>({});
+
+  agregarAlCarrito(item: MenuItem) {
+    this.cartService.addToCart(item);
+    this.addedItemIds.update(ids => ({ ...ids, [item.id]: true }));
+    setTimeout(() => {
+      this.addedItemIds.update(ids => {
+        const copy = { ...ids };
+        delete copy[item.id];
+        return copy;
+      });
+    }, 1000);
+  }
 
   ngOnInit() {
     const url = this.restauranteId 

@@ -44,7 +44,7 @@ interface CocinaPedido {
             </span>
           </div>
           <button (click)="logout()" class="flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 font-bold transition-all text-xs border border-red-100/40">
-            <span>🚪</span> Salir
+            Salir
           </button>
         </div>
       </header>
@@ -53,13 +53,13 @@ interface CocinaPedido {
       <div class="bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 class="text-3xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-            🍳 Dashboard de Cocina
+            Dashboard de Cocina
           </h1>
           <p class="text-slate-500 text-sm font-medium mt-1">Monitoreo de comandas en tiempo real y preparación de platos</p>
         </div>
         <div class="flex items-center gap-2">
           <button (click)="loadPedidos()" class="bg-primary hover:bg-[#1a233b] text-white px-5 py-3 rounded-2xl text-xs font-black shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
-            <span>🔄</span> Recargar Cola
+            Recargar Cola
           </button>
         </div>
       </div>
@@ -86,7 +86,7 @@ interface CocinaPedido {
         <!-- Columna 1: En Espera -->
         <div class="bg-slate-50/50 border border-gray-200/60 p-5 rounded-[2rem] flex flex-col min-h-[500px]">
           <h2 class="text-lg font-black text-gray-700 mb-4 flex items-center gap-2">
-            ⏳ En Cola ({{ pedidosEnEspera().length }})
+            En Cola ({{ pedidosEnEspera().length }})
           </h2>
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosEnEspera(); track pedido.id) {
@@ -110,7 +110,7 @@ interface CocinaPedido {
                 </div>
 
                 <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all active:scale-95 flex justify-center items-center gap-1">
-                  👨‍🍳 Empezar a Preparar
+                  Empezar a Preparar
                 </button>
               </div>
             } @empty {
@@ -122,7 +122,7 @@ interface CocinaPedido {
         <!-- Columna 2: Preparando -->
         <div class="bg-amber-50/20 border border-amber-200/40 p-5 rounded-[2rem] flex flex-col min-h-[500px]">
           <h2 class="text-lg font-black text-amber-800 mb-4 flex items-center gap-2">
-            🔥 Preparando ({{ pedidosPreparando().length }})
+            Preparando ({{ pedidosPreparando().length }})
           </h2>
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosPreparando(); track pedido.id) {
@@ -150,7 +150,7 @@ interface CocinaPedido {
                     Regresar
                   </button>
                   <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition active:scale-95">
-                    ✅ ¡Listo / Pronto!
+                    ¡Listo / Pronto!
                   </button>
                 </div>
               </div>
@@ -163,7 +163,7 @@ interface CocinaPedido {
         <!-- Columna 3: Pronto -->
         <div class="bg-emerald-50/20 border border-emerald-200/40 p-5 rounded-[2rem] flex flex-col min-h-[500px]">
           <h2 class="text-lg font-black text-emerald-800 mb-4 flex items-center gap-2">
-            🛎️ Listo para Llevar ({{ pedidosListos().length }})
+            Listo para Llevar ({{ pedidosListos().length }})
           </h2>
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosListos(); track pedido.id) {
@@ -187,7 +187,7 @@ interface CocinaPedido {
                 </div>
 
                 <button (click)="marcarComoEntregado(pedido.id)" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95">
-                  🚪 Marcar como Entregado
+                  Marcar como Entregado
                 </button>
               </div>
             } @empty {

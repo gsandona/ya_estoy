@@ -15,12 +15,12 @@ import { AuthService } from '../../../core/services/auth.service';
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-sm border border-gray-100">
         <div>
           <h1 class="text-3xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-            📈 Panel de Métricas de Negocio
+            Panel de Métricas de Negocio
           </h1>
           <p class="text-slate-500 text-sm font-medium mt-1">Estadísticas útiles, rendimiento del staff y tendencias comerciales en tiempo real</p>
         </div>
         <button (click)="loadStats()" class="bg-primary hover:bg-[#1a233b] text-white px-5 py-3 rounded-2xl text-xs font-black shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
-          <span>🔄</span> Actualizar Datos
+          Actualizar Datos
         </button>
       </div>
 
@@ -48,10 +48,9 @@ import { AuthService } from '../../../core/services/auth.service';
           
           <!-- Ventas Facturadas -->
           <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">$</div>
             <div class="flex justify-between items-start mb-4">
               <span class="text-xs uppercase font-black tracking-widest text-slate-400">Ventas Facturadas</span>
-              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">💰</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100 text-accent font-bold">$</span>
             </div>
             <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">\${{ formatCurrency(stats()?.totalVentasFacturadas) }}</h2>
             <p class="text-xs text-slate-400 font-semibold">Estimado de pedidos confirmados</p>
@@ -59,10 +58,11 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <!-- Pedidos a Cocina -->
           <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">🍳</div>
             <div class="flex justify-between items-start mb-4">
               <span class="text-xs uppercase font-black tracking-widest text-slate-400">Pedidos Cocina</span>
-              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">🍔</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100 flex items-center justify-center text-accent">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
             </div>
             <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">{{ stats()?.totalPedidosCocina }}</h2>
             <p class="text-xs text-slate-400 font-semibold">Total órdenes de comida enviadas</p>
@@ -70,10 +70,11 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <!-- Alertas Completadas -->
           <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">✓</div>
             <div class="flex justify-between items-start mb-4">
               <span class="text-xs uppercase font-black tracking-widest text-slate-400">Llamados Atendidos</span>
-              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">🛎️</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100 flex items-center justify-center text-accent">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
             </div>
             <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">{{ stats()?.totalTareasCerradas }}</h2>
             <p class="text-xs text-slate-400 font-semibold">Llamados y cuentas cerradas</p>
@@ -81,10 +82,11 @@ import { AuthService } from '../../../core/services/auth.service';
 
           <!-- Tareas Activas -->
           <div class="bg-white border border-slate-200 text-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group hover:border-slate-300 hover:shadow-md transition-all">
-            <div class="absolute -right-4 -bottom-4 text-slate-100 text-9xl font-black select-none pointer-events-none group-hover:scale-110 transition-transform">⏳</div>
             <div class="flex justify-between items-start mb-4">
               <span class="text-xs uppercase font-black tracking-widest text-slate-400">Alertas Activas</span>
-              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100">🚨</span>
+              <span class="h-8 w-8 rounded-xl bg-slate-50 flex items-center justify-center text-sm border border-slate-100 flex items-center justify-center text-accent">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
             </div>
             <h2 class="text-3xl font-black tracking-tight text-slate-800 mb-2">{{ stats()?.totalTareasPendientes }}</h2>
             <p class="text-xs text-slate-400 font-semibold">Pendientes de atención inmediata</p>
@@ -98,7 +100,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="bg-white/80 backdrop-blur-md p-6 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
             <div>
               <h3 class="text-xl font-black text-gray-800 tracking-tight mb-1 flex items-center gap-2">
-                👤 Rendimiento del Personal (Mozos)
+                Rendimiento del Personal (Mozos)
               </h3>
               <p class="text-xs text-gray-400 font-medium mb-6">Tareas resueltas e indicadores de carga de trabajo por mesero</p>
               
@@ -107,7 +109,9 @@ import { AuthService } from '../../../core/services/auth.service';
                   <div class="flex flex-col gap-2 p-4 bg-surface rounded-2xl border border-gray-100 transition-transform hover:translate-x-1 duration-200">
                     <div class="flex justify-between items-center">
                       <div class="flex items-center gap-3">
-                        <div class="h-9 w-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center font-bold text-sm">👤</div>
+                        <div class="h-9 w-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center font-bold text-sm">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m13-10a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
                         <div>
                           <p class="font-bold text-gray-700 text-sm truncate max-w-[150px] sm:max-w-none">{{ mozo.mozoEmail }}</p>
                           <p class="text-[10px] text-gray-400 font-semibold">Mozo Activo</p>
@@ -138,7 +142,7 @@ import { AuthService } from '../../../core/services/auth.service';
           <div class="bg-white/80 backdrop-blur-md p-6 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col justify-between">
             <div>
               <h3 class="text-xl font-black text-gray-800 tracking-tight mb-1 flex items-center gap-2">
-                🪑 Mesas más Demandadas (Top 5)
+                Mesas más Demandadas (Top 5)
               </h3>
               <p class="text-xs text-gray-400 font-medium mb-6">Identifica las mesas con mayor cantidad de alertas y actividad</p>
               
@@ -171,25 +175,24 @@ import { AuthService } from '../../../core/services/auth.service';
         <!-- Histograma de Horarios de Mayor Frecuencia -->
         <div class="bg-white/80 backdrop-blur-md p-6 rounded-[2rem] border border-gray-100 shadow-sm">
           <h3 class="text-xl font-black text-gray-800 tracking-tight mb-1 flex items-center gap-2">
-            ⏰ Horarios de Mayor Frecuencia
+            Horarios de Mayor Frecuencia
           </h3>
-          <p class="text-xs text-gray-400 font-medium mb-6">Distribución horaria de llamados, pedidos y solicitudes durante el día</p>
+          <p class="text-xs text-gray-400 font-medium mb-6">Distribución horaria de llamados, pedidos y solicitudes durante el día (Top 8 horas activas)</p>
           
-          <div class="flex flex-col gap-3">
+          <div class="flex flex-col gap-2.5">
             @for(h of filterPeakHours(); track h.hora) {
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-4">
                 <span class="w-16 text-right text-xs font-black text-gray-500 shrink-0">{{ h.label }}</span>
-                <div class="flex-1 bg-slate-50 h-6 rounded-lg overflow-hidden border border-slate-200/60 relative">
-                  <div class="bg-slate-700 h-full rounded-lg transition-all duration-700" 
+                <div class="flex-1 bg-slate-100/60 h-3 rounded-full overflow-hidden relative border border-slate-200/40">
+                  <div class="bg-slate-700 h-full rounded-full transition-all duration-700" 
                        [style.width.%]="getPercentWidth(h.totalServicios, getMaxHourCount())"></div>
-                  <span class="absolute left-3 top-0 bottom-0 flex items-center text-[10px] font-black"
-                        [ngClass]="getPercentWidth(h.totalServicios, getMaxHourCount()) > 20 ? 'text-white' : 'text-slate-700'">
-                    {{ h.totalServicios }} llamadas
-                  </span>
                 </div>
+                <span class="w-24 text-left text-xs font-black text-slate-600 shrink-0">
+                  {{ h.totalServicios }} llamados
+                </span>
               </div>
             } @empty {
-              <p class="text-center text-gray-400 py-10 text-sm">Aún no hay llamadas registradas hoy.</p>
+              <p class="text-center text-gray-400 py-10 text-sm font-medium">Aún no hay llamadas registradas hoy.</p>
             }
           </div>
         </div>
@@ -266,7 +269,7 @@ export class AdminInicioComponent implements OnInit {
       const match = rawHours.find((h: any) => h.hora === i);
       const count = match ? match.totalServicios : 0;
       
-      if (count > 0 || (i >= 11 && i <= 15) || (i >= 19 && i <= 23)) {
+      if (count > 0) {
         list.push({
           label: `${i.toString().padStart(2, '0')}:00 hs`,
           hora: i,
@@ -274,7 +277,8 @@ export class AdminInicioComponent implements OnInit {
         });
       }
     }
-    return list;
+    // Ordenar por total de mayor a menor para obtener los top 8, y luego cronológicamente por hora
+    return list.sort((a, b) => b.totalServicios - a.totalServicios).slice(0, 8).sort((a, b) => a.hora - b.hora);
   }
 
   getMaxHourCount(): number {

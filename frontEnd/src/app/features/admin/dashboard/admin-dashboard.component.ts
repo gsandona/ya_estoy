@@ -30,7 +30,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
           <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseMesas.set(!collapseMesas())">
             <div>
               <h2 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                🕹️ Control de Mesas
+                Control de Mesas
                 <span class="text-xs text-gray-400 inline-block transition-transform duration-300" [class.rotate-180]="collapseMesas()">▲</span>
               </h2>
               <p class="text-xs text-gray-400 font-medium mt-0.5">Administra los códigos QR, meseros asignados y estado de atención</p>
@@ -47,7 +47,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
           @if (showForm()) {
             <div class="bg-surface p-5 rounded-3xl mb-6 border border-gray-200 shadow-inner animate-fade-in">
               <h3 class="text-sm font-black text-gray-700 mb-3 flex items-center gap-1">
-                <span>📝</span> {{ editingId() ? 'Editar Mesa' : 'Nueva Mesa' }}
+                {{ editingId() ? 'Editar Mesa' : 'Nueva Mesa' }}
               </h3>
               <form #mesaForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
                 <div class="w-full md:w-32 relative">
@@ -90,7 +90,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                 <!-- Active Mesa Card -->
                 <div class="border border-green-200/80 rounded-3xl p-5 flex flex-col justify-between hover:border-green-400 transition relative group bg-white shadow-sm ring-4 ring-green-500/5">
                   <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                    <button (click)="openQrModal(mesa)" class="text-green-700 hover:text-green-900 font-bold text-[10px] bg-green-100/60 px-2.5 py-1 rounded-xl transition-colors border border-green-200/50">🖨️ QR</button>
+                    <button (click)="openQrModal(mesa)" class="text-green-700 hover:text-green-900 font-bold text-[10px] bg-green-100/60 px-2.5 py-1 rounded-xl transition-colors border border-green-200/50">QR</button>
                     @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
                       <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">Editar</button>
                       <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">Borrar</button>
@@ -138,7 +138,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     </div>
 
                     <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
-                      Cerrar Mesa 🔒
+                      Cerrar Mesa
                     </button>
                   </div>
                 </div>
@@ -146,7 +146,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                 <!-- Inactive Mesa Card -->
                 <div class="border border-slate-200 rounded-3xl p-5 flex flex-col justify-between hover:border-slate-300 transition relative group bg-white shadow-sm hover:shadow-md">
                   <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
-                    <button (click)="openQrModal(mesa)" class="text-slate-600 hover:text-slate-800 font-bold text-[10px] bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">🖨️ QR</button>
+                    <button (click)="openQrModal(mesa)" class="text-slate-600 hover:text-slate-800 font-bold text-[10px] bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">QR</button>
                     @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
                       <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">Editar</button>
                       <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">Borrar</button>
@@ -178,7 +178,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     </div>
 
                     <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(15,23,42,0.15)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
-                      Abrir Mesa 🛎️
+                      Abrir Mesa
                     </button>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
               <p class="text-xs text-gray-400 font-medium text-center sm:text-left">Reorganiza el salón en memoria y súbelo al servidor para aplicar los cambios a los códigos QR y mozos asignados.</p>
               <div class="flex items-center gap-3">
                 @if (saveSuccess()) {
-                  <span class="text-green-500 font-bold text-xs bg-green-50 px-3 py-1.5 rounded-xl animate-pulse">✅ ¡Guardado!</span>
+                  <span class="text-green-500 font-bold text-xs bg-green-50 px-3 py-1.5 rounded-xl animate-pulse">¡Guardado!</span>
                 }
                 <button 
                   (click)="syncBackend()"
@@ -203,7 +203,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     <span class="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full"></span>
                     Sincronizando...
                   } @else {
-                    ☁️ Guardar y Publicar
+                    Guardar y Publicar
                   }
                 </button>
               </div>
@@ -218,7 +218,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
           <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseTasks.set(!collapseTasks())">
             <div>
               <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                🔔 Solicitudes Activas
+                Solicitudes Activas
                 <span class="text-xs text-gray-400 inline-block transition-transform duration-300" [class.rotate-180]="collapseTasks()">▲</span>
               </h1>
               <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
@@ -267,13 +267,13 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                        @if (task.pedidoEstado === 'Recibido' || !task.pedidoEstado) {
                          <span class="ml-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100">Por Aprobar</span>
                        } @else if (task.pedidoEstado === 'EnPreparacion') {
-                         <span class="ml-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100">En Cocina 🍳</span>
+                         <span class="ml-1.5 text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100">En Cocina</span>
                        } @else if (task.pedidoEstado === 'Listo') {
-                         <span class="ml-1.5 text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 animate-pulse">¡Listo! 🛎️</span>
+                         <span class="ml-1.5 text-[10px] font-black uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200 animate-pulse">¡Listo!</span>
                        }
                      }
                      <div class="text-[10px] font-bold text-gray-400 mt-1.5 flex items-center gap-1">
-                       ⏱ Hace {{ getMinutesElapsed(task.timestamp) }} min
+                       Hace {{ getMinutesElapsed(task.timestamp) }} min
                      </div>
                    </div>
                 </div>
@@ -293,25 +293,25 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
 
               <div class="flex gap-2 mt-auto">
                 <button class="flex-1 bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-200 transition-colors">
-                  Ver 👁️
+                  Ver
                 </button>
                 @if (task.type === 'Pedido') {
                   @if (task.pedidoEstado === 'Recibido' || !task.pedidoEstado) {
                     <button (click)="aprobarPedido(task.id)" class="flex-[2] bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
-                      Aprobar 👍
+                      Aprobar
                     </button>
                   } @else if (task.pedidoEstado === 'EnPreparacion') {
                     <button (click)="entregarPedido(task.id)" class="flex-[2] bg-slate-700 text-white py-2 rounded-xl text-xs font-bold hover:bg-slate-800 shadow-sm transition-transform active:scale-95">
-                      Cerrar Pedido 🚪
+                      Cerrar Pedido
                     </button>
                   } @else if (task.pedidoEstado === 'Listo') {
                     <button (click)="entregarPedido(task.id)" class="flex-[2] bg-[#10b981] text-white py-2 rounded-xl text-xs font-black hover:bg-[#0da473] shadow-[0_4px_12px_rgba(16,185,129,0.3)] transition-transform active:scale-95">
-                      🛎️ Entregar y Cerrar
+                      Entregar y Cerrar
                     </button>
                   }
                 } @else {
                   <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-2 rounded-xl text-xs font-bold hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
-                    Completar ✔
+                    Completar
                   </button>
                 }
               </div>
@@ -319,7 +319,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
           } @empty {
             <div class="col-span-full py-16 flex flex-col items-center justify-center text-gray-400 bg-white/50 backdrop-blur-sm rounded-3xl border-2 border-dashed border-gray-200">
               <div class="h-20 w-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-gray-100">
-                <span class="text-3xl filter grayscale opacity-40">✨</span>
+                <span class="text-3xl opacity-40"></span>
               </div>
               <h3 class="text-xl font-black text-gray-600 mb-1">Todo al día</h3>
               <p class="text-gray-400 font-medium text-sm">No hay solicitudes pendientes en este momento.</p>
@@ -335,7 +335,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl border border-white/20 relative">
           <button (click)="showReassignModal.set(null)" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 font-bold transition-colors">&times;</button>
           
-          <h3 class="text-xl font-black mb-1 text-gray-800 flex items-center gap-2">🔄 Reasignar</h3>
+          <h3 class="text-xl font-black mb-1 text-gray-800 flex items-center gap-2">Reasignar</h3>
           <p class="text-sm text-gray-500 mb-6 font-medium">Transfiere esta tarea a otro mozo disponible.</p>
           
           <div class="space-y-2 mb-6 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
@@ -374,7 +374,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
               ↓ Descargar Imagen QR
             </a>
             <button (click)="imprimirQr()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all text-xs text-sm">
-              🖨️ Imprimir Cartel
+              Imprimir Cartel
             </button>
           </div>
         </div>

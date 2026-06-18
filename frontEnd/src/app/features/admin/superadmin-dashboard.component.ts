@@ -99,7 +99,7 @@ interface Log {
       @if (activeTab() === 'errores') {
         <div class="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-gray-100 animate-fade-in">
           <div class="flex justify-between items-center mb-6">
-             <h2 class="text-2xl font-black text-red-600 flex items-center gap-2">⚠️ Registro de Errores Críticos</h2>
+             <h2 class="text-2xl font-black text-red-600 flex items-center gap-2">Registro de Errores Críticos</h2>
              <button (click)="loadErrores()" class="bg-gray-100 px-5 py-2 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors shadow-sm text-gray-700">Refrescar</button>
           </div>
           
@@ -114,8 +114,7 @@ interface Log {
                 <pre class="bg-red-50/40 text-red-900/90 p-4 rounded-xl text-xs overflow-x-auto font-mono whitespace-pre-wrap leading-relaxed border border-red-100/50">{{ err.detalles }}</pre>
               </div>
             } @empty {
-              <div class="py-12 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                <span class="text-4xl grayscale opacity-50 mb-3 block">✅</span>
+              <div class="py-12 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center">
                 <p class="text-gray-500 font-bold">El sistema está estable y sin errores.</p>
               </div>
             }
@@ -126,7 +125,7 @@ interface Log {
       <!-- Tab Branding -->
       @if (activeTab() === 'branding') {
         <div class="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-gray-100 animate-fade-in max-w-2xl mx-auto">
-          <h2 class="text-2xl font-black text-gray-800 mb-2 flex items-center gap-2">✨ Branding Global (Marca Blanca)</h2>
+          <h2 class="text-2xl font-black text-gray-800 mb-2 flex items-center gap-2">Branding Global (Marca Blanca)</h2>
           <p class="text-gray-500 mb-8 text-sm">Personaliza el nombre y el logo principal de la plataforma SaaS. Estos se mostrarán en la pantalla de inicio de sesión.</p>
           
           <div class="space-y-6">
@@ -141,7 +140,7 @@ interface Log {
               <div class="flex items-center gap-6 mt-2">
                 <div class="w-24 h-24 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden shadow-inner">
                   <img *ngIf="globalLogoBase64" [src]="globalLogoBase64" class="w-full h-full object-contain p-2" />
-                  <span *ngIf="!globalLogoBase64" class="text-3xl opacity-20">📷</span>
+                  <svg *ngIf="!globalLogoBase64" class="w-8 h-8 opacity-20 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 
                 <div class="flex-1">

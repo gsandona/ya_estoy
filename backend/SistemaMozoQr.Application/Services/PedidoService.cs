@@ -40,6 +40,7 @@ public class PedidoService : IPedidoService
             RestauranteId = mesa.RestauranteId,
             Estado = EstadoPedido.Recibido,
             Fecha = DateTime.UtcNow,
+            CodigoAcceso = mesa.CodigoAcceso,
             Items = new List<PedidoItem>()
         };
 
