@@ -22,8 +22,8 @@ export class SignalrService {
 
   constructor() {
     this.buildConnection();
-    this.startConnection();
     this.addListeners();
+    this.startConnection();
     this.fetchPendingTasks();
   }
 

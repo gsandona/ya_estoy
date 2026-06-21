@@ -24,6 +24,7 @@ public class PedidoRepository : IPedidoRepository
     public async Task<Pedido?> GetByIdAsync(Guid id)
     {
         return await _context.Pedidos
+            .IgnoreQueryFilters()
             .Include(p => p.Items)
             .Include(p => p.Mesa)
             .FirstOrDefaultAsync(p => p.Id == id);
@@ -32,6 +33,7 @@ public class PedidoRepository : IPedidoRepository
     public async Task<IEnumerable<Pedido>> GetByMesaIdAsync(Guid mesaId)
     {
         return await _context.Pedidos
+            .IgnoreQueryFilters()
             .Include(p => p.Items)
                 .ThenInclude(i => i.MenuItem)
             .Where(p => p.MesaId == mesaId)

@@ -21,177 +21,194 @@ interface CocinaPedido {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto p-4 md:p-8">
+    <div class="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 md:p-8 space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto">
       
-      <!-- Standalone Header for kitchen screen -->
-      <header class="bg-white shadow-sm border border-gray-100 px-6 py-4 rounded-[2rem] flex justify-between items-center bg-white/80 backdrop-blur-md mb-2">
+      <!-- Kitchen Header -->
+      <header class="bg-slate-900 border border-slate-800/80 px-6 py-4 rounded-2xl flex justify-between items-center shadow-md mb-2">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl overflow-hidden shadow-md border border-gray-200/50 flex">
+          <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-700/60 flex bg-slate-850">
             <img src="logo.png" class="w-full h-full object-cover" />
           </div>
           <div>
-            <span class="font-black text-lg text-slate-800 tracking-tight">{{ auth.currentUser()?.restauranteNombre || 'MozoGo' }}</span>
-            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">Módulo Cocina</span>
+            <span class="font-black text-lg text-slate-100 tracking-tight">{{ auth.currentUser()?.restauranteNombre || 'MozoGo' }}</span>
+            <span class="text-xs text-slate-400 font-bold block uppercase tracking-wider">MÓDULO DE COCINA</span>
           </div>
         </div>
 
         <div class="flex items-center gap-4">
           <div class="hidden sm:flex flex-col items-end">
-            <span class="font-bold text-xs text-slate-600">{{ auth.currentUser()?.email }}</span>
-            <span class="text-[10px] text-green-500 font-semibold flex items-center gap-1 mt-0.5">
-              <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-              Cocina Conectada
+            <span class="font-bold text-xs text-slate-300">{{ auth.currentUser()?.email }}</span>
+            <span class="text-[10px] text-emerald-400 font-semibold flex items-center gap-1.5 mt-0.5">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Sistema Conectado
             </span>
           </div>
-          <button (click)="logout()" class="flex items-center gap-1.5 py-2.5 px-4 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 font-bold transition-all text-xs border border-red-100/40">
+          <button (click)="logout()" class="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-red-950/40 text-red-400 hover:bg-red-900/50 font-bold transition-all text-xs border border-red-900/30">
             Salir
           </button>
         </div>
       </header>
 
-      <!-- Encabezado -->
-      <div class="bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <!-- Panel Title -->
+      <div class="bg-slate-900 p-6 rounded-2xl shadow-md border border-slate-800/85 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 class="text-3xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-            Dashboard de Cocina
-          </h1>
-          <p class="text-slate-500 text-sm font-medium mt-1">Monitoreo de comandas en tiempo real y preparación de platos</p>
+          <h1 class="text-2xl font-black text-slate-100 tracking-tight">Monitoreo de Comandas</h1>
+          <p class="text-slate-400 text-sm font-medium mt-1">Control de platos entrantes, en preparación y listos para despacho.</p>
         </div>
         <div class="flex items-center gap-2">
-          <button (click)="loadPedidos()" class="bg-primary hover:bg-[#1a233b] text-white px-5 py-3 rounded-2xl text-xs font-black shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
-            Recargar Cola
+          <button (click)="loadPedidos()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95">
+            Actualizar Pantalla
           </button>
         </div>
       </div>
 
-      <!-- Métricas Rápidas de Cocina -->
+      <!-- Métricas en Slate -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div class="bg-blue-500 text-white rounded-3xl p-6 shadow-md relative overflow-hidden">
-          <h3 class="text-xs uppercase font-black tracking-widest text-blue-100 mb-1">En Cola / Espera</h3>
-          <p class="text-4xl font-black">{{ pedidosEnEspera().length }}</p>
+        <div class="bg-slate-900 border-t-4 border-blue-500 rounded-xl p-5 shadow-md flex justify-between items-center">
+          <div>
+            <h3 class="text-xs uppercase font-bold tracking-widest text-slate-400">En Espera</h3>
+            <p class="text-3xl font-black mt-1 text-slate-100">{{ pedidosEnEspera().length }}</p>
+          </div>
+          <div class="text-xl text-blue-500">⏱️</div>
         </div>
-        <div class="bg-amber-500 text-white rounded-3xl p-6 shadow-md relative overflow-hidden">
-          <h3 class="text-xs uppercase font-black tracking-widest text-amber-100 mb-1">En Preparación</h3>
-          <p class="text-4xl font-black">{{ pedidosPreparando().length }}</p>
+        <div class="bg-slate-900 border-t-4 border-amber-500 rounded-xl p-5 shadow-md flex justify-between items-center">
+          <div>
+            <h3 class="text-xs uppercase font-bold tracking-widest text-slate-400">En Preparación</h3>
+            <p class="text-3xl font-black mt-1 text-slate-100">{{ pedidosPreparando().length }}</p>
+          </div>
+          <div class="text-2xl text-amber-500">🔥</div>
         </div>
-        <div class="bg-emerald-500 text-white rounded-3xl p-6 shadow-md relative overflow-hidden">
-          <h3 class="text-xs uppercase font-black tracking-widest text-emerald-100 mb-1">Listos / Pronto</h3>
-          <p class="text-4xl font-black">{{ pedidosListos().length }}</p>
+        <div class="bg-slate-900 border-t-4 border-emerald-500 rounded-xl p-5 shadow-md flex justify-between items-center">
+          <div>
+            <h3 class="text-xs uppercase font-bold tracking-widest text-slate-400">Listos</h3>
+            <p class="text-3xl font-black mt-1 text-slate-100">{{ pedidosListos().length }}</p>
+          </div>
+          <div class="text-2xl text-emerald-500">✓</div>
         </div>
       </div>
 
-      <!-- Vista de Columnas -->
+      <!-- Columnas del Flujo -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- Columna 1: En Espera -->
-        <div class="bg-slate-50/50 border border-gray-200/60 p-5 rounded-[2rem] flex flex-col min-h-[500px]">
-          <h2 class="text-lg font-black text-gray-700 mb-4 flex items-center gap-2">
-            En Cola ({{ pedidosEnEspera().length }})
-          </h2>
+        <!-- Columna 1: En Cola -->
+        <div class="bg-slate-900/50 border border-slate-800/80 p-5 rounded-2xl flex flex-col min-h-[500px]">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wider">
+              En Cola ({{ pedidosEnEspera().length }})
+            </h2>
+            <span class="bg-blue-900/40 text-blue-400 text-xs px-2.5 py-0.5 rounded-md font-bold border border-blue-900/30">Espera</span>
+          </div>
+          
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosEnEspera(); track pedido.id) {
-              <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm space-y-4 transition-all hover:border-blue-200">
-                <div class="flex justify-between items-start">
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4 hover:border-slate-700 transition-colors">
+                <div class="flex justify-between items-center">
                   <div>
-                    <span class="text-2xl font-black text-primary bg-primary/5 px-3 py-1 rounded-xl">Mesa {{ pedido.numeroMesa }}</span>
-                    <p class="text-[10px] text-gray-400 font-bold mt-2">Atiende: {{ pedido.mozoEmail }}</p>
+                    <span class="text-3xl font-black text-slate-100 bg-slate-800 px-3.5 py-1.5 rounded-lg border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <p class="text-xs text-slate-400 font-bold mt-3">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <span class="text-[10px] font-bold text-gray-400">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
+                  <span class="text-xs font-bold text-slate-400 bg-slate-850 px-2 py-1 rounded-md border border-slate-800">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
                 </div>
                 
-                <!-- Items de Comanda -->
-                <div class="bg-slate-50 rounded-2xl p-3 space-y-2 border border-slate-100">
+                <!-- Items list (highly readable) -->
+                <div class="bg-slate-950/60 rounded-lg p-4 space-y-3 border border-slate-800">
                   @for (item of pedido.items; track item.nombre) {
-                    <div class="flex justify-between text-sm">
-                      <span class="font-bold text-gray-800">{{ item.nombre }}</span>
-                      <span class="font-black text-primary">x{{ item.cantidad }}</span>
+                    <div class="flex justify-between items-center text-base border-b border-slate-900/50 pb-2 last:border-b-0 last:pb-0">
+                      <span class="font-bold text-slate-100 text-lg">{{ item.nombre }}</span>
+                      <span class="font-black text-blue-400 text-xl bg-blue-950/30 px-2.5 py-0.5 rounded-md border border-blue-900/20">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
-                <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition-all active:scale-95 flex justify-center items-center gap-1">
-                  Empezar a Preparar
+                <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-lg text-sm transition-all active:scale-[0.98] flex justify-center items-center gap-1">
+                  Iniciar Preparación
                 </button>
               </div>
             } @empty {
-              <p class="text-center text-gray-400 py-10 text-sm italic font-medium">No hay pedidos esperando.</p>
+              <p class="text-center text-slate-500 py-12 text-sm italic font-medium">No hay comandas en espera.</p>
             }
           </div>
         </div>
 
         <!-- Columna 2: Preparando -->
-        <div class="bg-amber-50/20 border border-amber-200/40 p-5 rounded-[2rem] flex flex-col min-h-[500px]">
-          <h2 class="text-lg font-black text-amber-800 mb-4 flex items-center gap-2">
-            Preparando ({{ pedidosPreparando().length }})
-          </h2>
+        <div class="bg-slate-900/50 border border-slate-800/80 p-5 rounded-2xl flex flex-col min-h-[500px]">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wider">
+              En Preparación ({{ pedidosPreparando().length }})
+            </h2>
+            <span class="bg-amber-900/40 text-amber-400 text-xs px-2.5 py-0.5 rounded-md font-bold border border-amber-900/30">Activos</span>
+          </div>
+          
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosPreparando(); track pedido.id) {
-              <div class="bg-white border border-amber-100 rounded-3xl p-5 shadow-sm space-y-4 transition-all hover:border-amber-300">
-                <div class="flex justify-between items-start">
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4 hover:border-slate-700 transition-colors">
+                <div class="flex justify-between items-center">
                   <div>
-                    <span class="text-2xl font-black text-amber-700 bg-amber-500/5 px-3 py-1 rounded-xl">Mesa {{ pedido.numeroMesa }}</span>
-                    <p class="text-[10px] text-gray-400 font-bold mt-2">Atiende: {{ pedido.mozoEmail }}</p>
+                    <span class="text-3xl font-black text-slate-100 bg-slate-800 px-3.5 py-1.5 rounded-lg border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <p class="text-xs text-slate-400 font-bold mt-3">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <span class="text-[10px] font-bold text-gray-400">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
+                  <span class="text-xs font-bold text-slate-400 bg-slate-850 px-2 py-1 rounded-md border border-slate-800">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
                 </div>
                 
-                <!-- Items de Comanda -->
-                <div class="bg-slate-50 rounded-2xl p-3 space-y-2 border border-slate-100">
+                <div class="bg-slate-950/60 rounded-lg p-4 space-y-3 border border-slate-800">
                   @for (item of pedido.items; track item.nombre) {
-                    <div class="flex justify-between text-sm">
-                      <span class="font-bold text-gray-800">{{ item.nombre }}</span>
-                      <span class="font-black text-amber-600">x{{ item.cantidad }}</span>
+                    <div class="flex justify-between items-center text-base border-b border-slate-900/50 pb-2 last:border-b-0 last:pb-0">
+                      <span class="font-bold text-slate-100 text-lg">{{ item.nombre }}</span>
+                      <span class="font-black text-amber-400 text-xl bg-amber-950/30 px-2.5 py-0.5 rounded-md border border-amber-900/20">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
-                <div class="flex gap-2">
-                  <button (click)="devolverAEspera(pedido.id)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 rounded-xl text-xs transition">
+                <div class="flex gap-3">
+                  <button (click)="devolverAEspera(pedido.id)" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-bold py-3 rounded-lg text-xs transition border border-slate-750">
                     Regresar
                   </button>
-                  <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs shadow-md transition active:scale-95">
-                    ¡Listo / Pronto!
+                  <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-xs transition active:scale-[0.98]">
+                    Terminado
                   </button>
                 </div>
               </div>
             } @empty {
-              <p class="text-center text-gray-400 py-10 text-sm italic font-medium">No hay platos preparándose.</p>
+              <p class="text-center text-slate-500 py-12 text-sm italic font-medium">No hay platos en preparación.</p>
             }
           </div>
         </div>
 
-        <!-- Columna 3: Pronto -->
-        <div class="bg-emerald-50/20 border border-emerald-200/40 p-5 rounded-[2rem] flex flex-col min-h-[500px]">
-          <h2 class="text-lg font-black text-emerald-800 mb-4 flex items-center gap-2">
-            Listo para Llevar ({{ pedidosListos().length }})
-          </h2>
+        <!-- Columna 3: Listo para retirar -->
+        <div class="bg-slate-900/50 border border-slate-800/80 p-5 rounded-2xl flex flex-col min-h-[500px]">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
+            <h2 class="text-base font-black text-slate-200 uppercase tracking-wider">
+              Listos para Despacho ({{ pedidosListos().length }})
+            </h2>
+            <span class="bg-emerald-900/40 text-emerald-400 text-xs px-2.5 py-0.5 rounded-md font-bold border border-emerald-900/30">Listos</span>
+          </div>
+          
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosListos(); track pedido.id) {
-              <div class="bg-white border border-emerald-100 rounded-3xl p-5 shadow-sm space-y-4 transition-all hover:border-emerald-300">
-                <div class="flex justify-between items-start">
+              <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4 hover:border-slate-700 transition-colors">
+                <div class="flex justify-between items-center">
                   <div>
-                    <span class="text-2xl font-black text-emerald-700 bg-emerald-500/5 px-3 py-1 rounded-xl">Mesa {{ pedido.numeroMesa }}</span>
-                    <p class="text-[10px] text-gray-400 font-bold mt-2">Atiende: {{ pedido.mozoEmail }}</p>
+                    <span class="text-3xl font-black text-slate-100 bg-slate-800 px-3.5 py-1.5 rounded-lg border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <p class="text-xs text-slate-400 font-bold mt-3">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">Completado</span>
+                  <span class="text-xs font-black text-emerald-400 bg-emerald-950/40 border border-emerald-900/40 px-2.5 py-1 rounded-md">Listo</span>
                 </div>
                 
-                <!-- Items de Comanda -->
-                <div class="bg-slate-50 rounded-2xl p-3 space-y-2 border border-slate-100">
+                <div class="bg-slate-950/60 rounded-lg p-4 space-y-3 border border-slate-800">
                   @for (item of pedido.items; track item.nombre) {
-                    <div class="flex justify-between text-sm">
-                      <span class="font-bold text-gray-800">{{ item.nombre }}</span>
-                      <span class="font-black text-emerald-600">x{{ item.cantidad }}</span>
+                    <div class="flex justify-between items-center text-base border-b border-slate-900/50 pb-2 last:border-b-0 last:pb-0">
+                      <span class="font-bold text-slate-100 text-lg">{{ item.nombre }}</span>
+                      <span class="font-black text-emerald-400 text-xl bg-emerald-950/30 px-2.5 py-0.5 rounded-md border border-emerald-900/20">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
-                <button (click)="marcarComoEntregado(pedido.id)" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs transition active:scale-95">
-                  Marcar como Entregado
+                <button (click)="marcarComoEntregado(pedido.id)" class="w-full bg-slate-800 hover:bg-slate-750 border border-slate-700 text-slate-100 font-bold py-3.5 rounded-lg text-sm transition active:scale-[0.98]">
+                  Entregar Pedido
                 </button>
               </div>
             } @empty {
-              <p class="text-center text-gray-400 py-10 text-sm italic font-medium">No hay pedidos listos pendientes de retiro.</p>
+              <p class="text-center text-slate-500 py-12 text-sm italic font-medium">No hay comandas listas.</p>
             }
           </div>
         </div>

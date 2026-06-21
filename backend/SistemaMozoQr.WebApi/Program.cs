@@ -72,7 +72,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAll");
 
@@ -103,23 +106,6 @@ using (var scope = app.Services.CreateScope())
         {
             // Ignore if column doesn't exist yet
         }
-    }
-
-    // Auto-add column CodigoAcceso to Pedidos table if not present (SQLite & PostgreSQL compatible)
-    try
-    {
-        if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
-        {
-            context.Database.ExecuteSqlRaw("ALTER TABLE \"Pedidos\" ADD COLUMN \"CodigoAcceso\" varchar(10);");
-        }
-        else
-        {
-            context.Database.ExecuteSqlRaw("ALTER TABLE Pedidos ADD COLUMN CodigoAcceso TEXT;");
-        }
-    }
-    catch (Exception)
-    {
-        // Column already exists or error ignored
     }
 
     try

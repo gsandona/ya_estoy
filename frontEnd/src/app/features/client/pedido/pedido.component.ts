@@ -664,21 +664,26 @@ export class PedidoComponent implements OnInit {
       },
       error: (err) => {
         if(pinParam) this.validatingPin.set(false);
-        this.clearSplitState();
+        
         if (err.status === 401) {
           // Requiere PIN
+          this.clearSplitState();
           localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.requirePin.set(true);
           this.isValidSession.set(undefined);
-        } else if (err.status === 400 && pinParam) {
+        } else if (err.status === 400 && pinParam && err.error?.code === 'PIN_INVALIDO') {
           // PIN Incorrecto
           localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.pinError.set('El PIN ingresado es incorrecto.');
-        } else {
-          // Mesa apagada, token expiro, etc.
+        } else if (err.status === 400 && err.error?.code === 'INACTIVA') {
+          // Mesa inactiva
+          this.clearSplitState();
           localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.requirePin.set(false);
-          console.error('Violación de seguridad o mesa inactiva', err);
+          setTimeout(() => this.isValidSession.set(false), 800);
+        } else {
+          // Error temporal de red u otro error del servidor. Conservamos el PIN y el estado de la división.
+          console.error('Error de conexión o de red', err);
           setTimeout(() => this.isValidSession.set(false), 800);
         }
       }
