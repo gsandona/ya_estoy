@@ -13,15 +13,15 @@ import { environment } from '../../../../environments/environment';
   template: `
     <!-- Splash Screen Inicial -->
     @if (isSplashing()) {
-      <div class="fixed inset-0 bg-[#0f172a] flex flex-col items-center justify-center z-50 transition-opacity duration-500" [ngClass]="{'opacity-0 pointer-events-none': !isSplashing()}">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a]"></div>
+      <div class="fixed inset-0 bg-primary flex flex-col items-center justify-center z-50 transition-opacity duration-500" [ngClass]="{'opacity-0 pointer-events-none': !isSplashing()}">
+        <div class="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/85"></div>
         <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
           <!-- Pulsing Logo Container -->
           <div class="h-28 w-28 rounded-3xl overflow-hidden shadow-xl mb-6 animate-pulse border border-white/10 flex">
             <img src="logo.png" class="w-full h-full object-cover" />
           </div>
           <h1 class="text-white text-4xl font-black tracking-tight mb-2">MozoGo</h1>
-          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mt-2">Cargando Sistema...</p>
+          <p class="text-slate-200/80 text-xs font-semibold uppercase tracking-widest mt-2">Cargando Sistema...</p>
           <div class="w-32 bg-white/10 h-1.5 rounded-full mt-6 overflow-hidden border border-white/5">
             <div class="bg-accent h-full w-1/2 rounded-full animate-[loading-bar_1.5s_infinite_ease-in-out]"></div>
           </div>
@@ -34,8 +34,10 @@ import { environment } from '../../../../environments/environment';
       <!-- Falla de validación (Toast Flotante y Moderno) -->
       @if (errorMessage()) {
         <div class="fixed top-8 left-0 right-0 z-50 flex justify-center w-full px-4 animate-[slide-down_0.5s_ease-out,shake_0.4s_ease-in-out_0.5s]">
-          <div class="bg-red-500 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(239,68,68,0.4)] border border-red-400 flex items-center gap-4 max-w-sm w-full backdrop-blur-md">
-            <div class="bg-white/20 p-2 rounded-full">⚠️</div>
+          <div class="bg-red-600 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(220,38,38,0.2)] border border-red-500 flex items-center gap-3.5 max-w-sm w-full backdrop-blur-md">
+            <span class="p-1.5 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </span>
             <p class="text-sm font-bold leading-tight">{{ errorMessage() }}</p>
           </div>
         </div>
@@ -113,8 +115,9 @@ import { environment } from '../../../../environments/environment';
 
             <div class="pt-2">
               <button type="submit" [disabled]="isLoading()"
-                class="w-full flex justify-center py-4 px-4 rounded-xl shadow-[0_4px_15px_rgb(16,185,129,0.3)] text-lg font-black text-white bg-accent hover:bg-[#0da473] hover:shadow-[0_8px_25px_rgb(16,185,129,0.4)] transition-all active:scale-[0.98] disabled:opacity-75 disabled:active:scale-100 disabled:hover:shadow-none items-center gap-3 tracking-wide">
-                🔐 Iniciar Sesión de Trabajo
+                class="w-full flex justify-center py-4 px-4 rounded-xl shadow-[0_4px_15px_rgba(25,135,84,0.2)] text-lg font-black text-white bg-accent hover:bg-accent/90 hover:shadow-[0_8px_25px_rgba(25,135,84,0.3)] transition-all active:scale-[0.98] disabled:opacity-75 disabled:active:scale-100 disabled:hover:shadow-none items-center gap-3 tracking-wide outline-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path></svg>
+                Iniciar Sesión de Trabajo
               </button>
             </div>
           </form>

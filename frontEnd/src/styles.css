@@ -5,18 +5,18 @@
 @layer base {
   body {
     @apply bg-surface text-primary font-sans antialiased m-0 p-0;
-    color: #2C201C;
+    color: #0f5132;
   }
   h1, h2, h3 {
     @apply font-serif tracking-tight;
-    color: #2C201C;
+    color: #0f5132;
   }
   input, select, textarea {
     @apply focus:border-accent/40 focus:ring-accent/10;
   }
 }
 
-/* Warm, elegant custom scrollbar */
+/* Clean, modern scrollbar matching the green theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -25,9 +25,9 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #EFEAE2;
+  background: #d1e7dd;
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D8CEBE;
+  background: #a3cfbb;
 }

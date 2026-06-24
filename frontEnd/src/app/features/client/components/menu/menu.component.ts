@@ -16,8 +16,8 @@ import { environment } from '../../../../../environments/environment';
         @for (cat of categories(); track cat.name; let isFirst = $first) {
           <details [open]="isFirst" class="group bg-surface rounded-2xl transition-all overflow-hidden border border-transparent shadow-sm">
             <summary class="flex justify-between items-center p-4 cursor-pointer list-none font-black text-lg text-gray-800 select-none outline-none group-open:bg-gray-50 transition-colors">
-              <span class="flex items-center gap-2">
-                <span class="text-xl">👉</span>
+              <span class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-accent shrink-0"></span>
                 {{ cat.name | titlecase }}
               </span>
               <span class="transition-transform duration-300 group-open:rotate-180 text-gray-400 bg-white rounded-full h-8 w-8 flex items-center justify-center shadow-sm">

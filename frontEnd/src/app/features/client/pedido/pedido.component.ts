@@ -16,7 +16,9 @@ import { FormsModule } from '@angular/forms';
     @if (requirePin()) {
       <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center">
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full border border-gray-100">
-          <div class="h-20 w-20 bg-accent/10 text-accent rounded-full mx-auto flex items-center justify-center text-3xl mb-6">🔒</div>
+          <div class="h-20 w-20 bg-accent/10 text-accent rounded-full mx-auto flex items-center justify-center mb-6">
+            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path></svg>
+          </div>
           <h2 class="text-2xl font-serif font-black text-primary mb-2">Mesa Protegida</h2>
           <p class="text-primary/60 text-sm mb-6">Por favor ingrese el PIN de acceso proporcionado por su Mozo para ver el menú.</p>
           
@@ -54,15 +56,16 @@ import { FormsModule } from '@angular/forms';
       </div>
     } @else if (isValidSession() === false) {
       <div class="min-h-screen bg-red-50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in">
-        <div class="h-28 w-28 bg-white text-red-500 rounded-full shadow-2xl flex items-center justify-center text-5xl mb-8 border-4 border-red-100 animate-[shake_0.5s_ease-out]">
-          🛑
+        <div class="h-28 w-28 bg-white text-red-500 rounded-full shadow-2xl flex items-center justify-center mb-8 border-4 border-red-100 animate-[shake_0.5s_ease-out]">
+          <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
         <h1 class="text-4xl font-black text-gray-900 mb-4 tracking-tight">Acceso Denegado</h1>
         <p class="text-lg text-gray-600 font-medium mb-8">
           El código QR ha expirado o la mesa está inactiva. Por favor avise al Mozo.
         </p>
         <button (click)="verifyMesa()" class="bg-white text-gray-800 font-bold py-3 px-8 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all flex items-center gap-2">
-          <span>🔄</span> Reintentar Conexión
+          <svg class="w-4 h-4 text-gray-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
+          Reintentar Conexión
         </button>
       </div>
 
@@ -76,7 +79,7 @@ import { FormsModule } from '@angular/forms';
           <p class="text-primary/40 text-xs font-semibold mb-4">Mesa {{ numeroMesa() }}</p>
           
           @if (montoConsumo() !== null && montoConsumo() !== undefined) {
-            <div class="bg-sand border border-[#E2DACF] rounded-2xl p-4 shadow-inner mb-2 animate-fade-in flex justify-between items-center w-full">
+            <div class="bg-sand border border-gray-200 rounded-2xl p-4 shadow-inner mb-2 animate-fade-in flex justify-between items-center w-full">
               <div class="text-left">
                 <span class="text-[10px] uppercase font-black text-primary/60 tracking-wider">Consumo Acumulado</span>
                 <h2 class="text-2xl font-black text-accent mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
@@ -84,7 +87,8 @@ import { FormsModule } from '@angular/forms';
               <button 
                 (click)="abrirDividirCuenta()"
                 class="bg-accent hover:bg-accent/90 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
-                🥞 Dividir Cuenta
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Dividir Cuenta
               </button>
             </div>
           }
@@ -92,9 +96,10 @@ import { FormsModule } from '@angular/forms';
 
         <div class="w-full max-w-sm space-y-4">
           @if (yaLlamo()) {
-            <div class="flex gap-2 w-full">
-              <div class="flex-1 h-16 bg-primary/10 border border-primary/20 text-primary rounded-2xl font-semibold text-lg flex justify-center items-center select-none">
-                🛎️ Mozo notificado
+            <div class="flex gap-2 w-full animate-fade-in">
+              <div class="flex-1 h-16 bg-primary/10 border border-primary/20 text-primary rounded-2xl font-semibold text-lg flex justify-center items-center gap-2 select-none">
+                <span class="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shrink-0"></span>
+                Mozo notificado
               </div>
               <button 
                 (click)="cancelarLlamado()"
@@ -103,7 +108,7 @@ import { FormsModule } from '@angular/forms';
                 @if (loadingCancelarLlamar()) {
                   <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
                 } @else {
-                  ❌
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                 }
               </button>
             </div>
@@ -111,19 +116,21 @@ import { FormsModule } from '@angular/forms';
             <button 
               (click)="llamarMozo()"
               [disabled]="loadingLlamar()"
-              class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] font-semibold text-lg flex justify-center items-center transition-all active:scale-95 hover:brightness-105">
+              class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgba(15,81,50,0.12)] font-semibold text-lg flex justify-center items-center gap-2 transition-all active:scale-95 hover:brightness-105">
               @if (loadingLlamar()) {
-                <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
+                <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
               } @else {
-                🛎️ Llamar Mozo
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Llamar Mozo
               }
             </button>
           }
 
           @if (yaPidioCuenta()) {
-            <div class="flex gap-2 w-full">
-              <div class="flex-1 h-16 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-semibold text-lg flex justify-center items-center select-none">
-                💳 Cuenta solicitada
+            <div class="flex gap-2 w-full animate-fade-in">
+              <div class="flex-1 h-16 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-semibold text-lg flex justify-center items-center gap-2 select-none">
+                <span class="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shrink-0"></span>
+                Cuenta solicitada
               </div>
               <button 
                 (click)="cancelarCuenta()"
@@ -132,7 +139,7 @@ import { FormsModule } from '@angular/forms';
                 @if (loadingCancelarCuenta()) {
                   <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
                 } @else {
-                  ❌
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                 }
               </button>
             </div>
@@ -140,22 +147,23 @@ import { FormsModule } from '@angular/forms';
             <button 
               (click)="pedirCuenta()"
               [disabled]="loadingCuenta()"
-              class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.3)] font-semibold text-lg flex justify-center items-center transition-all active:scale-95 hover:brightness-105">
+              class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgba(25,135,84,0.15)] font-semibold text-lg flex justify-center items-center gap-2 transition-all active:scale-95 hover:brightness-105">
               @if (loadingCuenta()) {
-                <span class="animate-spin h-5 w-5 mr-3 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
+                <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
               } @else {
-                💳 Pedir Cuenta
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-19.5 5.25h19.5m-19.5 0h19.5M4 18h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1z"></path></svg>
+                Pedir Cuenta
               }
             </button>
           }
 
           <button 
             (click)="showMenu.set(!showMenu())"
-            class="w-full h-16 bg-white border-2 border-transparent text-primary rounded-2xl shadow-sm font-semibold text-lg hover:border-gray-200 flex justify-center items-center transition-all">
+            class="w-full h-16 bg-white border-2 border-gray-100 text-primary rounded-2xl shadow-sm font-semibold text-lg hover:border-gray-200 flex justify-center items-center transition-all outline-none">
             @if (showMenu()) {
-              Ocultar Menú ⬆️
+              Ocultar Menú
             } @else {
-              📖 Ver Menú
+              Ver Menú
             }
           </button>
         </div>
@@ -165,17 +173,25 @@ import { FormsModule } from '@angular/forms';
           <div class="w-full max-w-sm rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3 border"
                [ngClass]="{
                  'bg-blue-50/50 border-blue-100 text-blue-800': activePedidoEstado() === 'Recibido',
-                 'bg-sand border-[#E2DACF] text-primary': activePedidoEstado() === 'Aprobado',
+                 'bg-sand border-gray-200 text-primary': activePedidoEstado() === 'Aprobado',
                  'bg-amber-50/50 border-amber-100 text-amber-800': activePedidoEstado() === 'EnPreparacion',
                  'bg-green-50/50 border-green-100 text-green-800': activePedidoEstado() === 'Listo'
                }">
             <div class="flex justify-between items-start">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">
-                  @if (activePedidoEstado() === 'Recibido') { 🍳 }
-                  @if (activePedidoEstado() === 'Aprobado') { 👍 }
-                  @if (activePedidoEstado() === 'EnPreparacion') { 🔥 }
-                  @if (activePedidoEstado() === 'Listo') { 🛎️ }
+              <div class="flex items-center gap-3">
+                <span class="text-accent flex items-center justify-center shrink-0">
+                  @if (activePedidoEstado() === 'Recibido') {
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  }
+                  @if (activePedidoEstado() === 'Aprobado') {
+                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  }
+                  @if (activePedidoEstado() === 'EnPreparacion') {
+                    <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
+                  }
+                  @if (activePedidoEstado() === 'Listo') {
+                    <svg class="w-5 h-5 text-green-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  }
                 </span>
                 <div>
                   <h3 class="font-bold text-gray-800 text-sm">Estado de tu Pedido</h3>
@@ -297,8 +313,9 @@ import { FormsModule } from '@angular/forms';
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 
-                <h2 class="text-2xl font-black text-gray-800 mb-2 flex items-center gap-2">
-                  <span>🥞</span> Dividir Cuenta
+                <h2 class="text-2xl font-black text-gray-800 mb-2 flex items-center gap-2.5">
+                   <svg class="w-6 h-6 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                   Dividir Cuenta
                 </h2>
                 <p class="text-xs text-slate-500 mb-4">Administrá los comensales de la mesa y calcula el consumo correspondiente.</p>
                 
@@ -347,13 +364,13 @@ import { FormsModule } from '@angular/forms';
                           (click)="changeSplitMode('equitativa')" 
                           [ngClass]="{'bg-white shadow-sm font-bold text-accent': splitMode() === 'equitativa', 'text-slate-500 font-semibold': splitMode() !== 'equitativa'}"
                           class="flex-1 py-2 text-xs rounded-lg transition-all">
-                          🟰 División Equitativa
+                          División Equitativa
                         </button>
                         <button 
                           (click)="changeSplitMode('items')" 
                           [ngClass]="{'bg-white shadow-sm font-bold text-accent': splitMode() === 'items', 'text-slate-500 font-semibold': splitMode() !== 'items'}"
                           class="flex-1 py-2 text-xs rounded-lg transition-all">
-                          🛒 Por Consumos
+                          Por Consumos
                         </button>
                       </div>
                     </div>
@@ -420,7 +437,7 @@ import { FormsModule } from '@angular/forms';
 
                   } @else {
                     <div class="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                      <span class="text-3xl block mb-2">👥</span>
+                      <svg class="w-10 h-10 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
                       <p class="text-sm font-bold text-slate-700">Comenzá por agregar comensales</p>
                       <p class="text-xs text-slate-400 mt-1 max-w-[200px] mx-auto">Agrega los nombres y apellidos de las personas en la mesa para poder dividir la cuenta.</p>
                     </div>
@@ -433,8 +450,9 @@ import { FormsModule } from '@angular/forms';
 
         @if (showSuccessToast()) {
           <div class="fixed top-6 left-0 right-0 flex justify-center z-50 animate-[slide-down_0.5s_ease-out] pointer-events-none">
-             <div class="bg-green-500 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(16,185,129,0.4)] font-black flex items-center gap-3 backdrop-blur-md">
-               <span class="text-xl">✅</span> ¡Pedido orquestado con éxito!
+             <div class="bg-green-600 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(25,135,84,0.2)] font-black flex items-center gap-3.5 backdrop-blur-md">
+               <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg>
+               ¡Pedido orquestado con éxito!
              </div>
           </div>
         }

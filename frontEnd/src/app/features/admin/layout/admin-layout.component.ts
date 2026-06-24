@@ -14,56 +14,79 @@ import { AdminDataService } from '../config/admin-data.service';
   template: `
     <div class="min-h-screen bg-surface flex">
       <!-- Desktop Sidebar -->
-      <aside class="w-72 bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all">
-        <div class="p-6 border-b border-white/10 mt-4">
+      <aside [ngClass]="sidebarCollapsed() ? 'w-20' : 'w-72'" class="bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all duration-300">
+        <div class="p-4 border-b border-white/10 mt-4 flex items-center justify-between">
           <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
               <img src="logo.png" class="w-full h-full object-cover" />
             </div>
-            <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
+            @if (!sidebarCollapsed()) {
+              <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
+            }
           </h2>
-          <p class="text-slate-400 text-sm mt-1 font-medium select-none">Gestión Staff • {{ auth.currentUser()?.role }}</p>
+          <button (click)="sidebarCollapsed.set(!sidebarCollapsed())" class="hidden md:flex p-1.5 hover:bg-white/10 rounded-xl transition-colors text-white shrink-0">
+            @if (sidebarCollapsed()) {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            }
+          </button>
         </div>
-        <nav class="flex-1 p-6 space-y-3">
+        @if (!sidebarCollapsed()) {
+          <div class="px-6 py-2 border-b border-white/5 select-none">
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Gestión Staff • {{ auth.currentUser()?.role }}</p>
+          </div>
+        }
+        <nav class="flex-1 p-4 space-y-2">
           @if (auth.isAdmin() || auth.isSuperAdmin()) {
-            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Métricas y Datos' : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
-              Métricas y Datos
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">Métricas y Datos</span>
+              }
             </a>
           }
-          <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-            <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+          <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Mesas y Tareas' : ''">
+            <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
             </span>
-            Mesas y Tareas
+            @if (!sidebarCollapsed()) {
+              <span class="truncate">Mesas y Tareas</span>
+            }
           </a>
 
           @if (auth.isAdmin()) {
-            <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+            <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Config. Personal' : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
-              Config. Personal
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">Config. Personal</span>
+              }
             </a>
           }
           
           @if (auth.isSuperAdmin()) {
-            <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-semibold hover:bg-white/10 transition-all border border-transparent">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center">
+            <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Sistema' : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
-              Sistema
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">Sistema</span>
+              }
             </a>
           }
         </nav>
-        <div class="p-6">
-          <button (click)="logout()" class="w-full flex items-center gap-3 py-3.5 px-5 rounded-2xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent">
+        <div class="p-4">
+          <button (click)="logout()" class="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Cerrar Sesión' : ''">
             <span class="flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
-            Cerrar Sesión
+            @if (!sidebarCollapsed()) {
+              <span class="truncate">Cerrar Sesión</span>
+            }
           </button>
         </div>
       </aside>
@@ -209,6 +232,7 @@ export class AdminLayoutComponent {
   dataService = inject(AdminDataService);
   
   mobileMenuOpen = signal(false);
+  sidebarCollapsed = signal(false);
   globalAppName = signal<string>('');
   globalLogoBase64 = signal<string>('');
 

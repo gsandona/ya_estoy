@@ -27,6 +27,7 @@ public static class ModelBuilderExtensions
 
         modelBuilder.Entity<Usuario>().HasData(
             new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999999"), Email = "super@gino.com", PasswordHash = passHash, NombreCompleto = "Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
+            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999998"), Email = "tizi@super.com", PasswordHash = "$2a$11$zieF/dteFcfxg9Bj5LdddeUPIFuF9N3IoWtslgPMjbTNRl1ArdeL.", NombreCompleto = "Tizi Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
             
             // Rest 1 & 2
             new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000001"), RestauranteId = rest1Id, Email = "admin@sabor.com", PasswordHash = passHash, NombreCompleto = "Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
