@@ -58,6 +58,13 @@ public class RestauranteDbContext : DbContext
             new SystemSetting { Key = "CleanupJobIntervalHours", Value = "24" }
         );
         
+        // Evitar advertencia de Model Validation 10622 de EF Core
+        modelBuilder.Entity<PedidoItem>()
+            .HasOne(pi => pi.MenuItem)
+            .WithMany()
+            .HasForeignKey(pi => pi.MenuItemId)
+            .IsRequired(false);
+
         // --- SEED DATA MULTI-TENANT ---
         modelBuilder.SeedData();
     }

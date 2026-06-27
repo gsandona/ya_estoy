@@ -45,7 +45,7 @@ public class PedidoRepository : IPedidoRepository
         return await _context.Pedidos
             .Include(p => p.Items)
                 .ThenInclude(i => i.MenuItem)
-            .Include(p => p.Mesa)
+            .Include(p => p.Mesa!)
                 .ThenInclude(m => m.Mozo)
             .Where(p => p.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.EnPreparacion || 
                        p.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Listo || 
