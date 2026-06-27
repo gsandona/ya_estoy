@@ -65,6 +65,12 @@ public class RestauranteDbContext : DbContext
             .HasForeignKey(pi => pi.MenuItemId)
             .IsRequired(false);
 
+        modelBuilder.Entity<PedidoItem>()
+            .HasOne(pi => pi.Pedido)
+            .WithMany(p => p.Items)
+            .HasForeignKey(pi => pi.PedidoId)
+            .IsRequired(false);
+
         // --- SEED DATA MULTI-TENANT ---
         modelBuilder.SeedData();
     }
