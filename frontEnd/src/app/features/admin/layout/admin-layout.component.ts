@@ -40,7 +40,7 @@ import { LanguageService } from '../../../core/services/language.service';
         }
         <nav class="flex-1 p-4 space-y-2">
           @if (auth.isAdmin() || auth.isSuperAdmin()) {
-            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.metrics : ''">
+            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.metrics : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
@@ -49,7 +49,7 @@ import { LanguageService } from '../../../core/services/language.service';
               }
             </a>
           }
-          <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.tables : ''">
+          <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.tables : ''">
             <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
             </span>
@@ -59,7 +59,7 @@ import { LanguageService } from '../../../core/services/language.service';
           </a>
 
           @if (auth.isAdmin()) {
-            <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.personal : ''">
+            <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.personal : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
@@ -70,7 +70,7 @@ import { LanguageService } from '../../../core/services/language.service';
           }
           
           @if (auth.isSuperAdmin()) {
-            <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-3 py-3 px-4 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.system : ''">
+            <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.system : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
@@ -81,7 +81,7 @@ import { LanguageService } from '../../../core/services/language.service';
           }
         </nav>
         <div class="p-4">
-          <button (click)="logout()" class="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.logout : ''">
+          <button (click)="logout()" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="w-full flex items-center py-3 rounded-xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.logout : ''">
             <span class="flex items-center justify-center shrink-0">
               <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
@@ -121,7 +121,7 @@ import { LanguageService } from '../../../core/services/language.service';
               <span>🌐</span> {{ lang.currentLang() | uppercase }}
             </button>
             <app-tenant-selector></app-tenant-selector>
-            <div class="flex flex-col items-end">
+            <div class="hidden sm:flex flex-col items-end">
                <span class="font-bold text-sm">{{ auth.currentUser()?.email }}</span>
                <span class="text-xs text-green-500 font-semibold">{{ lang.translations().common.online }}</span>
             </div>

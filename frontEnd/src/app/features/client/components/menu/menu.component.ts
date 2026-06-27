@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, OnInit } from '@angular/core';
+import { Component, Input, inject, signal, OnInit, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { CartService, MenuItem } from '../../../../core/services/cart.service';
@@ -9,64 +9,75 @@ import { environment } from '../../../../../environments/environment';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 border border-gray-100">
-      <h2 class="text-2xl font-serif font-black text-primary mb-4 tracking-tight">Nuestro Menú</h2>
+    <div class="bg-white rounded-[2rem] shadow-xl w-full max-w-md p-6 border border-gray-200/85">
+      <h2 class="text-2xl font-black text-gray-800 mb-5 tracking-tight text-center sm:text-left">Nuestro Menú</h2>
       
-      <div class="space-y-4">
-        @for (cat of categories(); track cat.name; let isFirst = $first) {
-          <details [open]="isFirst" class="group bg-surface rounded-2xl transition-all overflow-hidden border border-transparent shadow-sm">
-            <summary class="flex justify-between items-center p-4 cursor-pointer list-none font-black text-lg text-gray-800 select-none outline-none group-open:bg-gray-50 transition-colors">
-              <span class="flex items-center gap-2.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-accent shrink-0"></span>
-                {{ cat.name | titlecase }}
-              </span>
-              <span class="transition-transform duration-300 group-open:rotate-180 text-gray-400 bg-white rounded-full h-8 w-8 flex items-center justify-center shadow-sm">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-              </span>
-            </summary>
-            
-            <div class="px-4 pb-4 space-y-4 pt-2 bg-gray-50/50">
-               @for (item of cat.items; track item.id) {
-                 @if (item.activo !== false) {
-                   <div class="flex justify-between items-start pt-4 border-t border-gray-100/60 first:border-0 first:pt-0">
-                     <div class="flex-1 pr-4">
-                       <h3 class="font-bold text-gray-800 text-lg leading-tight">{{ item.nombre }}</h3>
-                       <p class="text-sm text-gray-500 font-medium mt-1 leading-snug">{{ item.descripcion }}</p>
-                     </div>
-                     <div class="flex flex-col items-end justify-between h-full">
-                       <span class="font-black text-primary mb-3 text-lg">\${{ item.precio }}</span>
-                        <button 
-                          (click)="agregarAlCarrito(item)"
-                          [ngClass]="{ 'bg-green-600 scale-105 shadow-green-500/20': addedItemIds()[item.id], 'bg-accent shadow-accent/10': !addedItemIds()[item.id] }"
-                          class="text-white px-5 py-2 rounded-xl text-sm font-bold hover:opacity-90 transition-all transform active:scale-[0.96] shadow-md flex items-center gap-1.5 duration-200">
-                          @if (addedItemIds()[item.id]) {
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                            Agregado
-                          } @else {
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
-                            Agregar
-                          }
-                        </button>
-                      </div>
-                    </div>
-                 }
-               }
+      <!-- Selector de Categorías (Pestañas Premium) -->
+      <div class="grid grid-cols-4 gap-1 mb-6 bg-gray-50 p-1.5 rounded-2xl border border-gray-150">
+        <button (click)="activeTab.set('Comidas')"
+                [ngClass]="activeTab() === 'Comidas' ? 'bg-primary text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100/60'"
+                class="flex flex-col items-center justify-center py-2.5 rounded-xl transition active:scale-95 outline-none">
+          <span class="text-lg mb-0.5">🍕</span>
+          <span class="text-[9px] font-black uppercase tracking-wider">Comidas</span>
+        </button>
+        <button (click)="activeTab.set('Bebidas')"
+                [ngClass]="activeTab() === 'Bebidas' ? 'bg-primary text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100/60'"
+                class="flex flex-col items-center justify-center py-2.5 rounded-xl transition active:scale-95 outline-none">
+          <span class="text-lg mb-0.5">🍹</span>
+          <span class="text-[9px] font-black uppercase tracking-wider">Bebidas</span>
+        </button>
+        <button (click)="activeTab.set('Postres')"
+                [ngClass]="activeTab() === 'Postres' ? 'bg-primary text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100/60'"
+                class="flex flex-col items-center justify-center py-2.5 rounded-xl transition active:scale-95 outline-none">
+          <span class="text-lg mb-0.5">🍰</span>
+          <span class="text-[9px] font-black uppercase tracking-wider">Postres</span>
+        </button>
+        <button (click)="activeTab.set('Otros')"
+                [ngClass]="activeTab() === 'Otros' ? 'bg-primary text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100/60'"
+                class="flex flex-col items-center justify-center py-2.5 rounded-xl transition active:scale-95 outline-none">
+          <span class="text-lg mb-0.5">🏷️</span>
+          <span class="text-[9px] font-black uppercase tracking-wider">Otros</span>
+        </button>
+      </div>
+
+      <!-- Listado de Productos Filtrados -->
+      <div class="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+        @for (item of filteredItems(); track item.id) {
+          @if (item.activo !== false) {
+            <div class="bg-white p-4 rounded-2xl border border-gray-150 shadow-sm flex justify-between items-start gap-4 transition-all hover:border-accent/30 hover:shadow-md">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded border border-gray-150 text-gray-500 bg-gray-50/50">{{ item.categoria }}</span>
+                </div>
+                <h3 class="font-bold text-gray-800 text-base leading-tight truncate">{{ item.nombre }}</h3>
+                <p class="text-xs text-gray-400 font-semibold mt-1 leading-snug line-clamp-2">{{ item.descripcion }}</p>
+              </div>
+              <div class="flex flex-col items-end justify-between self-stretch shrink-0">
+                <span class="font-black text-primary text-lg mb-2">\${{ item.precio }}</span>
+                <button 
+                  (click)="agregarAlCarrito(item)"
+                  [ngClass]="{ 'bg-green-50 text-green-700 border border-green-150 scale-105 shadow-green-500/5': addedItemIds()[item.id], 'bg-accent text-white shadow-accent/10': !addedItemIds()[item.id] }"
+                  class="px-4 py-2.5 rounded-xl text-xs font-black hover:opacity-95 transition-all transform active:scale-95 shadow-sm flex items-center gap-1.5 duration-200">
+                  @if (addedItemIds()[item.id]) {
+                    <svg class="w-3.5 h-3.5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Agregado</span>
+                  } @else {
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                    <span>Agregar</span>
+                  }
+                </button>
+              </div>
             </div>
-          </details>
+          }
         } @empty {
-          <div class="text-center py-10">
-            <div class="animate-spin h-8 w-8 border-4 border-accent border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p class="text-gray-500 font-medium">Cargando menú delicioso de API...</p>
+          <div class="text-center py-16 border border-dashed border-gray-200 rounded-3xl bg-gray-50/50">
+            <span class="text-4xl block mb-3 opacity-60">✨</span>
+            <p class="text-slate-400 font-bold text-sm">No hay productos disponibles en esta sección.</p>
           </div>
         }
       </div>
     </div>
-  `,
-  styles: [`
-    details > summary::-webkit-details-marker {
-      display: none;
-    }
-  `]
+  `
 })
 export class MenuComponent implements OnInit {
   @Input() restauranteId!: string;
@@ -74,8 +85,18 @@ export class MenuComponent implements OnInit {
   cartService = inject(CartService);
   http = inject(HttpClient);
 
-  categories = signal<{name: string, items: MenuItem[]}[]>([]);
+  menuItems = signal<MenuItem[]>([]);
   addedItemIds = signal<Record<string, boolean>>({});
+  activeTab = signal<'Comidas' | 'Bebidas' | 'Postres' | 'Otros'>('Comidas');
+
+  filteredItems = computed(() => {
+    const tab = this.activeTab();
+    return this.menuItems().filter(item => {
+      const cat = (item.categoria || '').toLowerCase().trim();
+      const group = this.getGroupForCategory(cat);
+      return group === tab;
+    });
+  });
 
   agregarAlCarrito(item: MenuItem) {
     this.cartService.addToCart(item);
@@ -96,35 +117,38 @@ export class MenuComponent implements OnInit {
 
     this.http.get<MenuItem[]>(url).subscribe({
       next: (data) => {
-        this.groupAndSetCategories(data);
+        this.menuItems.set(data);
       },
       error: (err) => {
         console.error('Error fetching /api/menu', err);
-        // Fallback robusto
         const mockData: MenuItem[] = [
-          { id: '1', categoria: 'Aderezos', nombre: 'Kétchup', precio: 1, descripcion: 'Clásico', activo: true },
-          { id: '2', categoria: 'Bebidas calientes', nombre: 'Café', precio: 3, descripcion: 'Latte', activo: true }
+          { id: '1', categoria: 'Aderezos', nombre: 'Kétchup', precio: 150, descripcion: 'Clásico aderezo', activo: true },
+          { id: '2', categoria: 'Bebidas calientes', nombre: 'Café Cortado', precio: 320, descripcion: 'Café expreso con un toque de leche', activo: true }
         ];
-        this.groupAndSetCategories(mockData);
+        this.menuItems.set(mockData);
       }
     });
   }
 
-  private groupAndSetCategories(data: MenuItem[]) {
-    // Agrupar por categoría
-    const grouped = data.reduce((acc, item) => {
-      const cat = item.categoria || 'Varios';
-      if (!acc[cat]) acc[cat] = [];
-      acc[cat].push(item);
-      return acc;
-    }, {} as Record<string, MenuItem[]>);
-    
-    // Transformar a Array
-    const catArray = Object.keys(grouped).map(key => ({
-      name: key,
-      items: grouped[key]
-    }));
-    
-    this.categories.set(catArray);
+  private getGroupForCategory(cat: string): 'Comidas' | 'Bebidas' | 'Postres' | 'Otros' {
+    if (cat.includes('plato') || cat.includes('pizza') || cat.includes('clásico') || cat.includes('clasico') || 
+        cat.includes('pasta') || cat.includes('salado') || cat.includes('comida') || cat.includes('hamburguesa') || 
+        cat.includes('milanesa') || cat.includes('sándwich') || cat.includes('sandwich') || cat.includes('entrada') || 
+        cat.includes('lomo') || cat.includes('empanada') || cat.includes('tostado') || cat.includes('aderezo') || 
+        cat.includes('salsa') || cat.includes('aderezos')) {
+      return 'Comidas';
+    }
+    if (cat.includes('bebida') || cat.includes('cerveza') || cat.includes('agua') || cat.includes('gaseosa') || 
+        cat.includes('jugo') || cat.includes('trago') || cat.includes('café') || cat.includes('cafe') || 
+        cat.includes('te') || cat.includes('té') || cat.includes('licuado') || cat.includes('beer') || 
+        cat.includes('fria') || cat.includes('caliente')) {
+      return 'Bebidas';
+    }
+    if (cat.includes('postre') || cat.includes('dulce') || cat.includes('helado') || cat.includes('tarta') || 
+        cat.includes('torta') || cat.includes('alfajor') || cat.includes('medialuna') || cat.includes('flan') || 
+        cat.includes('mousse')) {
+      return 'Postres';
+    }
+    return 'Otros';
   }
 }
