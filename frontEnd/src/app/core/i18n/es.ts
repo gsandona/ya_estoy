@@ -90,5 +90,13 @@ export const es = {
     deliver: "Entregar Pedido",
     table: "Mesa",
     minutes: "min"
+  },
+  notifications: {
+    title: "Alarma y Notificaciones",
+    muteAll: "Silenciar Todo",
+    tasks: "Tareas (Llamados, Cuentas, Pedidos)",
+    orderStatus: "Estados de Pedido (Listo / Cocina)",
+    reassignments: "Reasignación de Tareas",
+    soundWarning: "Sonido de alarma y vibración habilitados"
   }
 };

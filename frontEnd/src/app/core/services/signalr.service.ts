@@ -5,6 +5,13 @@ import { MesaTask } from '../models/task.model';
 import { environment } from '../../../environments/environment';
 import { AdminDataService } from '../../features/admin/config/admin-data.service';
 
+export interface NotificationSettings {
+  muteAll: boolean;
+  tasks: boolean;
+  orderStatus: boolean;
+  reassignments: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,11 +27,63 @@ export class SignalrService {
   public readonly comandaChanged = signal<string | null>(null);
   public readonly mesaMontoConsumo = signal<{ mesaId: string, monto: number | null } | null>(null);
 
+  // Notification settings signal
+  public readonly notificationSettings = signal<NotificationSettings>({
+    muteAll: false,
+    tasks: true,
+    orderStatus: true,
+    reassignments: true
+  });
+
   constructor() {
+    this.loadSettings();
     this.buildConnection();
     this.addListeners();
     this.startConnection();
     this.fetchPendingTasks();
+  }
+
+  private getSettingsKey(): string {
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        if (user && user.id) {
+          return `notification_settings_${user.id}`;
+        }
+      } catch (e) {}
+    }
+    return 'notification_settings';
+  }
+
+  public loadSettings() {
+    const key = this.getSettingsKey();
+    const savedSettings = localStorage.getItem(key);
+    if (savedSettings) {
+      try {
+        this.notificationSettings.set(JSON.parse(savedSettings));
+      } catch (e) {
+        this.resetDefaultSettings();
+      }
+    } else {
+      this.resetDefaultSettings();
+    }
+  }
+
+  private resetDefaultSettings() {
+    this.notificationSettings.set({
+      muteAll: false,
+      tasks: true,
+      orderStatus: true,
+      reassignments: true
+    });
+  }
+
+  public updateNotificationSettings(settings: Partial<NotificationSettings>) {
+    const updated = { ...this.notificationSettings(), ...settings };
+    this.notificationSettings.set(updated);
+    const key = this.getSettingsKey();
+    localStorage.setItem(key, JSON.stringify(updated));
   }
 
   private fetchPendingTasks() {
@@ -91,7 +150,7 @@ export class SignalrService {
     if (!this.hubConnection) return;
 
     this.hubConnection.on('NotificarLlamadoMozo', (taskId: string, numeroMesa: number) => {
-      this.playAudioAlert();
+      this.playAudioAlert('tasks');
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
@@ -102,7 +161,7 @@ export class SignalrService {
     });
 
     this.hubConnection.on('NotificarNuevoPedido', (pedidoId: string, taskId: string, numeroMesa: number, details?: string) => {
-      this.playAudioAlert();
+      this.playAudioAlert('tasks');
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
@@ -115,7 +174,7 @@ export class SignalrService {
     });
 
     this.hubConnection.on('NotificarPidiendoCuenta', (taskId: string, numeroMesa: number) => {
-      this.playAudioAlert();
+      this.playAudioAlert('tasks');
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
@@ -126,6 +185,7 @@ export class SignalrService {
     });
 
     this.hubConnection.on('TareaReasignada', (taskId: string, newMozoId: string) => {
+      this.playAudioAlert('reassignments');
       this._tasks.update(tasks => tasks.map(t => 
         t.id.toLowerCase() === taskId.toLowerCase() ? { ...t, assignedMozoId: newMozoId } : t
       ));
@@ -146,7 +206,7 @@ export class SignalrService {
     });
 
     this.hubConnection.on('NotificarPedidoAprobado', (pedidoId: string, numeroMesa: number, details: string) => {
-      this.playAudioAlert();
+      this.playAudioAlert('orderStatus');
       this._tasks.update(tasks => tasks.map(t => 
         t.id.toLowerCase() === pedidoId.toLowerCase() ? { ...t, pedidoEstado: 'EnPreparacion' } : t
       ));
@@ -154,7 +214,7 @@ export class SignalrService {
     });
 
     this.hubConnection.on('NotificarPedidoListo', (pedidoId: string, taskId: string, numeroMesa: number) => {
-      this.playAudioAlert();
+      this.playAudioAlert('orderStatus');
       const exists = this._tasks().some(t => t.id.toLowerCase() === pedidoId.toLowerCase());
       if (exists) {
         this._tasks.update(tasks => tasks.map(t => 
@@ -180,17 +240,20 @@ export class SignalrService {
   }
 
   public async joinGroup(role: string, userId?: string) {
+    if (userId) {
+      this.loadSettings();
+    }
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
       await this.hubConnection.invoke('JoinGroup', role, userId || '');
     }
   }
 
-  private playAudioAlert() {
-    try {
-      // Si es una PC de escritorio (caja), silenciamos los sonidos para no molestar
-      const isDesktop = !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      if (isDesktop) return;
+  private playAudioAlert(type: 'tasks' | 'orderStatus' | 'reassignments') {
+    const settings = this.notificationSettings();
+    if (settings.muteAll) return;
+    if (!settings[type]) return;
 
+    try {
       // Vibración para celulares (patrón: vibra 200ms, pausa 100ms, vibra 200ms)
       if (navigator.vibrate) {
         navigator.vibrate([200, 100, 200]);

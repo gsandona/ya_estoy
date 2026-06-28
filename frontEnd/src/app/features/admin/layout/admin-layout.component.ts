@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -7,6 +7,7 @@ import { environment } from '../../../../environments/environment';
 import { TenantSelectorComponent } from './tenant-selector/tenant-selector.component';
 import { AdminDataService } from '../config/admin-data.service';
 import { LanguageService } from '../../../core/services/language.service';
+import { SignalrService } from '../../../core/services/signalr.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -120,6 +121,116 @@ import { LanguageService } from '../../../core/services/language.service';
             <button (click)="lang.toggleLanguage()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-primary hover:bg-gray-100 text-xs font-black transition-all active:scale-95 outline-none select-none">
               <span>🌐</span> {{ lang.currentLang() | uppercase }}
             </button>
+
+            <!-- Notification Settings Menu -->
+            <div id="notif-settings-menu-container" class="relative">
+              <button (click)="showNotificationSettings.set(!showNotificationSettings())" 
+                      class="relative flex items-center justify-center p-2 rounded-xl bg-gray-50 border border-gray-200 text-primary hover:bg-gray-100 transition-all active:scale-95 outline-none select-none"
+                      [title]="lang.translations().notifications?.title || 'Notificaciones'">
+                @if (signalrService.notificationSettings().muteAll) {
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75v-0.573a5.25 5.25 0 0 0-5.467-5.249c-2.825 0-5.18 2.213-5.28 5.03L6.5 11.25H4.5v1.5h15v-1.5h-2.25zM12 21a2.25 2.25 0 0 0 2.25-2.25H9.75A2.25 2.25 0 0 0 12 21zm-8.25-18l16.5 16.5"></path>
+                  </svg>
+                  <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 text-[8px] font-black text-white items-center justify-center">×</span>
+                  </span>
+                } @else {
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0"></path>
+                  </svg>
+                  @if (!signalrService.notificationSettings().tasks || !signalrService.notificationSettings().orderStatus || !signalrService.notificationSettings().reassignments) {
+                    <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span>
+                  } @else {
+                    <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-green-500"></span>
+                  }
+                }
+              </button>
+
+              <!-- Dropdown Panel -->
+              @if (showNotificationSettings()) {
+                <div class="absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 p-5 select-none animate-fade-in">
+                  <h3 class="text-sm font-black text-gray-800 mb-4 flex items-center justify-between border-b border-gray-100 pb-2.5">
+                    <span class="flex items-center gap-1.5 text-primary">
+                      🔔 {{ lang.translations().notifications?.title || 'Notificaciones' }}
+                    </span>
+                    <button (click)="showNotificationSettings.set(false)" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-50">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                  </h3>
+
+                  <div class="space-y-4">
+                    <!-- Silenciar Todo -->
+                    <div class="flex items-center justify-between">
+                      <div class="flex flex-col pr-3">
+                        <span class="text-sm font-bold text-gray-700">{{ lang.translations().notifications?.muteAll || 'Silenciar Todo' }}</span>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" 
+                               [checked]="signalrService.notificationSettings().muteAll" 
+                               (change)="toggleSetting('muteAll')" 
+                               class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                      </label>
+                    </div>
+
+                    <div class="border-t border-gray-100 my-2"></div>
+
+                    <!-- Tareas -->
+                    <div class="flex items-center justify-between" [ngClass]="{'opacity-40 pointer-events-none': signalrService.notificationSettings().muteAll}">
+                      <div class="flex flex-col pr-3">
+                        <span class="text-xs font-bold text-gray-800">{{ lang.translations().notifications?.tasks || 'Tareas (Llamados, Cuentas, Pedidos)' }}</span>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" 
+                               [checked]="signalrService.notificationSettings().tasks" 
+                               [disabled]="signalrService.notificationSettings().muteAll" 
+                               (change)="toggleSetting('tasks')" 
+                               class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                      </label>
+                    </div>
+
+                    <!-- Estados -->
+                    <div class="flex items-center justify-between" [ngClass]="{'opacity-40 pointer-events-none': signalrService.notificationSettings().muteAll}">
+                      <div class="flex flex-col pr-3">
+                        <span class="text-xs font-bold text-gray-800">{{ lang.translations().notifications?.orderStatus || 'Estados de Pedido' }}</span>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" 
+                               [checked]="signalrService.notificationSettings().orderStatus" 
+                               [disabled]="signalrService.notificationSettings().muteAll" 
+                               (change)="toggleSetting('orderStatus')" 
+                               class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                      </label>
+                    </div>
+
+                    <!-- Reasignaciones -->
+                    <div class="flex items-center justify-between" [ngClass]="{'opacity-40 pointer-events-none': signalrService.notificationSettings().muteAll}">
+                      <div class="flex flex-col pr-3">
+                        <span class="text-xs font-bold text-gray-800">{{ lang.translations().notifications?.reassignments || 'Reasignación de Tareas' }}</span>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" 
+                               [checked]="signalrService.notificationSettings().reassignments" 
+                               [disabled]="signalrService.notificationSettings().muteAll" 
+                               (change)="toggleSetting('reassignments')" 
+                               class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                      </label>
+                    </div>
+
+                    <!-- Footer Warning -->
+                    @if (!signalrService.notificationSettings().muteAll) {
+                      <div class="text-[10px] text-accent font-semibold uppercase tracking-wider text-center mt-2.5">
+                        🔊 {{ lang.translations().notifications?.soundWarning || 'Sonido y vibración habilitados' }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
             <app-tenant-selector></app-tenant-selector>
             <div class="hidden sm:flex flex-col items-end">
                <span class="font-bold text-sm">{{ auth.currentUser()?.username }}</span>
@@ -236,11 +347,13 @@ export class AdminLayoutComponent {
   http = inject(HttpClient);
   dataService = inject(AdminDataService);
   lang = inject(LanguageService);
+  public signalrService = inject(SignalrService);
   
   mobileMenuOpen = signal(false);
   sidebarCollapsed = signal(false);
   globalAppName = signal<string>('');
   globalLogoBase64 = signal<string>('');
+  showNotificationSettings = signal(false);
 
   constructor() {
     this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
@@ -249,6 +362,22 @@ export class AdminLayoutComponent {
       if (appName) this.globalAppName.set(appName);
       if (appLogo) this.globalLogoBase64.set(appLogo);
     });
+  }
+
+  toggleSetting(key: 'muteAll' | 'tasks' | 'orderStatus' | 'reassignments') {
+    const current = this.signalrService.notificationSettings();
+    this.signalrService.updateNotificationSettings({
+      [key]: !current[key]
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const container = document.getElementById('notif-settings-menu-container');
+    if (container && !container.contains(target)) {
+      this.showNotificationSettings.set(false);
+    }
   }
 
   logout() {

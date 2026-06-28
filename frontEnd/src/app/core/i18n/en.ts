@@ -90,5 +90,13 @@ export const en = {
     deliver: "Deliver Order",
     table: "Table",
     minutes: "min"
+  },
+  notifications: {
+    title: "Alarm & Notifications",
+    muteAll: "Mute All",
+    tasks: "Tasks (Calls, Bills, Orders)",
+    orderStatus: "Order Status (Ready / Kitchen)",
+    reassignments: "Task Reassignments",
+    soundWarning: "Alarm sound and vibration enabled"
   }
 };
