@@ -24,7 +24,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
     {
-        var user = await _usuarioRepository.GetByEmailAsync(loginDto.Email);
+        var user = await _usuarioRepository.GetByUsernameAsync(loginDto.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {
             return null; // Credenciales inválidas
@@ -36,7 +36,7 @@ public class AuthService : IAuthService
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Role, user.Rol.ToString())
         };
 
@@ -67,7 +67,7 @@ public class AuthService : IAuthService
         return new AuthResponseDto
         {
             Id = user.Id,
-            Email = user.Email,
+            Username = user.Username,
             Role = user.Rol.ToString(),
             Token = tokenHandler.WriteToken(token),
             RestauranteId = user.RestauranteId != Guid.Empty ? user.RestauranteId : null,

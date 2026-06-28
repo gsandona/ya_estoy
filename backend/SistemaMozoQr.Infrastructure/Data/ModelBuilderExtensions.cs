@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SistemaMozoQr.Domain.Entities;
+using System;
+using System.Collections.Generic;
 
 namespace SistemaMozoQr.Infrastructure.Data;
 
@@ -7,7 +9,8 @@ public static class ModelBuilderExtensions
 {
     public static void SeedData(this ModelBuilder modelBuilder)
     {
-        var passHash = "$2a$11$.bOXz4wVNeNh2KImM1g79O/TmlQsZ44j0ZvBrSSp2GRn0pFys2jpa"; // 1234
+        // Contraseña fuerte: "MozoGo1234!"
+        var passHash = "$2a$11$QZiZ0I01OY9YHmu28SD3puogxLv8eZr0bbrj8pUvL/eoVHeZRUgJm";
         
         var rest1Id = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var rest2Id = Guid.Parse("22222222-2222-2222-2222-222222222222");
@@ -16,6 +19,15 @@ public static class ModelBuilderExtensions
         var rest5Id = Guid.Parse("55555555-5555-5555-5555-555555555555");
         var rest6Id = Guid.Parse("66666666-6666-6666-6666-666666666666");
 
+        // Seed Roles
+        modelBuilder.Entity<Role>().HasData(
+            new Role { Id = 1, Nombre = "Mozo", Descripcion = "Mozo del restaurante" },
+            new Role { Id = 2, Nombre = "Admin", Descripcion = "Administrador del restaurante" },
+            new Role { Id = 3, Nombre = "SuperAdmin", Descripcion = "Super Administrador global del sistema" },
+            new Role { Id = 4, Nombre = "Cocina", Descripcion = "Personal de cocina" }
+        );
+
+        // Seed Restaurantes
         modelBuilder.Entity<Restaurante>().HasData(
             new Restaurante { Id = rest1Id, Nombre = "El Gran Sabor", IconoPrincipal = "🍽️", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Restaurante { Id = rest2Id, Nombre = "La Parrilla de Juan", IconoPrincipal = "🥩", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
@@ -25,49 +37,51 @@ public static class ModelBuilderExtensions
             new Restaurante { Id = rest6Id, Nombre = "Cordon Beer", IconoPrincipal = "🍺", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
         );
 
+        // Seed Usuarios (Email -> Username)
         modelBuilder.Entity<Usuario>().HasData(
-            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999999"), Email = "super@gino.com", PasswordHash = passHash, NombreCompleto = "Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
-            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999998"), Email = "tizi@super.com", PasswordHash = "$2a$11$zieF/dteFcfxg9Bj5LdddeUPIFuF9N3IoWtslgPMjbTNRl1ArdeL.", NombreCompleto = "Tizi Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
+            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999999"), Username = "supergino", PasswordHash = passHash, NombreCompleto = "Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
+            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999998"), Username = "tizisuper", PasswordHash = passHash, NombreCompleto = "Tizi Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
             
             // Rest 1 & 2
-            new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000001"), RestauranteId = rest1Id, Email = "admin@sabor.com", PasswordHash = passHash, NombreCompleto = "Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000002"), RestauranteId = rest1Id, Email = "mozo@sabor.com", PasswordHash = passHash, NombreCompleto = "Mozo", Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000001"), RestauranteId = rest2Id, Email = "admin@roma.com", PasswordHash = passHash, NombreCompleto = "Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000002"), RestauranteId = rest2Id, Email = "mozo@roma.com", PasswordHash = passHash, NombreCompleto = "Mozo", Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000001"), RestauranteId = rest1Id, Username = "adminsabor", PasswordHash = passHash, NombreCompleto = "Admin Sabor", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000002"), RestauranteId = rest1Id, Username = "mozosabor", PasswordHash = passHash, NombreCompleto = "Mozo Sabor", Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000001"), RestauranteId = rest2Id, Username = "adminroma", PasswordHash = passHash, NombreCompleto = "Admin Roma", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000002"), RestauranteId = rest2Id, Username = "mozoroma", PasswordHash = passHash, NombreCompleto = "Mozo Roma", Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
 
             // La Pasiva (Rest3) - 1 Admin, 10 Mozos
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000000"), Email = "admin@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Admin", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000001"), Email = "mozo1@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 1", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000002"), Email = "mozo2@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 2", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000003"), Email = "mozo3@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 3", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000004"), Email = "mozo4@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 4", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000005"), Email = "mozo5@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 5", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000006"), Email = "mozo6@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 6", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000007"), Email = "mozo7@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 7", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000008"), Email = "mozo8@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 8", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000009"), Email = "mozo9@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 9", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000010"), Email = "mozo10@lapasiva.com", PasswordHash = passHash, NombreCompleto = "Mozo 10", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000000"), Username = "adminlapasiva", PasswordHash = passHash, NombreCompleto = "Admin Pasiva", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000001"), Username = "mozo1lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 1", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000002"), Username = "mozo2lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 2", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000003"), Username = "mozo3lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 3", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000004"), Username = "mozo4lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 4", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000005"), Username = "mozo5lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 5", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000006"), Username = "mozo6lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 6", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000007"), Username = "mozo7lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 7", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000008"), Username = "mozo8lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 8", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000009"), Username = "mozo9lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 9", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000010"), Username = "mozo10lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 10", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
 
             // La Merienda (Rest4) - 1 Admin, 3 Mozos
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000000"), Email = "admin@lamerienda.com", PasswordHash = passHash, NombreCompleto = "Admin", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000001"), Email = "lucia@lamerienda.com", PasswordHash = passHash, NombreCompleto = "Lucia", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000002"), Email = "mateo@lamerienda.com", PasswordHash = passHash, NombreCompleto = "Mateo", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000003"), Email = "sofia@lamerienda.com", PasswordHash = passHash, NombreCompleto = "Sofia", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000000"), Username = "adminlamerienda", PasswordHash = passHash, NombreCompleto = "Admin Merienda", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000001"), Username = "lucialamerienda", PasswordHash = passHash, NombreCompleto = "Lucia", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000002"), Username = "mateolamerienda", PasswordHash = passHash, NombreCompleto = "Mateo", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000003"), Username = "sofialamerienda", PasswordHash = passHash, NombreCompleto = "Sofia", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
 
             // Bella Italia (Rest5) - 1 Admin, 2 Mozos
-            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000000"), Email = "admin@bellaitalia.com", PasswordHash = passHash, NombreCompleto = "Admin", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000001"), Email = "mario@bellaitalia.com", PasswordHash = passHash, NombreCompleto = "Mario", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000002"), Email = "luigi@bellaitalia.com", PasswordHash = passHash, NombreCompleto = "Luigi", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000000"), Username = "adminbellaitalia", PasswordHash = passHash, NombreCompleto = "Admin Bella Italia", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000001"), Username = "mariobellaitalia", PasswordHash = passHash, NombreCompleto = "Mario", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000002"), Username = "luigibellaitalia", PasswordHash = passHash, NombreCompleto = "Luigi", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
 
             // Cordon Beer (Rest6) - 1 Admin, 5 Mozos
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000000"), Email = "admin@cordonbeer.com", PasswordHash = passHash, NombreCompleto = "Admin", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000001"), Email = "bartender1@cordonbeer.com", PasswordHash = passHash, NombreCompleto = "Bartender 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000002"), Email = "bartender2@cordonbeer.com", PasswordHash = passHash, NombreCompleto = "Bartender 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000003"), Email = "mesero1@cordonbeer.com", PasswordHash = passHash, NombreCompleto = "Mesero 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000004"), Email = "mesero2@cordonbeer.com", PasswordHash = passHash, NombreCompleto = "Mesero 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000005"), Email = "mesero3@cordonbeer.com", PasswordHash = passHash, NombreCompleto = "Mesero 3", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo }
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000000"), Username = "admincordonbeer", PasswordHash = passHash, NombreCompleto = "Admin Cordon Beer", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000001"), Username = "bartender1cordonbeer", PasswordHash = passHash, NombreCompleto = "Bartender 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000002"), Username = "bartender2cordonbeer", PasswordHash = passHash, NombreCompleto = "Bartender 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000003"), Username = "mesero1cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000004"), Username = "mesero2cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000005"), Username = "mesero3cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 3", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo }
         );
 
+        // Seed Mesas
         modelBuilder.Entity<Mesa>().HasData(
             new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000001"), RestauranteId = rest1Id, Numero = 1, TokenQR = "MESA1_R1_QR" },
             new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000002"), RestauranteId = rest1Id, Numero = 2, TokenQR = "MESA2_R1_QR" },
@@ -95,11 +109,11 @@ public static class ModelBuilderExtensions
             new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000013"), Numero = 3, RestauranteId = rest6Id, TokenQR = "BEER_QR_3", Ubicacion = "Sector Pool", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000005") }
         );
 
+        // Seed MenuItems
         modelBuilder.Entity<MenuItem>().HasData(
-            // Rest 1 & 2
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000014"), RestauranteId = rest1Id, Categoria = "Bebidas", Nombre = "Agua M.", Precio = 1500, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000015"), RestauranteId = rest1Id, Categoria = "Platos", Nombre = "Milanesa", Precio = 8500, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000016"), RestauranteId = rest2Id, Categoria = "Pizzas", Nombre = "Muzzarella", Precio = 9000, Activo = true },
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000014"), RestauranteId = rest1Id, Categoria = "Bebidas", Nombre = "Agua Mineral", Precio = 1500, Activo = true },
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000015"), RestauranteId = rest1Id, Categoria = "Platos", Nombre = "Milanesa con Papas Fritas", Precio = 8500, Activo = true },
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000016"), RestauranteId = rest2Id, Categoria = "Pizzas", Nombre = "Pizza Muzzarella", Precio = 9000, Activo = true },
 
             // Pasiva
             new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000017"), RestauranteId = rest3Id, Categoria = "Pizzas", Nombre = "Pizza Servilleta", Descripcion = "Clásica porción fina", Precio = 250, Activo = true },
@@ -112,13 +126,36 @@ public static class ModelBuilderExtensions
             new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000022"), RestauranteId = rest4Id, Categoria = "Salados", Nombre = "Tostado de Campo", Precio = 450, Activo = true },
 
             // Italia
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000023"), RestauranteId = rest5Id, Categoria = "Pastas", Nombre = "Ravioles de espinaca", Precio = 800, Activo = true },
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000023"), RestauranteId = rest5Id, Categoria = "Pastas", Nombre = "Ravioles de espinaca con salsa", Precio = 800, Activo = true },
             new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000024"), RestauranteId = rest5Id, Categoria = "Pizzas", Nombre = "Pizza Margherita", Precio = 700, Activo = true },
 
             // Beer
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000025"), RestauranteId = rest6Id, Categoria = "Cervezas", Nombre = "IPA Cordon", Precio = 350, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000026"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Hamburguesa Completa", Precio = 650, Activo = true },
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000025"), RestauranteId = rest6Id, Categoria = "Cervezas", Nombre = "Cerveza IPA Cordon", Precio = 350, Activo = true },
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000026"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Hamburguesa Completa con Fritas", Precio = 650, Activo = true },
             new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000027"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Papas Cheddar y Bacon", Precio = 450, Activo = true }
         );
+
+        // Seed Default DashboardWidgetConfigs for all 6 Restaurants
+        var restaurants = new List<Guid> { rest1Id, rest2Id, rest3Id, rest4Id, rest5Id, rest6Id };
+        var widgets = new List<string> { "KPI_Ventas", "KPI_Pedidos", "KPI_Llamados", "KPI_Alertas", "StaffPerformance", "TopTables", "PeakHours" };
+
+        var configs = new List<DashboardWidgetConfig>();
+        int widgetSeedCounter = 1;
+        foreach (var rId in restaurants)
+        {
+            for (int i = 0; i < widgets.Count; i++)
+            {
+                configs.Add(new DashboardWidgetConfig
+                {
+                    Id = Guid.Parse($"aaaaaaaa-aaaa-aaaa-aaaa-{widgetSeedCounter:D12}"),
+                    RestauranteId = rId,
+                    WidgetKey = widgets[i],
+                    Orden = i + 1,
+                    Activo = true
+                });
+                widgetSeedCounter++;
+            }
+        }
+        modelBuilder.Entity<DashboardWidgetConfig>().HasData(configs);
     }
 }

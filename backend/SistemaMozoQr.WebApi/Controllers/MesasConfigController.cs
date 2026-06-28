@@ -108,7 +108,7 @@ public class MesasConfigController : ControllerBase
                   if (Guid.TryParse(dto.MozoId, out Guid parsedId)) {
                       realMozoId = parsedId;
                   } else {
-                      var user = usuarios.FirstOrDefault(u => u.Email == dto.MozoId);
+                      var user = usuarios.FirstOrDefault(u => u.Username == dto.MozoId);
                       if (user != null) realMozoId = user.Id;
                   }
              }

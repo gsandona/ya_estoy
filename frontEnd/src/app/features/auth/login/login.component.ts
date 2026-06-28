@@ -16,7 +16,7 @@ import { environment } from '../../../../environments/environment';
       <div class="fixed inset-0 bg-primary flex flex-col items-center justify-center z-50 transition-opacity duration-500" [ngClass]="{'opacity-0 pointer-events-none': !isSplashing()}">
         <div class="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/85"></div>
         <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
-          <!-- Pulsing Logo Container -->
+          <!-- pulsing logo -->
           <div class="h-28 w-28 rounded-3xl overflow-hidden shadow-xl mb-6 animate-pulse border border-white/10 flex">
             <img src="logo.png" class="w-full h-full object-cover" />
           </div>
@@ -31,26 +31,25 @@ import { environment } from '../../../../environments/environment';
 
     <!-- Pantalla de Login Principal -->
     <div class="min-h-screen bg-surface flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <!-- Falla de validación (Toast Flotante y Moderno) -->
+      <!-- Toast Error -->
       @if (errorMessage()) {
         <div class="fixed top-8 left-0 right-0 z-50 flex justify-center w-full px-4 animate-[slide-down_0.5s_ease-out,shake_0.4s_ease-in-out_0.5s]">
-          <div class="bg-red-600 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(220,38,38,0.2)] border border-red-500 flex items-center gap-3.5 max-w-sm w-full backdrop-blur-md">
-            <span class="p-1.5 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <div class="bg-red-50 text-red-800 px-6 py-4 rounded-2xl shadow-[0_10px_30px_rgba(220,38,38,0.06)] border border-red-200 flex items-center gap-3.5 max-w-sm w-full">
+            <span class="p-1.5 bg-red-100 rounded-full flex items-center justify-center shrink-0 text-red-700">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             </span>
-            <p class="text-sm font-bold leading-tight">{{ errorMessage() }}</p>
+            <p class="text-xs font-bold leading-tight">{{ errorMessage() }}</p>
           </div>
         </div>
       }
 
-      <!-- Fullscreen Loading Overlay (cuando conecta al servidor) -->
       @if (isLoading()) {
         <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-fade-in">
           <div class="bg-white/95 p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-xs w-full mx-4 border border-white/20">
             <div class="h-16 w-16 mb-4 relative flex items-center justify-center p-2">
               <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
-              <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex">
-                <img src="logo.png" class="w-full h-full object-cover" />
+              <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-gray-100 flex bg-white p-1.5">
+                <img src="logo.png" class="w-full h-full object-contain" />
               </div>
             </div>
             <h3 class="text-lg font-black text-gray-800">Conectando...</h3>
@@ -59,20 +58,19 @@ import { environment } from '../../../../environments/environment';
         </div>
       }
 
-      <!-- Decoración de fondo -->
       <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-accent/10 blur-3xl pointer-events-none"></div>
       
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
-        <div class="flex justify-center mb-8">
-          <div class="h-32 w-32 rounded-[2rem] overflow-hidden shadow-xl border border-white/10 flex">
-            <img src="logo.png" class="w-full h-full object-cover" />
+        <div class="flex justify-center mb-6">
+          <div class="h-20 w-20 rounded-2xl overflow-hidden shadow-md border border-gray-150 flex bg-white p-2.5">
+            <img src="logo.png" class="w-full h-full object-contain" />
           </div>
         </div>
-        <h2 class="text-center text-4xl font-black text-gray-900 tracking-tight mb-2 flex flex-col">
+        <h2 class="text-center text-3xl font-black text-gray-900 tracking-tight mb-1 flex flex-col">
           <span>MozoGo</span>
         </h2>
-        <p class="mt-4 text-center text-sm text-gray-500 font-medium">
-          Acceso privado · Usa tu <span class="text-accent">correo electrónico</span>
+        <p class="mt-2 text-center text-xs text-gray-400 font-semibold uppercase tracking-wider">
+          Acceso privado · Usa tu <span class="text-accent">nombre de usuario</span>
         </p>
       </div>
 
@@ -81,18 +79,19 @@ import { environment } from '../../../../environments/environment';
           
           <form class="space-y-6" (submit)="onLogin($event)">
             <div>
-              <label for="email" class="block text-sm font-bold text-gray-700">Correo Electrónico</label>
+              <label for="username" class="block text-sm font-bold text-gray-700">Nombre de Usuario</label>
               <div class="mt-2 relative">
-                <input id="email" [(ngModel)]="email" name="email" type="email" required email
-                  maxlength="50"
-                  #emailCtrl="ngModel"
+                <input id="username" [(ngModel)]="username" name="username" type="text" required
+                  maxlength="50" minlength="3" pattern="^[a-zA-Z0-9_]*$"
+                  #usernameCtrl="ngModel"
                   class="appearance-none block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent focus:border-accent text-lg transition-colors bg-gray-50 focus:bg-white"
-                  [ngClass]="{'border-red-500': emailCtrl.invalid && emailCtrl.touched}"
-                  placeholder="usuario@restaurante.com">
-                @if (emailCtrl.invalid && emailCtrl.touched) {
+                  [ngClass]="{'border-red-500': usernameCtrl.invalid && usernameCtrl.touched}"
+                  placeholder="Ej: supergino">
+                @if (usernameCtrl.invalid && usernameCtrl.touched) {
                   <p class="text-red-500 text-xs mt-1 absolute -bottom-5">
-                    @if(emailCtrl.errors?.['required']) { Correo es requerido. }
-                    @if(emailCtrl.errors?.['email']) { Formato de correo inválido. }
+                    @if(usernameCtrl.errors?.['required']) { El nombre de usuario es requerido. }
+                    @if(usernameCtrl.errors?.['minlength']) { Mínimo 3 caracteres. }
+                    @if(usernameCtrl.errors?.['pattern']) { Solo caracteres alfanuméricos y guión bajo. }
                   </p>
                 }
               </div>
@@ -102,13 +101,13 @@ import { environment } from '../../../../environments/environment';
               <label for="password" class="block text-sm font-bold text-gray-700">Contraseña Segura</label>
               <div class="mt-2 relative">
                 <input id="password" [(ngModel)]="password" name="password" type="password" required 
-                  maxlength="50" minlength="4"
+                  maxlength="50" minlength="8"
                   #passCtrl="ngModel"
                   class="appearance-none block w-full px-4 py-3 border-2 border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-accent focus:border-accent text-lg transition-colors bg-gray-50 focus:bg-white"
                   [ngClass]="{'border-red-500': passCtrl.invalid && passCtrl.touched}"
                   placeholder="••••••••">
                 @if (passCtrl.invalid && passCtrl.touched) {
-                  <p class="text-red-500 text-xs mt-1 absolute -bottom-5">Contraseña requerida (mín 4 caracteres).</p>
+                  <p class="text-red-500 text-xs mt-1 absolute -bottom-5">Contraseña requerida (mín 8 caracteres).</p>
                 }
               </div>
             </div>
@@ -155,7 +154,7 @@ export class LoginComponent {
   router = inject(Router);
   http = inject(HttpClient);
   
-  email = '';
+  username = '';
   password = '';
   
   isLoading = signal(false);
@@ -166,7 +165,6 @@ export class LoginComponent {
   globalLogoBase64 = signal<string>('');
 
   constructor() {
-    // Splash screen timer
     setTimeout(() => this.isSplashing.set(false), 1800);
 
     this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe({
@@ -182,11 +180,11 @@ export class LoginComponent {
 
   onLogin(event: Event) {
     event.preventDefault();
-    if (this.email && this.password) {
+    if (this.username && this.password) {
       this.isLoading.set(true);
       this.errorMessage.set('');
       
-      this.authService.login(this.email, this.password).subscribe({
+      this.authService.login(this.username, this.password).subscribe({
         next: () => {
           this.isLoading.set(false);
           this.router.navigate(['/admin']);
@@ -194,7 +192,7 @@ export class LoginComponent {
         error: (err) => {
           console.error(err);
           this.isLoading.set(false);
-          this.errorMessage.set('Credenciales inválidas o servidor inactivo. Asegúrate de tener el Backend encendido.');
+          this.errorMessage.set('Usuario o contraseña incorrectos. Asegúrate de tener el Backend encendido.');
         }
       });
     }

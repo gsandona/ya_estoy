@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -21,7 +21,7 @@ interface SystemSetting {
 interface Log {
   id: string;
   fechaHora: string;
-  usuarioEmail?: string;
+  usuarioUsername?: string;
   accion?: string;
   entidad?: string;
   detalles: string;
@@ -39,6 +39,7 @@ interface Log {
       <!-- Tabs -->
       <div class="flex flex-wrap gap-3 mb-8">
         <button (click)="activeTab.set('restaurantes')" [class.bg-primary]="activeTab() === 'restaurantes'" [class.text-white]="activeTab() === 'restaurantes'" [class.bg-white]="activeTab() !== 'restaurantes'" [class.text-gray-600]="activeTab() !== 'restaurantes'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Restaurantes</button>
+        <button (click)="activeTab.set('dashboard-config')" [class.bg-primary]="activeTab() === 'dashboard-config'" [class.text-white]="activeTab() === 'dashboard-config'" [class.bg-white]="activeTab() !== 'dashboard-config'" [class.text-gray-600]="activeTab() !== 'dashboard-config'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Configurar Dashboards</button>
         <button (click)="activeTab.set('auditoria')" [class.bg-primary]="activeTab() === 'auditoria'" [class.text-white]="activeTab() === 'auditoria'" [class.bg-white]="activeTab() !== 'auditoria'" [class.text-gray-600]="activeTab() !== 'auditoria'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Auditoría</button>
         <button (click)="activeTab.set('errores')" [class.bg-primary]="activeTab() === 'errores'" [class.text-white]="activeTab() === 'errores'" [class.bg-white]="activeTab() !== 'errores'" [class.text-gray-600]="activeTab() !== 'errores'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Errores</button>
         <button (click)="activeTab.set('branding')" [class.bg-primary]="activeTab() === 'branding'" [class.text-white]="activeTab() === 'branding'" [class.bg-white]="activeTab() !== 'branding'" [class.text-gray-600]="activeTab() !== 'branding'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Branding Global</button>
@@ -48,6 +49,95 @@ interface Log {
       @if (activeTab() === 'restaurantes') {
         <div class="animate-fade-in">
           <app-abm-restaurantes></app-abm-restaurantes>
+        </div>
+      }
+
+      <!-- Tab Configurar Dashboards -->
+      @if (activeTab() === 'dashboard-config') {
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-gray-100 animate-fade-in max-w-2xl mx-auto">
+          <h2 class="text-2xl font-black text-gray-800 mb-2">Parametrización de Dashboards</h2>
+          <p class="text-gray-500 mb-6 text-sm">Selecciona un restaurante y configura qué métricas mostrar en su panel de inicio, y en qué orden.</p>
+          
+          <div class="mb-6">
+            <label class="block text-sm font-bold text-gray-700 mb-2">Restaurante</label>
+            <select [(ngModel)]="configRestauranteId" (change)="loadDashboardWidgetConfigs()" class="w-full px-4 py-3 bg-surface border border-gray-200 rounded-xl font-bold text-gray-700 outline-none focus:ring-2 focus:ring-primary/20">
+              <option value="">Selecciona un restaurante...</option>
+              @for (r of restaurantes(); track r.id) {
+                <option [value]="r.id">{{ r.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          @if (configRestauranteId) {
+            <div class="space-y-4">
+              @for (widget of widgetConfigs(); track widget.widgetKey; let i = $index) {
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-150 shadow-sm">
+                  <div class="flex items-center gap-3">
+                    <input type="checkbox" [(ngModel)]="widget.activo" class="h-5 w-5 rounded border-gray-300 text-accent focus:ring-accent/10 cursor-pointer">
+                    <div>
+                      <span class="font-bold text-gray-800 text-sm">{{ getWidgetLabel(widget.widgetKey) }}</span>
+                      <span class="block text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Orden de Visualización: {{ i + 1 }}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="flex gap-1.5 items-center">
+                    <button (click)="moveWidgetUp(i)" [disabled]="i === 0" class="p-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 disabled:opacity-30 active:scale-95 transition font-bold" title="Subir orden">
+                      ↑
+                    </button>
+                    <button (click)="moveWidgetDown(i)" [disabled]="i === widgetConfigs().length - 1" class="p-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 disabled:opacity-30 active:scale-95 transition font-bold" title="Bajar orden">
+                      ↓
+                    </button>
+                    <button (click)="removeWidget(i)" class="p-2 bg-red-50 border border-red-100 hover:bg-red-100 text-red-600 rounded-lg active:scale-95 transition font-bold ml-2" title="Eliminar Widget">
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              }
+
+              <div class="pt-6 border-t border-gray-100 flex justify-between items-center gap-3">
+                <button (click)="openAddWidgetModal()" class="bg-emerald-50 text-emerald-700 border border-emerald-250 px-5 py-2.5 rounded-xl text-xs font-black shadow-sm hover:bg-emerald-100 transition active:scale-95">
+                  + Agregar Widget
+                </button>
+
+                <button (click)="saveDashboardWidgetConfigs()" class="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 transition-all shadow-sm active:scale-95 flex items-center gap-2">
+                  @if (isSavingDashboardConfig()) {
+                    <span class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                  }
+                  Guardar Configuración
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="text-center py-10 text-gray-400 font-semibold text-sm">
+              Por favor selecciona un restaurante de la lista para ver y configurar sus componentes.
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Modal Agregar Widget -->
+      @if (showAddWidgetModal()) {
+        <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+          <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl relative">
+            <button (click)="showAddWidgetModal.set(false)" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-50 hover:bg-gray-100 text-gray-500 font-bold transition-colors">&times;</button>
+            
+            <h3 class="text-xl font-black mb-1 text-gray-800">Agregar Widget</h3>
+            <p class="text-[10px] text-gray-400 mb-6 font-semibold uppercase tracking-wider">Métricas listas para acoplar al panel</p>
+            
+            <div class="space-y-2 max-h-72 overflow-y-auto pr-2 custom-scrollbar">
+              @for (widget of availableWidgetsToAdd(); track widget.key) {
+                <button (click)="addWidgetToRestaurante(widget.key)" class="w-full text-left px-4 py-3 rounded-2xl border border-gray-100 hover:border-emerald-300 hover:bg-emerald-50/50 font-bold text-gray-700 transition-all flex justify-between items-center group">
+                  <div>
+                    <span class="block text-sm text-gray-800 font-bold group-hover:text-emerald-700">{{ widget.label }}</span>
+                    <span class="block text-[9px] text-gray-400 font-medium mt-0.5">{{ widget.desc }}</span>
+                  </div>
+                  <span class="text-emerald-600 font-black text-lg">+</span>
+                </button>
+              } @empty {
+                <p class="text-center text-xs text-gray-400 font-bold py-6">Todos los widgets ya han sido agregados.</p>
+              }
+            </div>
+          </div>
         </div>
       }
 
@@ -79,7 +169,7 @@ interface Log {
                 @for (log of logsAuditoria(); track log.id) {
                   <tr class="hover:bg-primary/5 transition-colors group">
                     <td class="py-3 px-4 text-gray-500 whitespace-nowrap">{{ log.fechaHora | date:'short' }}</td>
-                    <td class="py-3 px-4 text-primary font-bold">{{ log.usuarioEmail }}</td>
+                    <td class="py-3 px-4 text-primary font-bold">{{ log.usuarioUsername }}</td>
                     <td class="py-3 px-4">
                       <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold">{{ log.accion }}</span>
                     </td>
@@ -110,7 +200,6 @@ interface Log {
                   <span class="text-sm font-bold text-red-800">{{ err.fechaHora | date:'medium' }}</span>
                   <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">ERROR</span>
                 </div>
-                <!-- Detalle legible de la excepción -->
                 <pre class="bg-red-50/40 text-red-900/90 p-4 rounded-xl text-xs overflow-x-auto font-mono whitespace-pre-wrap leading-relaxed border border-red-100/50">{{ err.detalles }}</pre>
               </div>
             } @empty {
@@ -168,7 +257,7 @@ interface Log {
 export class SuperAdminDashboardComponent {
   private http = inject(HttpClient);
   
-  activeTab = signal<'restaurantes' | 'auditoria' | 'errores' | 'branding'>('restaurantes');
+  activeTab = signal<'restaurantes' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding'>('restaurantes');
   restaurantes = signal<Restaurante[]>([]);
   logsAuditoria = signal<Log[]>([]);
   logsErrores = signal<Log[]>([]);
@@ -178,6 +267,33 @@ export class SuperAdminDashboardComponent {
   globalAppName = '';
   globalLogoBase64 = '';
   isSavingBranding = false;
+
+  // Dashboard configs signals
+  configRestauranteId = '';
+  widgetConfigs = signal<any[]>([]);
+  isSavingDashboardConfig = signal(false);
+  showAddWidgetModal = signal(false);
+
+  allPossibleWidgets = [
+    { key: 'KPI_Ventas', label: '💰 KPI: Ventas Totales', desc: 'Ingresos monetarios totales facturados.' },
+    { key: 'KPI_Pedidos', label: '🍳 KPI: Pedidos a Cocina', desc: 'Volumen total de pedidos comandados.' },
+    { key: 'KPI_Llamados', label: '✅ KPI: Llamados Cerrados', desc: 'Llamados resueltos por el staff.' },
+    { key: 'KPI_Alertas', label: '🚨 KPI: Alertas Activas', desc: 'Llamados pendientes en espera de atención.' },
+    { key: 'StaffPerformance', label: '🤵 Desempeño del Staff (Mozos)', desc: 'Productividad y volumen de servicio por mozo.' },
+    { key: 'TopTables', label: '📊 Ranking de Mesas', desc: 'Listado de mesas con mayor uso y rotación.' },
+    { key: 'PeakHours', label: '⏰ Horarios Pico', desc: 'Distribución de solicitudes según la hora del día.' },
+    // 5 nuevos widgets solicitados:
+    { key: 'AvgServiceTime', label: '⏱️ KPI: Tiempo de Atención', desc: 'Minutos promedio para resolver un llamado de cliente.' },
+    { key: 'OrderCancelRate', label: '❌ KPI: Tasa de Cancelación', desc: 'Porcentaje de comandas anuladas sobre el total.' },
+    { key: 'ClientCallsPerTable', label: '🛎️ KPI: Llamados por Mesa', desc: 'Promedio de llamados emitidos por mesa ocupada.' },
+    { key: 'BusyTablesCount', label: '🔥 KPI: Ocupación en Vivo', desc: 'Porcentaje actual de mesas en estado ocupada.' },
+    { key: 'VentasPorCategoria', label: '🍕 Distribución por Categoría', desc: 'Desglose proporcional de facturación por tipos de platos.' }
+  ];
+
+  availableWidgetsToAdd = computed(() => {
+    const currentKeys = this.widgetConfigs().map(w => w.widgetKey);
+    return this.allPossibleWidgets.filter(w => !currentKeys.includes(w.key));
+  });
 
   constructor() {
     this.loadRestaurantes();
@@ -214,11 +330,7 @@ export class SuperAdminDashboardComponent {
 
   saveBranding() {
     this.isSavingBranding = true;
-    
-    // Save App Name
     this.http.post(`${environment.apiUrl}/api/settings`, { key: 'GlobalAppName', value: this.globalAppName }).subscribe();
-    
-    // Save Logo Base64
     this.http.post(`${environment.apiUrl}/api/settings`, { key: 'GlobalLogoBase64', value: this.globalLogoBase64 }).subscribe({
       next: () => {
         this.isSavingBranding = false;
@@ -241,5 +353,78 @@ export class SuperAdminDashboardComponent {
     let url = `${environment.apiUrl}/api/logs/errores`;
     if (this.filterRestauranteId) url += `?restauranteId=${this.filterRestauranteId}`;
     this.http.get<Log[]>(url).subscribe(data => this.logsErrores.set(data));
+  }
+
+  // Dashboard configuration methods
+  loadDashboardWidgetConfigs() {
+    if (!this.configRestauranteId) return;
+    this.http.get<any[]>(`${environment.apiUrl}/api/dashboardconfig/${this.configRestauranteId}`).subscribe(data => {
+      this.widgetConfigs.set(data);
+    });
+  }
+
+  saveDashboardWidgetConfigs() {
+    this.isSavingDashboardConfig.set(true);
+    const payload = this.widgetConfigs().map((w, idx) => ({
+      ...w,
+      orden: idx + 1
+    }));
+    this.http.post(`${environment.apiUrl}/api/dashboardconfig`, payload).subscribe({
+      next: () => {
+        this.isSavingDashboardConfig.set(false);
+        alert('Configuración de dashboard guardada correctamente.');
+      },
+      error: (err) => {
+        console.error(err);
+        this.isSavingDashboardConfig.set(false);
+        alert('Error al guardar la configuración.');
+      }
+    });
+  }
+
+  moveWidgetUp(idx: number) {
+    if (idx === 0) return;
+    this.widgetConfigs.update(list => {
+      const copy = [...list];
+      const temp = copy[idx - 1];
+      copy[idx - 1] = copy[idx];
+      copy[idx] = temp;
+      return copy;
+    });
+  }
+
+  moveWidgetDown(idx: number) {
+    this.widgetConfigs.update(list => {
+      if (idx === list.length - 1) return list;
+      const copy = [...list];
+      const temp = copy[idx + 1];
+      copy[idx + 1] = copy[idx];
+      copy[idx] = temp;
+      return copy;
+    });
+  }
+
+  removeWidget(idx: number) {
+    this.widgetConfigs.update(list => list.filter((_, i) => i !== idx));
+  }
+
+  openAddWidgetModal() {
+    this.showAddWidgetModal.set(true);
+  }
+
+  addWidgetToRestaurante(key: string) {
+    this.widgetConfigs.update(list => [...list, {
+      id: '00000000-0000-0000-0000-000000000000',
+      restauranteId: this.configRestauranteId,
+      widgetKey: key,
+      orden: list.length + 1,
+      activo: true
+    }]);
+    this.showAddWidgetModal.set(false);
+  }
+
+  getWidgetLabel(key: string): string {
+    const matched = this.allPossibleWidgets.find(w => w.key === key);
+    return matched ? matched.label : key;
   }
 }

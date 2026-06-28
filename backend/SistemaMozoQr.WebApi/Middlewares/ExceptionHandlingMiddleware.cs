@@ -44,8 +44,9 @@ public class ExceptionHandlingMiddleware
                 Mensaje = exception.Message,
                 StackTrace = exception.StackTrace ?? string.Empty,
                 RutaAPI = context.Request.Path,
-                UsuarioInvolucrado = currentUserService?.GetUserEmail(),
-                FechaHora = DateTime.UtcNow
+                UsuarioInvolucrado = currentUserService?.GetUsername(),
+                FechaHora = DateTime.UtcNow,
+                RestauranteId = currentUserService?.GetRestauranteId() ?? Guid.Parse("11111111-1111-1111-1111-111111111111")
             };
 
             dbContext.ErrorLogs.Add(errorLog);

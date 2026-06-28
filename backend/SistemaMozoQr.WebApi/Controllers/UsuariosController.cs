@@ -73,7 +73,7 @@ public class UsuariosController : ControllerBase
         var usuariosRequeridos = dtos.Select(d => new SistemaMozoQr.Domain.Entities.Usuario
         {
             Id = d.Id,
-            Email = d.Email,
+            Username = d.Username,
             PasswordHash = !string.IsNullOrEmpty(d.Password) ? BCrypt.Net.BCrypt.HashPassword(d.Password) : null!,
             Rol = d.Role
         }).ToList();

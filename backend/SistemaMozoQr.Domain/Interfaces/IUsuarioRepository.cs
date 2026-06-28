@@ -4,7 +4,7 @@ namespace SistemaMozoQr.Domain.Interfaces;
 
 public interface IUsuarioRepository
 {
-    Task<Usuario?> GetByEmailAsync(string email);
+    Task<Usuario?> GetByUsernameAsync(string username);
     Task<Usuario?> GetByIdAsync(Guid id);
     Task<IEnumerable<Usuario>> GetAllAsync();
     Task<Usuario> AddAsync(Usuario usuario);

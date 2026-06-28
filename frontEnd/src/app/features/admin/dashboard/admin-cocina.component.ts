@@ -41,7 +41,7 @@ interface CocinaPedido {
             <span>🌐</span> {{ lang.currentLang() | uppercase }}
           </button>
           <div class="hidden sm:flex flex-col items-end">
-            <span class="font-bold text-xs text-primary/80">{{ auth.currentUser()?.email }}</span>
+            <span class="font-bold text-xs text-primary/80">{{ auth.currentUser()?.username }}</span>
             <span class="text-[10px] text-accent font-semibold flex items-center gap-1.5 mt-0.5">
               <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
               {{ lang.translations().common.online }}

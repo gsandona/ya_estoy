@@ -13,10 +13,10 @@ public class CurrentUserService : ICurrentUserService
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string? GetUserEmail()
+    public string? GetUsername()
     {
-        return _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email) 
-            ?? _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name) 
+        return _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name) 
+            ?? _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email) 
             ?? "Sistema/Anonimo";
     }
 

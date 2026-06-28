@@ -6,7 +6,6 @@ public class CrearMenuItemDto
 {
     [Required(ErrorMessage = "La categoría es obligatoria")]
     [MaxLength(100, ErrorMessage = "La categoría no puede superar los 100 caracteres")]
-    [RegularExpression("^(Aderezos|Postres|Bebidas calientes|Bebidas frias|Bebidas Calientes|Bebidas Frias)$", ErrorMessage = "La categoría debe ser Aderezos, Postres, Bebidas calientes o Bebidas frias")]
     public string Categoria { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
@@ -28,7 +27,6 @@ public class EditarMenuItemDto
 {
     [Required(ErrorMessage = "La categoría es obligatoria")]
     [MaxLength(100, ErrorMessage = "La categoría no puede superar los 100 caracteres")]
-    [RegularExpression("^(Aderezos|Postres|Bebidas calientes|Bebidas frias|Bebidas Calientes|Bebidas Frias)$", ErrorMessage = "La categoría debe ser Aderezos, Postres, Bebidas calientes o Bebidas frias")]
     public string Categoria { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio")]
@@ -52,7 +50,6 @@ public class BulkMenuItemDto
     
     [Required(ErrorMessage = "La categoría es obligatoria")]
     [MaxLength(100, ErrorMessage = "La categoría no puede superar los 100 caracteres")]
-    [RegularExpression("^(Aderezos|Postres|Bebidas calientes|Bebidas frias|Bebidas Calientes|Bebidas Frias)$", ErrorMessage = "La categoría debe ser Aderezos, Postres, Bebidas calientes o Bebidas frias")]
     public string Categoria { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio")]

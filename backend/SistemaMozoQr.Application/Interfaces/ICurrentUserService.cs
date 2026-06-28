@@ -2,7 +2,7 @@ namespace SistemaMozoQr.Application.Interfaces;
 
 public interface ICurrentUserService
 {
-    string? GetUserEmail();
+    string? GetUsername();
     string? GetUserId();
     Guid? GetRestauranteId();
     bool IsSuperAdmin();

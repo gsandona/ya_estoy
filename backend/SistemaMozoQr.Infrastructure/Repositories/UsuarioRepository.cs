@@ -37,9 +37,9 @@ public class UsuarioRepository : IUsuarioRepository
         return await _context.Usuarios.FindAsync(id);
     }
 
-    public async Task<Usuario?> GetByEmailAsync(string email)
+    public async Task<Usuario?> GetByUsernameAsync(string username)
     {
-        return await _context.Usuarios.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.Usuarios.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Username == username);
     }
 
     public async Task UpdateAsync(Usuario usuario)
@@ -52,7 +52,7 @@ public class UsuarioRepository : IUsuarioRepository
     {
         var dbItems = await _context.Usuarios.ToListAsync();
         
-        var toDelete = dbItems.Where(db => !incomingItems.Any(inc => inc.Id == db.Id) && db.Email != "admin@r.com").ToList();
+        var toDelete = dbItems.Where(db => !incomingItems.Any(inc => inc.Id == db.Id) && db.Username != "admin").ToList();
         if (toDelete.Any())
         {
             var toDeleteIds = toDelete.Select(u => u.Id).ToList();
@@ -69,7 +69,7 @@ public class UsuarioRepository : IUsuarioRepository
             var dbItem = dbItems.FirstOrDefault(db => db.Id == inc.Id);
             if (dbItem != null)
             {
-                dbItem.Email = inc.Email;
+                dbItem.Username = inc.Username;
                 dbItem.Rol = inc.Rol;
                 if (!string.IsNullOrEmpty(inc.PasswordHash))
                 {

@@ -2,6 +2,10 @@ using SistemaMozoQr.Application.DTOs;
 using SistemaMozoQr.Application.Interfaces;
 using SistemaMozoQr.Domain.Entities;
 using SistemaMozoQr.Domain.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SistemaMozoQr.Application.Services;
 
@@ -14,18 +18,49 @@ public class UsuarioService : IUsuarioService
         _usuarioRepository = usuarioRepository;
     }
 
+    private void ValidarFortalezaPassword(string? password)
+    {
+        if (string.IsNullOrEmpty(password)) return;
+        
+        // Mínimo 8 caracteres
+        if (password.Length < 8)
+            throw new Exception("La contraseña debe tener al menos 8 caracteres de longitud.");
+
+        // Al menos 3 números
+        int numCount = password.Count(char.IsDigit);
+        if (numCount < 3)
+            throw new Exception("La contraseña debe tener al menos 3 números.");
+            
+        // Al menos 1 mayúscula
+        bool hasUpper = password.Any(char.IsUpper);
+        if (!hasUpper)
+            throw new Exception("La contraseña debe tener al menos una letra mayúscula.");
+            
+        // Al menos 1 minúscula
+        bool hasLower = password.Any(char.IsLower);
+        if (!hasLower)
+            throw new Exception("La contraseña debe tener al menos una letra minúscula.");
+            
+        // Al menos 1 símbolo
+        bool hasSymbol = password.Any(c => !char.IsLetterOrDigit(c));
+        if (!hasSymbol)
+            throw new Exception("La contraseña debe tener al menos un símbolo especial (ej. .,+°!).");
+    }
+
     public async Task<UsuarioDto> CrearUsuarioAsync(CrearUsuarioDto dto)
     {
-        var existing = await _usuarioRepository.GetByEmailAsync(dto.Email);
+        var existing = await _usuarioRepository.GetByUsernameAsync(dto.Username);
         if (existing != null)
-            throw new Exception("El email ya está en uso.");
+            throw new Exception("El nombre de usuario ya está en uso.");
+
+        ValidarFortalezaPassword(dto.Password);
 
         var user = new Usuario
         {
             Id = dto.Id ?? Guid.NewGuid(),
             NombreCompleto = dto.NombreCompleto ?? "Usuario",
-            Email = dto.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(string.IsNullOrEmpty(dto.Password) ? "123456" : dto.Password),
+            Username = dto.Username,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(string.IsNullOrEmpty(dto.Password) ? "MozoGo1234!" : dto.Password),
             Rol = dto.Role
         };
 
@@ -35,7 +70,7 @@ public class UsuarioService : IUsuarioService
         {
             Id = user.Id,
             NombreCompleto = user.NombreCompleto,
-            Email = user.Email,
+            Username = user.Username,
             Role = user.Rol.ToString()
         };
     }
@@ -46,21 +81,22 @@ public class UsuarioService : IUsuarioService
         if (user == null)
             throw new Exception("Usuario no encontrado.");
 
-        if (user.Email != dto.Email)
+        if (user.Username != dto.Username)
         {
-            var existing = await _usuarioRepository.GetByEmailAsync(dto.Email);
+            var existing = await _usuarioRepository.GetByUsernameAsync(dto.Username);
             if (existing != null)
-                throw new Exception("El email ya está en uso.");
+                throw new Exception("El nombre de usuario ya está en uso.");
         }
-
-        user.NombreCompleto = dto.NombreCompleto ?? user.NombreCompleto;
-        user.Email = dto.Email;
-        user.Rol = dto.Role;
 
         if (!string.IsNullOrEmpty(dto.Password))
         {
+            ValidarFortalezaPassword(dto.Password);
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
         }
+
+        user.NombreCompleto = dto.NombreCompleto ?? user.NombreCompleto;
+        user.Username = dto.Username;
+        user.Rol = dto.Role;
 
         await _usuarioRepository.UpdateAsync(user);
 
@@ -68,7 +104,7 @@ public class UsuarioService : IUsuarioService
         {
             Id = user.Id,
             NombreCompleto = user.NombreCompleto,
-            Email = user.Email,
+            Username = user.Username,
             Role = user.Rol.ToString()
         };
     }
@@ -89,7 +125,7 @@ public class UsuarioService : IUsuarioService
         {
             Id = u.Id,
             NombreCompleto = u.NombreCompleto,
-            Email = u.Email,
+            Username = u.Username,
             Role = u.Rol.ToString()
         });
     }

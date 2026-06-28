@@ -87,7 +87,7 @@ public class TaskRepository : ITaskRepository
             var tareasCompletadas = tasks.Count(t => t.AssignedMozoId == mIdStr && t.Status == "Completed");
             var mesasAsignadasActualmente = mesas.Count(mesa => mesa.MozoId == m.Id && mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Ocupada);
             return new {
-                MozoEmail = m.Email,
+                MozoEmail = m.Username,
                 TareasCompletadas = tareasCompletadas,
                 MesasAsignadasActualmente = mesasAsignadasActualmente
             };

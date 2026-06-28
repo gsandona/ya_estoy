@@ -91,6 +91,34 @@ public class RestaurantesController : ControllerBase
         if (!_context.IsSuperAdmin && existing.ParentRestauranteId != _context.CurrentTenantId)
             return Forbid();
 
+        // Eliminar entidades dependientes primero para evitar violación de claves foráneas en SQLite
+        var users = await _context.Usuarios.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ToListAsync();
+        _context.Usuarios.RemoveRange(users);
+
+        var tables = await _context.Mesas.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ToListAsync();
+        _context.Mesas.RemoveRange(tables);
+
+        var menuItems = await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ToListAsync();
+        _context.MenuItems.RemoveRange(menuItems);
+
+        var orders = await _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).ToListAsync();
+        var orderIds = orders.Select(o => o.Id).ToList();
+        var orderItems = await _context.PedidoItems.Where(pi => orderIds.Contains(pi.PedidoId)).ToListAsync();
+        _context.PedidoItems.RemoveRange(orderItems);
+        _context.Pedidos.RemoveRange(orders);
+
+        var tasks = await _context.Tasks.IgnoreQueryFilters().Where(t => t.RestauranteId == id).ToListAsync();
+        _context.Tasks.RemoveRange(tasks);
+
+        var auditLogs = await _context.Auditorias.IgnoreQueryFilters().Where(a => a.RestauranteId == id).ToListAsync();
+        _context.Auditorias.RemoveRange(auditLogs);
+
+        var errorLogs = await _context.ErrorLogs.IgnoreQueryFilters().Where(e => e.RestauranteId == id).ToListAsync();
+        _context.ErrorLogs.RemoveRange(errorLogs);
+
+        var widgetConfigs = await _context.DashboardWidgetConfigs.IgnoreQueryFilters().Where(w => w.RestauranteId == id).ToListAsync();
+        _context.DashboardWidgetConfigs.RemoveRange(widgetConfigs);
+
         _context.Restaurantes.Remove(existing);
         await _context.SaveChangesAsync();
         return NoContent();

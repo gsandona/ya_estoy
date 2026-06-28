@@ -43,7 +43,7 @@ import { AuthService } from '../../../core/services/auth.service';
               <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
                 <option [value]="null">Sin asignar</option>
                 @for (mozo of dataService.mozos(); track mozo.id) {
-                  <option [value]="mozo.id">{{ mozo.email }}</option>
+                  <option [value]="mozo.id">{{ mozo.username }}</option>
                 }
               </select>
             </div>
@@ -75,7 +75,7 @@ import { AuthService } from '../../../core/services/auth.service';
             <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
               <span class="text-xs font-semibold text-gray-500">Asignado a:</span>
               <span class="text-sm font-bold px-2 py-1 bg-surface rounded-lg text-primary">
-                {{ getMozoEmail(mesa.mozoId) }}
+                {{ getMozoUsername(mesa.mozoId) }}
               </span>
             </div>
           </div>
@@ -285,9 +285,9 @@ export class AbmMesasComponent {
     });
   }
 
-  getMozoEmail(mozoId: string | null): string {
+  getMozoUsername(mozoId: string | null): string {
     if (!mozoId) return 'Sin asignar';
     const mozo = this.dataService.mozos().find(m => m.id === mozoId);
-    return mozo?.email || 'Sin asignar';
+    return mozo?.username || 'Sin asignar';
   }
 }

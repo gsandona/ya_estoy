@@ -122,11 +122,11 @@ import { LanguageService } from '../../../core/services/language.service';
             </button>
             <app-tenant-selector></app-tenant-selector>
             <div class="hidden sm:flex flex-col items-end">
-               <span class="font-bold text-sm">{{ auth.currentUser()?.email }}</span>
+               <span class="font-bold text-sm">{{ auth.currentUser()?.username }}</span>
                <span class="text-xs text-green-500 font-semibold">{{ lang.translations().common.online }}</span>
             </div>
             <div class="h-10 w-10 flex items-center justify-center bg-surface border border-gray-200 rounded-full font-bold text-primary">
-              {{ auth.currentUser()?.email?.charAt(0) | uppercase}}
+              {{ auth.currentUser()?.username?.charAt(0) | uppercase}}
             </div>
           </div>
         </header>

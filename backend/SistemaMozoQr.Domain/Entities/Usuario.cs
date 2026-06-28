@@ -14,12 +14,20 @@ public class Usuario : IMustHaveTenant
     
     [Required]
     [MaxLength(100)]
-    public string Email { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
 
     [Required]
     public string PasswordHash { get; set; } = string.Empty;
 
     public Rol Rol { get; set; } = Rol.Mozo;
+
+    public int RolId 
+    { 
+        get => (int)Rol; 
+        set => Rol = (Rol)value; 
+    }
+
+    public Role? Role { get; set; }
 
     public Guid RestauranteId { get; set; }
 }

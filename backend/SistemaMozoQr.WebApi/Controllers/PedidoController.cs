@@ -51,7 +51,7 @@ public class PedidoController : ControllerBase
                 id = p.Id,
                 mesaId = p.MesaId,
                 numeroMesa = p.Mesa?.Numero ?? 0,
-                mozoEmail = p.Mesa?.Mozo?.Email ?? "Sin mozo",
+                mozoEmail = p.Mesa?.Mozo?.Username ?? "Sin mozo",
                 estado = p.Estado,
                 fecha = p.Fecha,
                 items = p.Items.Select(i => new

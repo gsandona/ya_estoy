@@ -70,7 +70,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                   <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
                     <option [value]="null">Sin asignar</option>
                     @for (mozo of dataService.mozos(); track mozo.id) {
-                      <option [value]="mozo.id">{{ mozo.email }}</option>
+                      <option [value]="mozo.id">{{ mozo.username }}</option>
                     }
                   </select>
                 </div>
@@ -133,7 +133,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     <div class="flex justify-between items-center text-[10px]">
                       <span class="font-semibold text-gray-400">Mozo:</span>
                       <span class="font-bold px-2 py-0.5 bg-slate-100 rounded-md text-primary truncate max-w-[120px]">
-                        {{ getMozoEmail(mesa.mozoId) }}
+                        {{ getMozoUsername(mesa.mozoId) }}
                       </span>
                     </div>
 
@@ -173,7 +173,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     <div class="flex justify-between items-center text-[10px]">
                       <span class="font-semibold text-gray-400">Mozo:</span>
                       <span class="font-bold px-2 py-0.5 bg-slate-100 rounded-md text-primary truncate max-w-[120px]">
-                        {{ getMozoEmail(mesa.mozoId) }}
+                        {{ getMozoUsername(mesa.mozoId) }}
                       </span>
                     </div>
 
@@ -240,7 +240,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
               </select>
               <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
                 <option value="All">Todos los Mozos</option>
-                @for(mz of dataService.mozos(); track mz.id) { <option [value]="mz.id">{{mz.email}}</option> }
+                @for(mz of dataService.mozos(); track mz.id) { <option [value]="mz.id">{{mz.username}}</option> }
               </select>
             </div>
           }
@@ -342,7 +342,7 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
             @for(mz of dataService.mozos(); track mz.id) {
               <button (click)="reasignar(showReassignModal()!, mz.id)" class="w-full text-left px-4 py-3 rounded-2xl border border-gray-100 hover:border-primary/30 hover:bg-primary/5 font-bold text-gray-700 transition-all flex items-center gap-3 group">
                 <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs group-hover:bg-primary/10 group-hover:text-primary">👤</div>
-                {{mz.email}}
+                {{mz.username}}
               </button>
             }
           </div>
@@ -584,10 +584,10 @@ export class AdminDashboardComponent {
     });
   }
 
-  getMozoEmail(mozoId: string | null): string {
+  getMozoUsername(mozoId: string | null): string {
     if (!mozoId) return 'Sin asignar';
     const mozo = this.dataService.mozos().find(m => m.id === mozoId);
-    return mozo?.email || 'Sin asignar';
+    return mozo?.username || 'Sin asignar';
   }
 
   getMinutesElapsed(date: Date): number {

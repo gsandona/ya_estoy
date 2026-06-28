@@ -25,6 +25,8 @@ public class RestauranteDbContext : DbContext
     public DbSet<Pedido> Pedidos { get; set; }
     public DbSet<PedidoItem> PedidoItems { get; set; }
     public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<DashboardWidgetConfig> DashboardWidgetConfigs { get; set; }
     public DbSet<MesaTask> Tasks { get; set; }
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<AuditoriaLog> Auditorias { get; set; }
@@ -42,12 +44,20 @@ public class RestauranteDbContext : DbContext
         modelBuilder.Entity<MesaTask>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<AuditoriaLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<ErrorLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
+        modelBuilder.Entity<DashboardWidgetConfig>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
 
         // Self-referencing relationship for Sucursales
         modelBuilder.Entity<Restaurante>()
             .HasOne<Restaurante>()
             .WithMany()
             .HasForeignKey(r => r.ParentRestauranteId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Relación de Roles
+        modelBuilder.Entity<Usuario>()
+            .HasOne(u => u.Role)
+            .WithMany()
+            .HasForeignKey(u => u.RolId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // SystemSettings primary key
@@ -78,7 +88,7 @@ public class RestauranteDbContext : DbContext
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var auditEntries = new List<AuditoriaLog>();
-        var userEmail = _currentUserService?.GetUserEmail() ?? "Sistema";
+        var userUsername = _currentUserService?.GetUsername() ?? "Sistema";
 
         foreach (var entry in ChangeTracker.Entries())
         {
@@ -107,9 +117,9 @@ public class RestauranteDbContext : DbContext
                 }
                 else if (entry.Entity is Usuario user)
                 {
-                    detalles = entry.State == EntityState.Added ? $"Se creó el usuario '{user.Email}' (Rol: {user.Rol})"
-                             : entry.State == EntityState.Deleted ? $"Se eliminó el usuario '{user.Email}'"
-                             : $"Se actualizaron datos del usuario '{user.Email}'";
+                    detalles = entry.State == EntityState.Added ? $"Se creó el usuario '{user.Username}' (Rol: {user.Rol})"
+                             : entry.State == EntityState.Deleted ? $"Se eliminó el usuario '{user.Username}'"
+                             : $"Se actualizaron datos del usuario '{user.Username}'";
                 }
                 else if (entry.Entity is Mesa mesa)
                 {
@@ -135,7 +145,7 @@ public class RestauranteDbContext : DbContext
 
                 var auditLog = new AuditoriaLog
                 {
-                    UsuarioEmail = userEmail,
+                    UsuarioUsername = userUsername,
                     Entidad = entry.Entity.GetType().Name,
                     Accion = entry.State.ToString(),
                     FechaHora = DateTime.UtcNow,

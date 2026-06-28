@@ -8,7 +8,7 @@ import { TenantContextService } from './tenant-context.service';
 
 export interface User {
   id: string;
-  email: string;
+  username: string;
   role: 'Admin' | 'Mozo' | 'SuperAdmin' | 'Cocina';
   token: string;
   restauranteId?: string;
@@ -73,8 +73,8 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string) {
-    return this.http.post<User>(`${environment.apiUrl}/api/auth/login`, { email, password }).pipe(
+  login(username: string, password: string) {
+    return this.http.post<User>(`${environment.apiUrl}/api/auth/login`, { username, password }).pipe(
       tap(user => {
         this._token = user.token;
         this._currentUser.set(user);
