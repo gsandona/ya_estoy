@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -34,7 +34,6 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             migrationBuilder.AddColumn<int>(
                 name: "RolId",
                 table: "Usuarios",
-                type: "INTEGER",
                 nullable: false,
                 defaultValue: 0);
 
@@ -42,11 +41,11 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "DashboardWidgetConfigs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    RestauranteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WidgetKey = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Orden = table.Column<int>(type: "INTEGER", nullable: false),
-                    Activo = table.Column<bool>(type: "INTEGER", nullable: false)
+                    Id = table.Column<Guid>(nullable: false),
+                    RestauranteId = table.Column<Guid>(nullable: false),
+                    WidgetKey = table.Column<string>(maxLength: 50, nullable: false),
+                    Orden = table.Column<int>(nullable: false),
+                    Activo = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -57,10 +56,10 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Nombre = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Descripcion = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true)
+                    Nombre = table.Column<string>(maxLength: 50, nullable: false),
+                    Descripcion = table.Column<string>(maxLength: 200, nullable: true)
                 },
                 constraints: table =>
                 {
