@@ -23,33 +23,25 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.AuditoriaLog", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Accion")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.Property<string>("Detalles")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.Property<string>("Entidad")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.Property<string>("EntidadId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<DateTime>("FechaHora")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("FechaHora");
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
-                    b.Property<string>("UsuarioUsername")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("UsuarioUsername");
 
                     b.HasKey("Id");
 
@@ -419,29 +411,22 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.ErrorLog", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("FechaHora")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("FechaHora");
 
                     b.Property<string>("Mensaje")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
                     b.Property<string>("RutaAPI")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.Property<string>("StackTrace")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<string>("UsuarioInvolucrado")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("UsuarioInvolucrado");
 
                     b.HasKey("Id");
 
@@ -453,31 +438,24 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.MenuItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("INTEGER");
+                    b.Property<bool>("Activo");
 
                     b.Property<string>("Categoria")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.Property<string>("Descripcion")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(500);
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(200);
 
-                    b.Property<decimal>("Precio")
-                        .HasColumnType("TEXT");
+                    b.Property<decimal>("Precio");
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
                     b.HasKey("Id");
 
@@ -618,34 +596,25 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Mesa", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("CodigoAcceso")
-                        .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(10);
 
-                    b.Property<int>("Estado")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Estado");
 
-                    b.Property<decimal?>("MontoConsumo")
-                        .HasColumnType("TEXT");
+                    b.Property<decimal?>("MontoConsumo");
 
-                    b.Property<Guid?>("MozoId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid?>("MozoId");
 
-                    b.Property<int>("Numero")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Numero");
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
-                    b.Property<string>("TokenQR")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("TokenQR");
 
                     b.Property<string>("Ubicacion")
-                        .HasMaxLength(250)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(250);
 
                     b.HasKey("Id");
 
@@ -815,32 +784,24 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.MesaTask", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<string>("AssignedMozoId")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("AssignedMozoId");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("CreatedAt");
 
                     b.Property<string>("Details")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
                     b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<int>("TableId")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("TableId");
 
                     b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -852,24 +813,18 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Pedido", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("CodigoAcceso")
-                        .HasMaxLength(10)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(10);
 
-                    b.Property<int>("Estado")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Estado");
 
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("Fecha");
 
-                    b.Property<Guid>("MesaId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("MesaId");
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
                     b.HasKey("Id");
 
@@ -883,20 +838,15 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.PedidoItem", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<int>("Cantidad")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Cantidad");
 
-                    b.Property<Guid>("MenuItemId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("MenuItemId");
 
-                    b.Property<Guid>("PedidoId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("PedidoId");
 
-                    b.Property<decimal>("PrecioUnitario")
-                        .HasColumnType("TEXT");
+                    b.Property<decimal>("PrecioUnitario");
 
                     b.HasKey("Id");
 
@@ -910,27 +860,20 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Restaurante", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("INTEGER");
+                    b.Property<bool>("Activo");
 
-                    b.Property<DateTime>("FechaCreacion")
-                        .HasColumnType("TEXT");
+                    b.Property<DateTime>("FechaCreacion");
 
-                    b.Property<string>("IconoPrincipal")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("IconoPrincipal");
 
-                    b.Property<string>("LogoUrl")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("LogoUrl");
 
                     b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<Guid?>("ParentRestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid?>("ParentRestauranteId");
 
                     b.HasKey("Id");
 
@@ -1034,12 +977,10 @@ namespace SistemaMozoQr.Infrastructure.Migrations
 
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.SystemSetting", b =>
                 {
-                    b.Property<string>("Key")
-                        .HasColumnType("TEXT");
+                    b.Property<string>("Key");
 
                     b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
                     b.HasKey("Key");
 
@@ -1056,30 +997,24 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             modelBuilder.Entity("SistemaMozoQr.Domain.Entities.Usuario", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("NombreCompleto")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                        .IsRequired();
 
-                    b.Property<Guid>("RestauranteId")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid>("RestauranteId");
 
-                    b.Property<int>("Rol")
-                        .HasColumnType("INTEGER");
+                    b.Property<int>("Rol");
 
                     b.Property<int>("RolId");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
