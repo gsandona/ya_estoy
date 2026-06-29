@@ -19,6 +19,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
     <PackageReference Include="WebPush" Version="1.0.13" />
+    <PackageReference Include="FirebaseAdmin" Version="2.4.1" />
   </ItemGroup>
 
 </Project>

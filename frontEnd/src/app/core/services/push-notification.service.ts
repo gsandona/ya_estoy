@@ -1,6 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SwPush } from '@angular/service-worker';
+import { PushNotifications, ActionPerformed, PushNotificationSchema } from '@capacitor/push-notifications';
+import { FCM } from '@capacitor-community/fcm';
+import { Capacitor } from '@capacitor/core';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
@@ -9,88 +11,100 @@ import { firstValueFrom } from 'rxjs';
 })
 export class PushNotificationService {
   private http = inject(HttpClient);
-  private swPush = inject(SwPush);
-
-  public readonly isSubscribed = signal<boolean>(false);
   public readonly isSupported = signal<boolean>(false);
+  public readonly isSubscribed = signal<boolean>(false);
 
   constructor() {
-    this.isSupported.set(this.swPush.isEnabled);
-    if (this.swPush.isEnabled) {
-      this.swPush.subscription.subscribe(sub => {
-        this.isSubscribed.set(sub !== null);
-      });
-    }
+    const isNative = Capacitor.isNativePlatform();
+    this.isSupported.set(isNative);
   }
 
   public async subscribeToNotifications(): Promise<void> {
-    if (!this.swPush.isEnabled) {
-      console.warn('Web Push is not enabled or supported in this browser/environment.');
+    if (!Capacitor.isNativePlatform()) {
+      console.warn('Native Push Notifications are only supported on native mobile platforms (Android/iOS).');
       return;
     }
 
     try {
-      // 1. Obtener la clave pública VAPID del backend
-      const res = await firstValueFrom(
-        this.http.get<{ publicKey: string }>(`${environment.apiUrl}/api/push-notifications/public-key`)
-      );
+      let permStatus = await PushNotifications.checkPermissions();
       
-      const serverPublicKey = res.publicKey;
+      if (permStatus.receive === 'prompt') {
+        permStatus = await PushNotifications.requestPermissions();
+      }
 
-      // 2. Solicitar suscripción al navegador (esto mostrará el prompt nativo de permisos)
-      const subscription = await this.swPush.requestSubscription({
-        serverPublicKey: serverPublicKey
-      });
+      if (permStatus.receive !== 'granted') {
+        throw new Error('User denied push notification permissions.');
+      }
 
-      // 3. Convertir a DTO y enviar al backend
-      const subJson = subscription.toJSON();
-      const subDto = {
-        endpoint: subJson.endpoint,
-        p256dh: subJson.keys?.['p256dh'] || '',
-        auth: subJson.keys?.['auth'] || ''
-      };
-
-      await firstValueFrom(
-        this.http.post(`${environment.apiUrl}/api/push-notifications/subscribe`, subDto)
-      );
-
+      await PushNotifications.register();
+      this.setupListeners();
       this.isSubscribed.set(true);
-      console.log('Successfully subscribed to Web Push notifications.');
-    } catch (err) {
-      console.error('Could not subscribe to Web Push notifications:', err);
-      throw err;
+    } catch (error) {
+      console.error('Error during push notification setup:', error);
+      throw error;
     }
   }
 
+  private setupListeners() {
+    PushNotifications.addListener('registration', async (token) => {
+      console.log('Native push registration succeeded.');
+      
+      try {
+        const fcmTokenResponse = await FCM.getToken();
+        const fcmToken = fcmTokenResponse.token;
+        console.log('Unified FCM Token obtained:', fcmToken);
+
+        const deviceType = Capacitor.getPlatform(); // "android" o "ios"
+        
+        await firstValueFrom(
+          this.http.post(`${environment.apiUrl}/api/devices/register`, {
+            token: fcmToken,
+            deviceType: deviceType
+          })
+        );
+        
+        localStorage.setItem('fcm_token', fcmToken);
+      } catch (err) {
+        console.error('Error registering FCM token with backend:', err);
+      }
+    });
+
+    PushNotifications.addListener('registrationError', (error) => {
+      console.error('Push registration error:', error);
+    });
+
+    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+      console.log('Push notification received in foreground:', notification);
+    });
+
+    PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
+      console.log('Push notification action performed:', action);
+    });
+  }
+
   public async unsubscribeFromNotifications(): Promise<void> {
-    if (!this.swPush.isEnabled) return;
+    if (!Capacitor.isNativePlatform()) return;
 
     try {
-      const currentSubscription = await firstValueFrom(this.swPush.subscription);
-      if (currentSubscription) {
-        const subJson = currentSubscription.toJSON();
-        const subDto = {
-          endpoint: subJson.endpoint,
-          p256dh: subJson.keys?.['p256dh'] || '',
-          auth: subJson.keys?.['auth'] || ''
-        };
-
-        // 1. Avisar al backend para eliminarla de la base de datos
+      const fcmToken = localStorage.getItem('fcm_token');
+      if (fcmToken) {
         try {
           await firstValueFrom(
-            this.http.post(`${environment.apiUrl}/api/push-notifications/unsubscribe`, subDto)
+            this.http.post(`${environment.apiUrl}/api/devices/unregister`, {
+              token: fcmToken
+            })
           );
         } catch (e) {
-          console.warn('Could not notify backend of unsubscription', e);
+          console.warn('Could not unregister device token from backend:', e);
         }
-
-        // 2. Desuscribir en el navegador
-        await this.swPush.unsubscribe();
+        localStorage.removeItem('fcm_token');
       }
+
+      await PushNotifications.removeAllListeners();
       this.isSubscribed.set(false);
-      console.log('Successfully unsubscribed from Web Push.');
-    } catch (err) {
-      console.error('Could not unsubscribe from Web Push:', err);
+      console.log('Native push unsubscribed successfully.');
+    } catch (error) {
+      console.error('Error during push unsubscription:', error);
     }
   }
 }

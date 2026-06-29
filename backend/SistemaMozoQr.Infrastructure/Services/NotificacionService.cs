@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using WebPush;
+using FirebaseAdmin.Messaging;
 using SistemaMozoQr.Application.Interfaces;
 using SistemaMozoQr.Domain.Entities;
 using SistemaMozoQr.Infrastructure.Data;
@@ -77,17 +77,10 @@ public class NotificacionService : INotificacionService
     {
         try
         {
-            var pubKey = await _context.SystemSettings.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Key == "VapidPublicKey");
-            var privKey = await _context.SystemSettings.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Key == "VapidPrivateKey");
-            var subject = await _context.SystemSettings.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Key == "VapidSubject");
-
-            if (pubKey == null || privKey == null) return;
-
-            var vapidDetails = new VapidDetails(
-                subject?.Value ?? "mailto:admin@mozogo.com",
-                pubKey.Value,
-                privKey.Value
-            );
+            if (FirebaseAdmin.FirebaseApp.DefaultInstance == null)
+            {
+                return;
+            }
 
             var targetUserIds = new List<Guid>();
 
@@ -107,57 +100,80 @@ public class NotificacionService : INotificacionService
             var distinctUserIds = targetUserIds.Distinct().ToList();
             if (!distinctUserIds.Any()) return;
 
-            // Obtener suscripciones push activas de estos destinatarios
-            var subscriptions = await _context.PushSubscriptions
-                .Where(sub => distinctUserIds.Contains(sub.UsuarioId))
+            // Obtener tokens FCM de estos destinatarios
+            var deviceTokens = await _context.UserDeviceTokens
+                .Where(t => distinctUserIds.Contains(t.UsuarioId))
                 .ToListAsync();
 
-            if (!subscriptions.Any()) return;
+            if (!deviceTokens.Any()) return;
 
-            var payloadObj = new
+            var tokensList = deviceTokens.Select(t => t.Token).ToList();
+
+            // Construir el mensaje FCM Multicast con alta prioridad para despertar pantallas bloqueadas
+            var multicastMessage = new MulticastMessage()
             {
-                notification = new
+                Tokens = tokensList,
+                Notification = new Notification()
                 {
-                    title = title,
-                    body = message,
-                    icon = "assets/icons/icon-96x96.png",
-                    badge = "assets/icons/icon-72x72.png",
-                    vibrate = new int[] { 200, 100, 200, 100, 200 },
-                    data = new
+                    Title = title,
+                    Body = message
+                },
+                Data = new Dictionary<string, string>()
+                {
+                    { "title", title },
+                    { "body", message },
+                    { "url", "/admin/tareas" }
+                },
+                Android = new AndroidConfig()
+                {
+                    Priority = Priority.High,
+                    Notification = new AndroidNotification()
                     {
-                        url = "/admin/tareas"
+                        Sound = "default"
+                    }
+                },
+                Apns = new ApnsConfig()
+                {
+                    Headers = new Dictionary<string, string>()
+                    {
+                        { "apns-priority", "10" } // Alta prioridad para iOS background/locked
+                    },
+                    Aps = new Aps()
+                    {
+                        Sound = "default",
+                        ContentAvailable = true
                     }
                 }
             };
 
-            var payloadJson = System.Text.Json.JsonSerializer.Serialize(payloadObj);
-            var webPushClient = new WebPushClient();
+            var response = await FirebaseMessaging.DefaultInstance.SendEachForMulticastAsync(multicastMessage);
 
-            foreach (var sub in subscriptions)
+            // Limpieza de tokens inválidos o desinstalados de forma automática
+            bool needsDbSave = false;
+            for (var i = 0; i < response.Responses.Count; i++)
             {
-                try
+                if (!response.Responses[i].IsSuccess)
                 {
-                    var pushSub = new PushSubscription(sub.Endpoint, sub.P256dh, sub.Auth);
-                    await webPushClient.SendNotificationAsync(pushSub, payloadJson, vapidDetails);
-                }
-                catch (WebPushException ex)
-                {
-                    if (ex.StatusCode == System.Net.HttpStatusCode.Gone || ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    var exception = response.Responses[i].Exception;
+                    if (exception != null && 
+                        (exception.MessagingErrorCode == MessagingErrorCode.Unregistered || 
+                         exception.MessagingErrorCode == MessagingErrorCode.InvalidArgument))
                     {
-                        _context.PushSubscriptions.Remove(sub);
+                        var failedToken = deviceTokens[i];
+                        _context.UserDeviceTokens.Remove(failedToken);
+                        needsDbSave = true;
                     }
-                }
-                catch (Exception)
-                {
-                    // Ignorar errores individuales
                 }
             }
 
-            await _context.SaveChangesAsync();
+            if (needsDbSave)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al enviar Web Push: {ex.Message}");
+            Console.WriteLine($"Error al enviar notificaciones FCM: {ex.Message}");
         }
     }
 }

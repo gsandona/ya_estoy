@@ -2,6 +2,9 @@ using SistemaMozoQr.Application;
 using SistemaMozoQr.Infrastructure;
 using SistemaMozoQr.Infrastructure.Data;
 using SistemaMozoQr.Infrastructure.SignalR;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using System.IO;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -157,6 +160,40 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"Error al inicializar llaves VAPID: {ex.Message}");
     }
+}
+
+// Inicializar Firebase Admin SDK si las credenciales existen (archivo local o variable de entorno)
+try
+{
+    var credentialPath = Path.Combine(app.Environment.ContentRootPath, "firebase-service-account.json");
+    if (File.Exists(credentialPath))
+    {
+        FirebaseApp.Create(new AppOptions()
+        {
+            Credential = GoogleCredential.FromFile(credentialPath)
+        });
+        Console.WriteLine("Firebase Admin SDK inicializado desde archivo local.");
+    }
+    else
+    {
+        var credentialsJson = Environment.GetEnvironmentVariable("FIREBASE_CREDENTIALS_JSON");
+        if (!string.IsNullOrEmpty(credentialsJson))
+        {
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromJson(credentialsJson)
+            });
+            Console.WriteLine("Firebase Admin SDK inicializado desde variable de entorno.");
+        }
+        else
+        {
+            Console.WriteLine("Advertencia: No se encontró 'firebase-service-account.json' ni la variable de entorno 'FIREBASE_CREDENTIALS_JSON'. Las notificaciones Push nativas estarán desactivadas.");
+        }
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error al inicializar Firebase Admin: {ex.Message}");
 }
 
 app.Run();
