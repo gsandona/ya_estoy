@@ -48,17 +48,39 @@ export class SignalrService {
   private setupAudioUnlock() {
     const unlockAudio = () => {
       this.initAudioContext();
+      this.playSilentSound();
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
     };
     window.addEventListener('click', unlockAudio);
     window.addEventListener('touchstart', unlockAudio);
+
+    // Auto-resumir en iOS Safari cuando la pestaña vuelve al primer plano
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && this.audioCtx) {
+        this.audioCtx.resume().catch(e => console.warn('Could not resume AudioContext on visibilitychange:', e));
+      }
+    });
+  }
+
+  private playSilentSound() {
+    if (!this.audioCtx) return;
+    try {
+      const buffer = this.audioCtx.createBuffer(1, 1, 22050);
+      const source = this.audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.audioCtx.destination);
+      // Iniciar el buffer de silencio para desbloquear el motor de audio de iOS
+      source.start(0);
+    } catch (e) {
+      console.warn('Silent sound play failed:', e);
+    }
   }
 
   private initAudioContext() {
     if (this.audioCtx) {
       if (this.audioCtx.state === 'suspended') {
-        this.audioCtx.resume();
+        this.audioCtx.resume().catch(() => {});
       }
       return;
     }
