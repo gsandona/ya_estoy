@@ -8,6 +8,7 @@ import { TenantSelectorComponent } from './tenant-selector/tenant-selector.compo
 import { AdminDataService } from '../config/admin-data.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { SignalrService } from '../../../core/services/signalr.service';
+import { PushNotificationService } from '../../../core/services/push-notification.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -348,6 +349,7 @@ export class AdminLayoutComponent {
   dataService = inject(AdminDataService);
   lang = inject(LanguageService);
   public signalrService = inject(SignalrService);
+  private pushNotification = inject(PushNotificationService);
   
   mobileMenuOpen = signal(false);
   sidebarCollapsed = signal(false);
@@ -361,6 +363,11 @@ export class AdminLayoutComponent {
       const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
       if (appName) this.globalAppName.set(appName);
       if (appLogo) this.globalLogoBase64.set(appLogo);
+    });
+
+    // Solicitar y registrar notificaciones push al iniciar sesión
+    this.pushNotification.subscribeToNotifications().catch(e => {
+      console.warn('Web Push subscription failed or was ignored:', e);
     });
   }
 
@@ -381,7 +388,9 @@ export class AdminLayoutComponent {
   }
 
   logout() {
-    this.auth.logout();
-    this.router.navigate(['/login']);
+    this.pushNotification.unsubscribeFromNotifications().finally(() => {
+      this.auth.logout();
+      this.router.navigate(['/login']);
+    });
   }
 }

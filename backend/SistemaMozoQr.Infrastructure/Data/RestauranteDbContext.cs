@@ -31,6 +31,7 @@ public class RestauranteDbContext : DbContext
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<AuditoriaLog> Auditorias { get; set; }
     public DbSet<ErrorLog> ErrorLogs { get; set; }
+    public DbSet<UserPushSubscription> PushSubscriptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,6 +46,7 @@ public class RestauranteDbContext : DbContext
         modelBuilder.Entity<AuditoriaLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<ErrorLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<DashboardWidgetConfig>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
+        modelBuilder.Entity<UserPushSubscription>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
 
         // Self-referencing relationship for Sucursales
         modelBuilder.Entity<Restaurante>()
@@ -80,6 +82,18 @@ public class RestauranteDbContext : DbContext
             .WithMany(p => p.Items)
             .HasForeignKey(pi => pi.PedidoId)
             .IsRequired(false);
+
+        modelBuilder.Entity<UserPushSubscription>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Endpoint).IsRequired();
+            entity.Property(e => e.P256dh).IsRequired();
+            entity.Property(e => e.Auth).IsRequired();
+            entity.HasOne(e => e.Usuario)
+                  .WithMany()
+                  .HasForeignKey(e => e.UsuarioId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
 
         // --- SEED DATA MULTI-TENANT ---
         modelBuilder.SeedData();

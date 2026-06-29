@@ -125,6 +125,38 @@ using (var scope = app.Services.CreateScope())
             throw;
         }
     }
+
+    // Generar e inicializar llaves VAPID si no existen en la base de datos
+    try
+    {
+        var pubKeySetting = context.SystemSettings.IgnoreQueryFilters().FirstOrDefault(s => s.Key == "VapidPublicKey");
+        var privKeySetting = context.SystemSettings.IgnoreQueryFilters().FirstOrDefault(s => s.Key == "VapidPrivateKey");
+        if (pubKeySetting == null || privKeySetting == null)
+        {
+            var vapidKeys = WebPush.VapidHelper.GenerateVapidKeys();
+            
+            if (pubKeySetting == null)
+            {
+                context.SystemSettings.Add(new SistemaMozoQr.Domain.Entities.SystemSetting { Key = "VapidPublicKey", Value = vapidKeys.PublicKey });
+            }
+            if (privKeySetting == null)
+            {
+                context.SystemSettings.Add(new SistemaMozoQr.Domain.Entities.SystemSetting { Key = "VapidPrivateKey", Value = vapidKeys.PrivateKey });
+            }
+            
+            var subjectSetting = context.SystemSettings.IgnoreQueryFilters().FirstOrDefault(s => s.Key == "VapidSubject");
+            if (subjectSetting == null)
+            {
+                context.SystemSettings.Add(new SistemaMozoQr.Domain.Entities.SystemSetting { Key = "VapidSubject", Value = "mailto:admin@mozogo.com" });
+            }
+
+            context.SaveChanges();
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error al inicializar llaves VAPID: {ex.Message}");
+    }
 }
 
 app.Run();
