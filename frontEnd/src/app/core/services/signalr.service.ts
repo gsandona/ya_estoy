@@ -19,6 +19,7 @@ export class SignalrService {
   private hubConnection: signalR.HubConnection | null = null;
   private http = inject(HttpClient);
   private adminDataService = inject(AdminDataService);
+  private audioCtx: AudioContext | null = null;
   
   private _tasks = signal<MesaTask[]>([]);
   public readonly pendingTasks = computed(() => this._tasks().filter(t => t.status === 'Pending'));
@@ -41,6 +42,34 @@ export class SignalrService {
     this.addListeners();
     this.startConnection();
     this.fetchPendingTasks();
+    this.setupAudioUnlock();
+  }
+
+  private setupAudioUnlock() {
+    const unlockAudio = () => {
+      this.initAudioContext();
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
+  }
+
+  private initAudioContext() {
+    if (this.audioCtx) {
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
+      return;
+    }
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        this.audioCtx = new AudioContextClass();
+      }
+    } catch (e) {
+      console.warn('Could not initialize AudioContext:', e);
+    }
   }
 
   private getSettingsKey(): string {
@@ -259,13 +288,19 @@ export class SignalrService {
         navigator.vibrate([200, 100, 200]);
       }
 
-      // Web Audio API para un sonido de campanilla (chime) suave y moderno
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      const audioCtx = new AudioContext();
+      // Asegurar que el AudioContext esté inicializado y activo
+      this.initAudioContext();
+
+      if (!this.audioCtx) return;
+
+      if (this.audioCtx.state === 'suspended') {
+        this.audioCtx.resume();
+      }
       
       const playChime = (freq: number, startTime: number) => {
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
+        if (!this.audioCtx) return;
+        const oscillator = this.audioCtx.createOscillator();
+        const gainNode = this.audioCtx.createGain();
         
         oscillator.type = 'sine';
         oscillator.frequency.setValueAtTime(freq, startTime);
@@ -276,14 +311,14 @@ export class SignalrService {
         gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.8);
         
         oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
+        gainNode.connect(this.audioCtx.destination);
         
         oscillator.start(startTime);
         oscillator.stop(startTime + 1);
       };
 
       // Doble campanilla (e.g., C6 y E6)
-      const now = audioCtx.currentTime;
+      const now = this.audioCtx.currentTime;
       playChime(1046.50, now);        // C6
       playChime(1318.51, now + 0.15); // E6
 
