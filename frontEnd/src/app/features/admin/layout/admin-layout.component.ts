@@ -96,7 +96,7 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
 
       <!-- Main Content -->
       <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <header class="h-20 bg-white shadow-sm z-0 flex items-center px-6 md:px-8 justify-between">
+        <header class="h-20 bg-white shadow-sm z-30 flex items-center px-6 md:px-8 justify-between">
           
           <!-- Mobile Hamburger Toggle -->
           <div class="flex items-center gap-3 md:hidden">
