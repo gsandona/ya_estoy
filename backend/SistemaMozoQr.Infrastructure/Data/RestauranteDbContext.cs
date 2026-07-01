@@ -32,6 +32,7 @@ public class RestauranteDbContext : DbContext
     public DbSet<AuditoriaLog> Auditorias { get; set; }
     public DbSet<ErrorLog> ErrorLogs { get; set; }
     public DbSet<UserPushSubscription> PushSubscriptions { get; set; }
+    public DbSet<Venta> Ventas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -47,6 +48,7 @@ public class RestauranteDbContext : DbContext
         modelBuilder.Entity<ErrorLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<DashboardWidgetConfig>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<UserPushSubscription>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
+        modelBuilder.Entity<Venta>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
 
         // Self-referencing relationship for Sucursales
         modelBuilder.Entity<Restaurante>()
@@ -116,7 +118,7 @@ public class RestauranteDbContext : DbContext
             }
 
             // Excluir entidades de control e items individuales de pedido (evita sobrecargar el log)
-            if (entry.Entity is AuditoriaLog || entry.Entity is ErrorLog || entry.Entity is MesaTask || entry.Entity is SystemSetting || entry.Entity is PedidoItem)
+            if (entry.Entity is AuditoriaLog || entry.Entity is ErrorLog || entry.Entity is MesaTask || entry.Entity is SystemSetting || entry.Entity is PedidoItem || entry.Entity is Venta)
                 continue;
 
             if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted)

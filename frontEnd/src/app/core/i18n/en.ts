@@ -21,6 +21,8 @@ export const en = {
     tables: "Tables & Tasks",
     personal: "Staff Config",
     system: "System",
+    kitchen: "Kitchen",
+    sales: "Sales",
     logout: "Log Out",
     roleLabel: "Staff Management"
   },

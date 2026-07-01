@@ -24,35 +24,6 @@ interface CocinaPedido {
   template: `
     <div class="min-h-screen bg-sand text-primary font-sans p-4 md:p-8 space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto">
       
-      <!-- Kitchen Header -->
-      <header class="bg-white border border-gray-200/80 px-6 py-4 rounded-2xl flex justify-between items-center shadow-sm mb-2">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl overflow-hidden border border-gray-100 flex bg-sand/40">
-            <img src="logo.png" class="w-full h-full object-cover" />
-          </div>
-          <div>
-            <span class="font-black text-lg text-gray-800 tracking-tight">{{ auth.currentUser()?.restauranteNombre || 'MozoGo' }}</span>
-            <span class="text-xs text-primary/60 font-bold block uppercase tracking-wider">{{ lang.translations().kitchen.title | uppercase }}</span>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-4">
-          <button (click)="lang.toggleLanguage()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-primary hover:bg-gray-100 text-xs font-black transition-all active:scale-95 outline-none select-none">
-            <span>🌐</span> {{ lang.currentLang() | uppercase }}
-          </button>
-          <div class="hidden sm:flex flex-col items-end">
-            <span class="font-bold text-xs text-primary/80">{{ auth.currentUser()?.username }}</span>
-            <span class="text-[10px] text-accent font-semibold flex items-center gap-1.5 mt-0.5">
-              <span class="h-2 w-2 rounded-full bg-accent animate-pulse"></span>
-              {{ lang.translations().common.online }}
-            </span>
-          </div>
-          <button (click)="logout()" class="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 font-bold transition-all text-xs border border-red-200/30">
-            {{ lang.translations().common.logout }}
-          </button>
-        </div>
-      </header>
-
       <!-- Panel Title -->
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -60,6 +31,13 @@ interface CocinaPedido {
           <p class="text-primary/60 text-sm font-medium mt-1">{{ lang.translations().kitchen.subtitle }}</p>
         </div>
         <div class="flex items-center gap-2">
+          <button (click)="toggleMute()" 
+                  [class]="signalrService.notificationSettings().muteAll ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'"
+                  class="border px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 flex items-center gap-1.5 outline-none select-none">
+            <span>{{ signalrService.notificationSettings().muteAll ? '🔇' : '🔊' }}</span>
+            {{ signalrService.notificationSettings().muteAll ? 'Sonido Silenciado' : 'Sonido Activado' }}
+          </button>
+          
           <button (click)="loadPedidos()" class="bg-primary hover:bg-opacity-95 text-white border border-transparent px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95">
             {{ lang.translations().kitchen.refresh }}
           </button>
@@ -227,7 +205,7 @@ interface CocinaPedido {
 })
 export class AdminCocinaComponent implements OnInit {
   private http = inject(HttpClient);
-  private signalrService = inject(SignalrService);
+  public signalrService = inject(SignalrService);
   auth = inject(AuthService);
   router = inject(Router);
   lang = inject(LanguageService);
@@ -235,6 +213,11 @@ export class AdminCocinaComponent implements OnInit {
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);
+  }
+
+  toggleMute() {
+    const currentMute = this.signalrService.notificationSettings().muteAll;
+    this.signalrService.updateNotificationSettings({ muteAll: !currentMute });
   }
 
   pedidos = signal<CocinaPedido[]>([]);

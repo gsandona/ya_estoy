@@ -131,16 +131,11 @@ import { LanguageService } from '../../../core/services/language.service';
                           <span class="text-sm font-black tracking-wider text-emerald-700">{{ mesa.codigoAcceso }}</span>
                         </div>
 
-                        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-2 flex flex-col justify-center">
+                        <div (click)="openBillingModal(mesa)" class="bg-slate-50 border border-slate-100 rounded-2xl p-2 flex flex-col justify-center cursor-pointer hover:bg-emerald-50 hover:border-emerald-200 transition-all select-none">
                           <span class="text-[8px] font-black text-gray-400 uppercase tracking-wider text-center">{{ lang.translations().tables.consumed }}</span>
                           <div class="flex gap-1 items-center justify-center mt-0.5">
                             <span class="text-[10px] text-gray-500 font-black">$</span>
-                            <input type="number" 
-                                   [value]="mesa.montoConsumo"
-                                   (blur)="actualizarMontoConsumo(mesa.id, $event)"
-                                   (keyup.enter)="actualizarMontoConsumo(mesa.id, $event)"
-                                   placeholder="0" 
-                                   class="w-14 text-center text-xs font-black bg-transparent border-none focus:outline-none text-gray-800 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                            <span class="text-xs font-black text-gray-800">{{ mesa.montoConsumo || 0 }}</span>
                           </div>
                         </div>
                       </div>
@@ -154,7 +149,7 @@ import { LanguageService } from '../../../core/services/language.service';
                         </span>
                       </div>
 
-                      <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
+                      <button (click)="openBillingModal(mesa)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
                         {{ lang.translations().tables.closeTable }}
                       </button>
                     </div>
@@ -461,6 +456,133 @@ import { LanguageService } from '../../../core/services/language.service';
         </div>
       </div>
     }
+
+    <!-- Modal POS de Facturación y Consumos Extra (Caja) -->
+    @if (showBillingModal() && billingMesa()) {
+      <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+        <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-4xl w-full border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6 relative max-h-[90vh] overflow-y-auto text-primary">
+          <button (click)="showBillingModal.set(false)" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-gray-500 font-black shadow-sm transition-all cursor-pointer">&times;</button>
+          
+          <!-- Columna Izquierda: Panel de Control de Cargos -->
+          <div class="space-y-6">
+            <div>
+              <h2 class="text-xl font-black text-gray-800 tracking-tight">Cobro y Consumo</h2>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Mesa {{ billingMesa()?.numero }} • PIN de Acceso: {{ billingMesa()?.codigoAcceso }}</p>
+            </div>
+
+            <!-- Formulario 1: Agregar Plato de la Carta -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+              <h3 class="text-xs font-black text-gray-700">Agregar plato del menú</h3>
+              <div class="flex gap-2">
+                <select [(ngModel)]="selectedMenuItemId" class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none">
+                  <option value="">Selecciona un plato...</option>
+                  @for (item of dataService.menuItems(); track item.id) {
+                    @if (item.activo) {
+                      <option [value]="item.id">{{ item.nombre }} (\${{ item.precio }})</option>
+                    }
+                  }
+                </select>
+                <input type="number" [(ngModel)]="extraQuantity" min="1" class="w-16 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-center outline-none">
+                <button (click)="addExtraItem()" class="bg-primary text-white px-4 py-2 rounded-xl text-xs font-black hover:bg-opacity-90 active:scale-95 transition-all shadow-sm">
+                  +
+                </button>
+              </div>
+            </div>
+
+            <!-- Formulario 2: Agregar Cargo Manual -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+              <h3 class="text-xs font-black text-gray-700">Agregar cargo manual</h3>
+              <div class="grid grid-cols-3 gap-2">
+                <input type="text" [(ngModel)]="manualChargeDescription" placeholder="Ej: Servicio de mesa" class="col-span-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none text-gray-800">
+                <input type="number" [(ngModel)]="manualChargeMonto" placeholder="$ Monto" class="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-center outline-none text-gray-800">
+              </div>
+              <button (click)="addManualCharge()" class="w-full bg-primary text-white py-2 rounded-xl text-xs font-black hover:bg-opacity-90 active:scale-95 transition-all shadow-sm">
+                Agregar Cargo Extra
+              </button>
+            </div>
+
+            <!-- Botones de Acción de Consumo -->
+            <div class="pt-4 border-t border-gray-100 flex gap-2">
+              <button (click)="showBillingModal.set(false)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-2xl text-xs font-black transition-all active:scale-95">
+                Volver
+              </button>
+              @if (extraItems().length > 0 || manualCharges().length > 0) {
+                <button (click)="confirmarCobro()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl text-xs font-black transition-all active:scale-95 shadow-lg shadow-emerald-600/20">
+                  Guardar Extras
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Ticket Previo de Consumo -->
+          <div class="bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] p-5 rounded-3xl flex flex-col justify-between font-mono text-[11px] text-primary/95 min-h-[350px]">
+            <div class="space-y-4">
+              <!-- Encabezado Ticket -->
+              <div class="text-center pb-3 border-b border-dashed border-[#DCD0C0] space-y-1">
+                <span class="text-xs font-black tracking-tight block">TICKET PREVIO</span>
+                <span class="text-[9px] text-gray-500 block">Mesa {{ billingMesa()?.numero }} • PIN {{ billingMesa()?.codigoAcceso }}</span>
+              </div>
+
+              <!-- Listado de Consumos (Existentes + Nuevos) -->
+              <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+                <!-- Consumos de la base de datos -->
+                @for (item of billingItems(); track item.id) {
+                  <div class="flex justify-between items-start gap-1">
+                    <div class="flex-1 text-left">
+                      <span class="font-bold block text-gray-800">{{ item.nombre }}</span>
+                      <span class="text-[9px] text-gray-500 font-semibold">{{ item.cantidad }} x \${{ item.precioUnitario | number:'1.2-2' }}</span>
+                    </div>
+                    <span class="font-black text-gray-800">\${{ item.total | number:'1.2-2' }}</span>
+                  </div>
+                }
+
+                <!-- Consumos extras locales -->
+                @for (item of extraItems(); track $index) {
+                  <div class="flex justify-between items-start gap-1 bg-emerald-500/5 p-1 rounded">
+                    <div class="flex-1 text-left">
+                      <span class="font-black text-emerald-800 block">* {{ item.nombre }} (Extra)</span>
+                      <span class="text-[9px] text-emerald-600 font-semibold">{{ item.cantidad }} x \${{ item.precioUnitario | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-black text-emerald-800">
+                      <span>\${{ item.total | number:'1.2-2' }}</span>
+                      <button (click)="removeExtraItem($index)" class="text-red-500 font-black hover:text-red-700 active:scale-90 text-[13px] line-none select-none">&times;</button>
+                    </div>
+                  </div>
+                }
+
+                <!-- Cargos manuales locales -->
+                @for (charge of manualCharges(); track $index) {
+                  <div class="flex justify-between items-start gap-1 bg-emerald-500/5 p-1 rounded">
+                    <div class="flex-1 text-left">
+                      <span class="font-black text-emerald-800 block">* {{ charge.descripcion }} (Cargo)</span>
+                      <span class="text-[9px] text-emerald-600 font-semibold">1 x \${{ charge.monto | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-black text-emerald-800">
+                      <span>\${{ charge.monto | number:'1.2-2' }}</span>
+                      <button (click)="removeManualCharge($index)" class="text-red-500 font-black hover:text-red-700 active:scale-90 text-[13px] line-none select-none">&times;</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Footer del Ticket con Total y Cierre -->
+            <div class="pt-4 border-t border-dashed border-[#DCD0C0] space-y-4">
+              <div class="flex justify-between items-center text-xs font-black">
+                <span>TOTAL A PAGAR</span>
+                <span class="text-emerald-700 text-sm">\${{ getPreviewTotal() | number:'1.2-2' }}</span>
+              </div>
+
+              <!-- Cerrar Mesa -->
+              <button (click)="cerrarMesa(billingMesa()!.id)" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-1">
+                🧾 Registrar Pago y Cerrar Mesa
+              </button>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    }
   `,
   styles: [`
     @keyframes fade-in {
@@ -482,6 +604,18 @@ export class AdminDashboardComponent {
   private tenantContext = inject(TenantContextService);
   
   currentDate = new Date();
+
+  // Signals para Facturación y Consumos Extra (POS Caja)
+  showBillingModal = signal(false);
+  billingMesa = signal<AdminMesa | null>(null);
+  billingItems = signal<any[]>([]);
+  billingTotal = signal<number>(0);
+  extraItems = signal<any[]>([]);
+  manualCharges = signal<any[]>([]);
+  selectedMenuItemId = '';
+  extraQuantity = 1;
+  manualChargeDescription = '';
+  manualChargeMonto = 0;
 
   // Signals para Filtros
   filterType = signal<string>('All');
@@ -770,11 +904,122 @@ export class AdminDashboardComponent {
 
   async cerrarMesa(mesaId: string) {
     try {
-      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null).subscribe({
-        next: () => this.dataService.refreshAll(),
+      const token = localStorage.getItem('auth_token');
+      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({
+        next: () => {
+          this.dataService.refreshAll();
+          this.showBillingModal.set(false);
+          this.billingMesa.set(null);
+        },
         error: (e) => console.error(e)
       });
     } catch(e) { console.error(e); }
+  }
+
+  openBillingModal(mesa: any) {
+    this.billingMesa.set(mesa);
+    this.extraItems.set([]);
+    this.manualCharges.set([]);
+    this.selectedMenuItemId = '';
+    this.extraQuantity = 1;
+    this.manualChargeDescription = '';
+    this.manualChargeMonto = 0;
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    this.http.get<any>(`${environment.apiUrl}/api/mesas/${mesa.id}/consumos`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: (data) => {
+        this.billingItems.set(data.items);
+        this.billingTotal.set(data.total);
+        this.showBillingModal.set(true);
+      },
+      error: (err) => console.error('Error al cargar consumos de mesa:', err)
+    });
+  }
+
+  addExtraItem() {
+    if (!this.selectedMenuItemId || this.extraQuantity < 1) return;
+    const matchedItem = this.dataService.menuItems().find(i => i.id === this.selectedMenuItemId);
+    if (!matchedItem) return;
+
+    const existingIndex = this.extraItems().findIndex(i => i.menuItemId === this.selectedMenuItemId);
+    if (existingIndex > -1) {
+      this.extraItems.update(items => {
+        items[existingIndex].cantidad += this.extraQuantity;
+        items[existingIndex].total = items[existingIndex].cantidad * items[existingIndex].precioUnitario;
+        return [...items];
+      });
+    } else {
+      this.extraItems.update(items => [...items, {
+        menuItemId: matchedItem.id,
+        nombre: matchedItem.nombre,
+        cantidad: this.extraQuantity,
+        precioUnitario: matchedItem.precio,
+        total: this.extraQuantity * matchedItem.precio
+      }]);
+    }
+    this.selectedMenuItemId = '';
+    this.extraQuantity = 1;
+  }
+
+  removeExtraItem(index: number) {
+    this.extraItems.update(items => items.filter((_, i) => i !== index));
+  }
+
+  addManualCharge() {
+    if (!this.manualChargeDescription.trim() || this.manualChargeMonto <= 0) return;
+    this.manualCharges.update(charges => [...charges, {
+      descripcion: this.manualChargeDescription.trim(),
+      monto: this.manualChargeMonto
+    }]);
+    this.manualChargeDescription = '';
+    this.manualChargeMonto = 0;
+  }
+
+  removeManualCharge(index: number) {
+    this.manualCharges.update(charges => charges.filter((_, i) => i !== index));
+  }
+
+  getPreviewTotal(): number {
+    const dbTotal = this.billingTotal();
+    const extraTotal = this.extraItems().reduce((acc, i) => acc + i.total, 0);
+    const manualTotal = this.manualCharges().reduce((acc, c) => acc + c.monto, 0);
+    return dbTotal + extraTotal + manualTotal;
+  }
+
+  confirmarCobro() {
+    const mesa = this.billingMesa();
+    if (!mesa) return;
+
+    const payload = {
+      items: [
+        ...this.extraItems().map(i => ({ menuItemId: i.menuItemId, cantidad: i.cantidad })),
+        ...this.manualCharges().map(c => ({ descripcion: c.descripcion, monto: c.monto }))
+      ]
+    };
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    this.http.post<any>(`${environment.apiUrl}/api/mesas/${mesa.id}/agregar-consumo`, payload, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json' 
+      }
+    }).subscribe({
+      next: (res) => {
+        this.dataService.refreshAll();
+        // Recargar consumos y limpiar temporales locales
+        this.openBillingModal(mesa);
+        alert('Consumos extras guardados en la mesa.');
+      },
+      error: (err) => console.error('Error al agregar consumos:', err)
+    });
   }
 
   openReassignModal(taskId: string) {

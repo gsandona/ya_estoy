@@ -15,7 +15,7 @@ export class AdminLandingComponent implements OnInit {
     if (role === 'Admin' || role === 'SuperAdmin') {
       this.router.navigate(['/admin/inicio']);
     } else if (role === 'Cocina') {
-      this.router.navigate(['/cocina']);
+      this.router.navigate(['/admin/cocina']);
     } else {
       this.router.navigate(['/admin/dashboard']);
     }

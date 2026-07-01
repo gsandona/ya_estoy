@@ -51,14 +51,39 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
               }
             </a>
           }
-          <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.tables : ''">
-            <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
-            </span>
-            @if (!sidebarCollapsed()) {
-              <span class="truncate">{{ lang.translations().sidebar.tables }}</span>
-            }
-          </a>
+          
+          @if (auth.currentUser()?.role !== 'Cocina') {
+            <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.tables : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
+              </span>
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">{{ lang.translations().sidebar.tables }}</span>
+              }
+            </a>
+          }
+
+          @if (auth.currentUser()?.role === 'Cocina' || auth.isAdmin() || auth.isSuperAdmin()) {
+            <a routerLink="/admin/cocina" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.kitchen : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
+              </span>
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">{{ lang.translations().sidebar.kitchen }}</span>
+              }
+            </a>
+          }
+
+          @if (auth.isAdmin() || auth.isSuperAdmin()) {
+            <a routerLink="/admin/ventas" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.sales : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
+              </span>
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">{{ lang.translations().sidebar.sales }}</span>
+              }
+            </a>
+          }
 
           @if (auth.isAdmin()) {
             <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.personal : ''">
@@ -291,12 +316,32 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
                   Métricas y Datos
                 </a>
               }
-              <a routerLink="/admin/dashboard" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
-                </span>
-                Mesas y Tareas
-              </a>
+              @if (auth.currentUser()?.role !== 'Cocina') {
+                <a routerLink="/admin/dashboard" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
+                  </span>
+                  Mesas y Tareas
+                </a>
+              }
+
+              @if (auth.currentUser()?.role === 'Cocina' || auth.isAdmin() || auth.isSuperAdmin()) {
+                <a routerLink="/admin/cocina" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
+                  </span>
+                  Cocina
+                </a>
+              }
+
+              @if (auth.isAdmin() || auth.isSuperAdmin()) {
+                <a routerLink="/admin/ventas" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
+                  </span>
+                  Ventas
+                </a>
+              }
 
               @if (auth.isAdmin()) {
                 <a routerLink="/admin/configuracion" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
