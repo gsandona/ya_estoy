@@ -21,6 +21,8 @@ public class CrearMenuItemDto
     public string? Descripcion { get; set; }
 
     public bool Activo { get; set; } = true;
+
+    public Guid? MenuCategoryId { get; set; }
 }
 
 public class EditarMenuItemDto
@@ -42,6 +44,8 @@ public class EditarMenuItemDto
     public string? Descripcion { get; set; }
 
     public bool Activo { get; set; }
+
+    public Guid? MenuCategoryId { get; set; }
 }
 
 public class BulkMenuItemDto
@@ -65,4 +69,6 @@ public class BulkMenuItemDto
     public string? Descripcion { get; set; }
 
     public bool Activo { get; set; } = true;
+
+    public Guid? MenuCategoryId { get; set; }
 }

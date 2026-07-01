@@ -12,6 +12,7 @@ export interface AdminMenuItem {
   precio: number; 
   descripcion: string; 
   activo: boolean;
+  menuCategoryId?: string;
 }
 
 @Injectable({ providedIn: 'root' })

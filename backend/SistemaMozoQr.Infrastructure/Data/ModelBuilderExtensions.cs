@@ -157,5 +157,24 @@ public static class ModelBuilderExtensions
             }
         }
         modelBuilder.Entity<DashboardWidgetConfig>().HasData(configs);
+
+        // Seed Menu Categories & Subcategories
+        var comidasId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000001");
+        var bebidaAlcoholId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000002");
+        var bebidaFriaId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000003");
+        var postreId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000004");
+        var bebidaCalienteId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000005");
+
+        modelBuilder.Entity<MenuCategory>().HasData(
+            new MenuCategory { Id = comidasId, Nombre = "Comidas", Emoji = "🍔", ParentCategoryId = null },
+            new MenuCategory { Id = bebidaAlcoholId, Nombre = "Bebida con alcohol", Emoji = "🍷", ParentCategoryId = null },
+            new MenuCategory { Id = bebidaFriaId, Nombre = "Bebida fria", Emoji = "🥤", ParentCategoryId = null },
+            new MenuCategory { Id = postreId, Nombre = "Postre", Emoji = "🍰", ParentCategoryId = null },
+            new MenuCategory { Id = bebidaCalienteId, Nombre = "Bebidas calientes", Emoji = "☕", ParentCategoryId = null },
+
+            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000011"), Nombre = "Entradas", Emoji = "🥗", ParentCategoryId = comidasId },
+            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Nombre = "Platos", Emoji = "🍝", ParentCategoryId = comidasId },
+            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000013"), Nombre = "Panes", Emoji = "🍞", ParentCategoryId = comidasId }
+        );
     }
 }

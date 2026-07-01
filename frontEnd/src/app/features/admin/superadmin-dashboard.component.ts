@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { AbmRestaurantesComponent } from './config/abm-restaurantes.component';
+import { SuperadminCategoriesComponent } from './config/superadmin-categories.component';
 
 interface Restaurante {
   id: string;
@@ -41,7 +42,7 @@ interface ErrorLog {
 @Component({
   selector: 'app-super-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, AbmRestaurantesComponent],
+  imports: [CommonModule, FormsModule, AbmRestaurantesComponent, SuperadminCategoriesComponent],
   template: `
     <div class="p-6">
       <h1 class="text-3xl font-black mb-8">Centro de Control SaaS</h1>
@@ -50,6 +51,7 @@ interface ErrorLog {
       <div class="flex flex-wrap gap-3 mb-8">
         <button (click)="activeTab.set('restaurantes')" [class.bg-primary]="activeTab() === 'restaurantes'" [class.text-white]="activeTab() === 'restaurantes'" [class.bg-white]="activeTab() !== 'restaurantes'" [class.text-gray-600]="activeTab() !== 'restaurantes'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Restaurantes</button>
         <button (click)="activeTab.set('dashboard-config')" [class.bg-primary]="activeTab() === 'dashboard-config'" [class.text-white]="activeTab() === 'dashboard-config'" [class.bg-white]="activeTab() !== 'dashboard-config'" [class.text-gray-600]="activeTab() !== 'dashboard-config'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Configurar Dashboards</button>
+        <button (click)="activeTab.set('menu-categories')" [class.bg-primary]="activeTab() === 'menu-categories'" [class.text-white]="activeTab() === 'menu-categories'" [class.bg-white]="activeTab() !== 'menu-categories'" [class.text-gray-600]="activeTab() !== 'menu-categories'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Categorías de Menú</button>
         <button (click)="activeTab.set('auditoria')" [class.bg-primary]="activeTab() === 'auditoria'" [class.text-white]="activeTab() === 'auditoria'" [class.bg-white]="activeTab() !== 'auditoria'" [class.text-gray-600]="activeTab() !== 'auditoria'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Auditoría</button>
         <button (click)="activeTab.set('errores')" [class.bg-primary]="activeTab() === 'errores'" [class.text-white]="activeTab() === 'errores'" [class.bg-white]="activeTab() !== 'errores'" [class.text-gray-600]="activeTab() !== 'errores'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Errores</button>
         <button (click)="activeTab.set('branding')" [class.bg-primary]="activeTab() === 'branding'" [class.text-white]="activeTab() === 'branding'" [class.bg-white]="activeTab() !== 'branding'" [class.text-gray-600]="activeTab() !== 'branding'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Branding Global</button>
@@ -313,13 +315,20 @@ interface ErrorLog {
           </div>
         </div>
       }
+
+      <!-- Tab Categorías de Menú -->
+      @if (activeTab() === 'menu-categories') {
+        <div class="animate-fade-in">
+          <app-superadmin-categories></app-superadmin-categories>
+        </div>
+      }
     </div>
   `
 })
 export class SuperAdminDashboardComponent {
   private http = inject(HttpClient);
   
-  activeTab = signal<'restaurantes' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding'>('restaurantes');
+  activeTab = signal<'restaurantes' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding' | 'menu-categories'>('restaurantes');
   restaurantes = signal<Restaurante[]>([]);
   logsAuditoria = signal<Log[]>([]);
   logsErrores = signal<ErrorLog[]>([]);

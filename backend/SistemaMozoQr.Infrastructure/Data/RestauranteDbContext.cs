@@ -33,6 +33,7 @@ public class RestauranteDbContext : DbContext
     public DbSet<ErrorLog> ErrorLogs { get; set; }
     public DbSet<UserPushSubscription> PushSubscriptions { get; set; }
     public DbSet<Venta> Ventas { get; set; }
+    public DbSet<MenuCategory> MenuCategories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -96,6 +97,25 @@ public class RestauranteDbContext : DbContext
                   .HasForeignKey(e => e.UsuarioId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
+
+        // Categorías y Subcategorías
+        modelBuilder.Entity<MenuCategory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Emoji).IsRequired().HasMaxLength(10);
+            entity.HasOne(e => e.ParentCategory)
+                  .WithMany(e => e.SubCategories)
+                  .HasForeignKey(e => e.ParentCategoryId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // MenuItem a MenuCategory
+        modelBuilder.Entity<MenuItem>()
+            .HasOne(m => m.MenuCategory)
+            .WithMany(c => c.MenuItems)
+            .HasForeignKey(m => m.MenuCategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // --- SEED DATA MULTI-TENANT ---
         modelBuilder.SeedData();

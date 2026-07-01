@@ -52,7 +52,8 @@ public class MenuController : ControllerBase
             Nombre = dto.Nombre,
             Precio = dto.Precio,
             Descripcion = dto.Descripcion,
-            Activo = dto.Activo
+            Activo = dto.Activo,
+            MenuCategoryId = dto.MenuCategoryId
         };
 
         var result = await _menuRepository.AddAsync(item);
@@ -70,6 +71,7 @@ public class MenuController : ControllerBase
         item.Precio = dto.Precio;
         item.Descripcion = dto.Descripcion;
         item.Activo = dto.Activo;
+        item.MenuCategoryId = dto.MenuCategoryId;
 
         await _menuRepository.UpdateAsync(item);
         return Ok(item);
@@ -95,7 +97,8 @@ public class MenuController : ControllerBase
             Nombre = dto.Nombre,
             Precio = dto.Precio,
             Descripcion = dto.Descripcion,
-            Activo = dto.Activo
+            Activo = dto.Activo,
+            MenuCategoryId = dto.MenuCategoryId
         }).ToList();
 
         await _menuRepository.BulkSyncAsync(items);

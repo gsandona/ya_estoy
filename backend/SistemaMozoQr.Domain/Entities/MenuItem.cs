@@ -23,6 +23,9 @@ public class MenuItem : IMustHaveTenant
     
     public bool Activo { get; set; } = true;
 
+    public Guid? MenuCategoryId { get; set; }
+    public MenuCategory? MenuCategory { get; set; }
+
     public Guid RestauranteId { get; set; }
     public Restaurante? Restaurante { get; set; }
 }

@@ -16,22 +16,22 @@ public class MenuItemRepository : IMenuItemRepository
 
     public async Task<IEnumerable<MenuItem>> GetAllAsync()
     {
-        return await _context.MenuItems.ToListAsync();
+        return await _context.MenuItems.Include(m => m.MenuCategory).ToListAsync();
     }
 
     public async Task<IEnumerable<MenuItem>> GetAllActivosAsync()
     {
-        return await _context.MenuItems.Where(m => m.Activo).ToListAsync();
+        return await _context.MenuItems.Include(m => m.MenuCategory).Where(m => m.Activo).ToListAsync();
     }
 
     public async Task<IEnumerable<MenuItem>> GetAllActivosPorRestauranteAsync(Guid restauranteId)
     {
-        return await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == restauranteId && m.Activo).ToListAsync();
+        return await _context.MenuItems.IgnoreQueryFilters().Include(m => m.MenuCategory).Where(m => m.RestauranteId == restauranteId && m.Activo).ToListAsync();
     }
 
     public async Task<MenuItem?> GetByIdAsync(Guid id)
     {
-        return await _context.MenuItems.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == id);
+        return await _context.MenuItems.IgnoreQueryFilters().Include(m => m.MenuCategory).FirstOrDefaultAsync(m => m.Id == id);
     }
 
     public async Task<MenuItem> AddAsync(MenuItem item)
@@ -75,6 +75,7 @@ public class MenuItemRepository : IMenuItemRepository
                 dbItem.Precio = inc.Precio;
                 dbItem.Descripcion = inc.Descripcion;
                 dbItem.Activo = inc.Activo;
+                dbItem.MenuCategoryId = inc.MenuCategoryId;
                 _context.MenuItems.Update(dbItem);
             }
             else
