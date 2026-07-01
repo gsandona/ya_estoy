@@ -467,7 +467,10 @@ import { LanguageService } from '../../../core/services/language.service';
           <div class="space-y-6">
             <div>
               <h2 class="text-xl font-black text-gray-800 tracking-tight">Cobro y Consumo</h2>
-              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Mesa {{ billingMesa()?.numero }} • PIN de Acceso: {{ billingMesa()?.codigoAcceso }}</p>
+              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
+                Mesa {{ billingMesa()?.numero }} • PIN: {{ billingMesa()?.codigoAcceso }}
+                • Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
+              </p>
             </div>
 
             <!-- Formulario 1: Agregar Plato de la Carta -->
@@ -574,12 +577,68 @@ import { LanguageService } from '../../../core/services/language.service';
               </div>
 
               <!-- Cerrar Mesa -->
-              <button (click)="cerrarMesa(billingMesa()!.id)" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-1">
+              <button (click)="showConfirmCloseModal.set(true)" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-1">
                 🧾 Registrar Pago y Cerrar Mesa
               </button>
             </div>
           </div>
           
+        </div>
+      </div>
+    }
+
+    <!-- Confirm Close Modal -->
+    @if (showConfirmCloseModal()) {
+      <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md border border-gray-150 shadow-2xl space-y-5 animate-scale-up">
+          <div class="pb-2 border-b border-gray-100">
+            <h3 class="text-lg font-black text-gray-800">Confirmar Cierre de Cuenta</h3>
+            <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">
+              Mesa {{ billingMesa()?.numero }} • Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
+            </p>
+          </div>
+
+          <div class="space-y-3 max-h-[250px] overflow-y-auto pr-1">
+            <!-- Render already saved billing items -->
+            @for (item of billingItems(); track item.id) {
+              <div class="flex justify-between items-center text-xs font-bold text-gray-700">
+                <span>{{ item.cantidad }}x {{ item.nombre }}</span>
+                <span>\${{ item.total | number:'1.2-2' }}</span>
+              </div>
+            }
+            
+            <!-- Render pending extra items -->
+            @for (item of extraItems(); track item.menuItemId) {
+              <div class="flex justify-between items-center text-xs font-bold text-accent">
+                <span>{{ item.cantidad }}x {{ item.nombre }} (Extra)</span>
+                <span>\${{ item.total | number:'1.2-2' }}</span>
+              </div>
+            }
+
+            <!-- Render pending manual charges -->
+            @for (charge of manualCharges(); track charge.descripcion) {
+              <div class="flex justify-between items-center text-xs font-bold text-accent">
+                <span>1x {{ charge.descripcion }} (Manual)</span>
+                <span>\${{ charge.monto | number:'1.2-2' }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="pt-4 border-t border-dashed border-gray-200">
+            <div class="flex justify-between items-center font-black text-gray-800 text-sm">
+              <span>TOTAL FACTURA</span>
+              <span class="text-emerald-700 text-base">\${{ getPreviewTotal() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="flex gap-3 justify-end pt-2">
+            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs">
+              Cancelar
+            </button>
+            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">
+              Confirmar Pago y Facturar
+            </button>
+          </div>
         </div>
       </div>
     }
@@ -607,6 +666,7 @@ export class AdminDashboardComponent {
 
   // Signals para Facturación y Consumos Extra (POS Caja)
   showBillingModal = signal(false);
+  showConfirmCloseModal = signal(false);
   billingMesa = signal<AdminMesa | null>(null);
   billingItems = signal<any[]>([]);
   billingTotal = signal<number>(0);
@@ -903,19 +963,62 @@ export class AdminDashboardComponent {
   }
 
   async cerrarMesa(mesaId: string) {
-    try {
-      const token = localStorage.getItem('auth_token');
-      this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null, {
-        headers: { Authorization: `Bearer ${token}` }
+    this.showConfirmCloseModal.set(true);
+  }
+
+  async ejecutarCierreYFacturacion() {
+    const mesa = this.billingMesa();
+    if (!mesa) return;
+
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+
+    // Check if there are pending extra items or manual charges to save first
+    const hasUnsavedExtras = this.extraItems().length > 0 || this.manualCharges().length > 0;
+
+    if (hasUnsavedExtras) {
+      const payload = {
+        items: [
+          ...this.extraItems().map(i => ({ menuItemId: i.menuItemId, cantidad: i.cantidad })),
+          ...this.manualCharges().map(c => ({ descripcion: c.descripcion, monto: c.monto }))
+        ]
+      };
+
+      this.http.post<any>(`${environment.apiUrl}/api/mesas/${mesa.id}/agregar-consumo`, payload, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json' 
+        }
       }).subscribe({
         next: () => {
-          this.dataService.refreshAll();
-          this.showBillingModal.set(false);
-          this.billingMesa.set(null);
+          this.procederConCerrarMesaAPI(mesa.id);
         },
-        error: (e) => console.error(e)
+        error: (err) => {
+          console.error('Error al guardar consumos antes de cerrar:', err);
+          alert('Hubo un error al guardar los consumos extras. Cierre cancelado.');
+        }
       });
-    } catch(e) { console.error(e); }
+    } else {
+      this.procederConCerrarMesaAPI(mesa.id);
+    }
+  }
+
+  private procederConCerrarMesaAPI(mesaId: string) {
+    const token = localStorage.getItem('auth_token');
+    this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        this.dataService.refreshAll();
+        this.showConfirmCloseModal.set(false);
+        this.showBillingModal.set(false);
+        this.billingMesa.set(null);
+      },
+      error: (e) => {
+        console.error(e);
+        alert('Hubo un error al cerrar la mesa.');
+      }
+    });
   }
 
   openBillingModal(mesa: any) {

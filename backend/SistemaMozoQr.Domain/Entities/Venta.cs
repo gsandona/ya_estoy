@@ -19,4 +19,6 @@ public class Venta : IMustHaveTenant
     public decimal Total { get; set; }
     
     public string DetallesJson { get; set; } = string.Empty;
+    
+    public string? MozoNombre { get; set; }
 }

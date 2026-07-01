@@ -14,6 +14,7 @@ interface Venta {
   fechaHora: string;
   total: number;
   detallesJson: string; // JSON string
+  mozoNombre?: string;
 }
 
 interface ConsumoItem {
@@ -98,6 +99,7 @@ interface ConsumoItem {
                 <th class="py-4 px-4">Hora</th>
                 <th class="py-4 px-4 text-center">Mesa</th>
                 <th class="py-4 px-4">Código PIN</th>
+                <th class="py-4 px-4">Mozo</th>
                 <th class="py-4 px-4 text-right">Total Facturado</th>
                 <th class="py-4 px-4 text-center">Acciones</th>
               </tr>
@@ -110,7 +112,8 @@ interface ConsumoItem {
                     <span class="px-2.5 py-1 bg-gray-100 text-primary rounded-lg">Mesa {{ venta.mesaNumero }}</span>
                   </td>
                   <td class="py-3.5 px-4 font-mono text-gray-500">{{ venta.codigoAcceso }}</td>
-                  <td class="py-3.5 px-4 text-right text-emerald-700 font-black">\\\${{ venta.total | number:'1.2-2' }}</td>
+                  <td class="py-3.5 px-4 text-gray-600 font-medium">{{ venta.mozoNombre || 'Sin mozo' }}</td>
+                  <td class="py-3.5 px-4 text-right text-emerald-700 font-black">\${{ venta.total | number:'1.2-2' }}</td>
                   <td class="py-3.5 px-4 text-center">
                     <button (click)="verDetalle(venta)" class="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-xl text-[10px] font-black shadow-sm hover:bg-emerald-100 transition active:scale-95">
                       Ver Ticket
@@ -139,6 +142,7 @@ interface ConsumoItem {
             <div class="text-center pb-4 border-b border-dashed border-[#DCD0C0] space-y-1">
               <span class="text-lg font-black tracking-tight block">TICKET DE CONSUMO</span>
               <span class="text-[10px] text-gray-500 block">Mesa {{ selectedVenta()?.mesaNumero }} • Código {{ selectedVenta()?.codigoAcceso }}</span>
+              <span class="text-[10px] text-gray-600 font-bold block">Mozo: {{ selectedVenta()?.mozoNombre || 'Sin mozo' }}</span>
               <span class="text-[9px] text-gray-400 block">{{ selectedVenta()?.fechaHora | date:'medium' }}</span>
             </div>
 

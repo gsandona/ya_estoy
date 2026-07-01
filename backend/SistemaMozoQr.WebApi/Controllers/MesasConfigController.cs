@@ -151,11 +151,11 @@ public class MesasConfigController : ControllerBase
     [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
     public async Task<IActionResult> Cerrar(Guid id)
     {
-        var mesa = await _mesaRepository.GetByIdAsync(id);
+        var mesa = await _dbContext.Mesas.IgnoreQueryFilters().Include(m => m.Mozo).FirstOrDefaultAsync(m => m.Id == id);
         if (mesa == null) return NotFound();
 
         // 1. Registrar la Venta en el histórico antes de limpiar la sesión
-        if (!string.IsNullOrEmpty(mesa.CodigoAcceso) && (mesa.MontoConsumo ?? 0) > 0)
+        if (!string.IsNullOrEmpty(mesa.CodigoAcceso))
         {
             var ordersList = await _pedidoRepository.GetByMesaIdAsync(mesa.Id);
             var activeOrders = ordersList.Where(o => o.Estado != SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado && o.CodigoAcceso == mesa.CodigoAcceso).ToList();
@@ -167,21 +167,27 @@ public class MesasConfigController : ControllerBase
                 total = i.Cantidad * i.PrecioUnitario
             }).ToList();
 
-            var detallesJson = System.Text.Json.JsonSerializer.Serialize(itemsList);
+            decimal totalFinal = itemsList.Sum(i => i.total);
 
-            var venta = new Venta
+            if (totalFinal > 0)
             {
-                Id = Guid.NewGuid(),
-                RestauranteId = mesa.RestauranteId,
-                MesaNumero = mesa.Numero,
-                CodigoAcceso = mesa.CodigoAcceso,
-                FechaHora = DateTime.UtcNow,
-                Total = mesa.MontoConsumo ?? 0,
-                DetallesJson = detallesJson
-            };
+                var detallesJson = System.Text.Json.JsonSerializer.Serialize(itemsList);
 
-            _dbContext.Ventas.Add(venta);
-            await _dbContext.SaveChangesAsync();
+                var venta = new Venta
+                {
+                    Id = Guid.NewGuid(),
+                    RestauranteId = mesa.RestauranteId,
+                    MesaNumero = mesa.Numero,
+                    CodigoAcceso = mesa.CodigoAcceso,
+                    FechaHora = DateTime.UtcNow,
+                    Total = totalFinal,
+                    DetallesJson = detallesJson,
+                    MozoNombre = mesa.Mozo?.NombreCompleto ?? "Sin mozo asignado"
+                };
+
+                _dbContext.Ventas.Add(venta);
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         // 2. Liberar la mesa
