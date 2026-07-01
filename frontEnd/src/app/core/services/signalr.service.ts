@@ -43,6 +43,14 @@ export class SignalrService {
     this.startConnection();
     this.fetchPendingTasks();
     this.setupAudioUnlock();
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event) => {
+        if (event.key === this.getSettingsKey()) {
+          this.loadSettings();
+        }
+      });
+    }
   }
 
   private setupAudioUnlock() {
@@ -301,8 +309,15 @@ export class SignalrService {
 
   private playAudioAlert(type: 'tasks' | 'orderStatus' | 'reassignments') {
     const settings = this.notificationSettings();
-    if (settings.muteAll) return;
-    if (!settings[type]) return;
+    console.log('playAudioAlert check:', { type, settings });
+    if (settings.muteAll) {
+      console.log('playAudioAlert: Mute All is active. Skip audio.');
+      return;
+    }
+    if (!settings[type]) {
+      console.log(`playAudioAlert: Setting for ${type} is disabled. Skip audio.`);
+      return;
+    }
 
     try {
       // Vibración para celulares (patrón: vibra 200ms, pausa 100ms, vibra 200ms)

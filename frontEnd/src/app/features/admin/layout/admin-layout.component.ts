@@ -165,13 +165,13 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
                       <div class="flex flex-col pr-3">
                         <span class="text-sm font-bold text-gray-700">{{ lang.translations().notifications?.muteAll || 'Silenciar Todo' }}</span>
                       </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" 
-                               [checked]="signalrService.notificationSettings().muteAll" 
-                               (change)="toggleSetting('muteAll')" 
-                               class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                      </label>
+                      <button type="button"
+                              (click)="toggleSetting('muteAll')"
+                              class="relative inline-flex items-center cursor-pointer w-11 h-6 rounded-full transition-colors duration-250 focus:outline-none shadow-inner"
+                              [class]="signalrService.notificationSettings().muteAll ? 'bg-red-500' : 'bg-gray-200'">
+                        <span class="inline-block w-5 h-5 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
+                              [class]="signalrService.notificationSettings().muteAll ? 'translate-x-[22px]' : 'translate-x-0.5'"></span>
+                      </button>
                     </div>
 
                     <div class="border-t border-gray-100 my-2"></div>
@@ -181,14 +181,14 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
                       <div class="flex flex-col pr-3">
                         <span class="text-xs font-bold text-gray-800">{{ lang.translations().notifications?.tasks || 'Tareas (Llamados, Cuentas, Pedidos)' }}</span>
                       </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" 
-                               [checked]="signalrService.notificationSettings().tasks" 
-                               [disabled]="signalrService.notificationSettings().muteAll" 
-                               (change)="toggleSetting('tasks')" 
-                               class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                      </label>
+                      <button type="button"
+                              (click)="toggleSetting('tasks')"
+                              [disabled]="signalrService.notificationSettings().muteAll"
+                              class="relative inline-flex items-center cursor-pointer w-9 h-5 rounded-full transition-colors duration-250 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
+                              [class]="signalrService.notificationSettings().tasks ? 'bg-accent' : 'bg-gray-200'">
+                        <span class="inline-block w-4 h-4 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
+                              [class]="signalrService.notificationSettings().tasks ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
+                      </button>
                     </div>
 
                     <!-- Estados -->
@@ -196,14 +196,14 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
                       <div class="flex flex-col pr-3">
                         <span class="text-xs font-bold text-gray-800">{{ lang.translations().notifications?.orderStatus || 'Estados de Pedido' }}</span>
                       </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" 
-                               [checked]="signalrService.notificationSettings().orderStatus" 
-                               [disabled]="signalrService.notificationSettings().muteAll" 
-                               (change)="toggleSetting('orderStatus')" 
-                               class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                      </label>
+                      <button type="button"
+                              (click)="toggleSetting('orderStatus')"
+                              [disabled]="signalrService.notificationSettings().muteAll"
+                              class="relative inline-flex items-center cursor-pointer w-9 h-5 rounded-full transition-colors duration-250 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
+                              [class]="signalrService.notificationSettings().orderStatus ? 'bg-accent' : 'bg-gray-200'">
+                        <span class="inline-block w-4 h-4 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
+                              [class]="signalrService.notificationSettings().orderStatus ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
+                      </button>
                     </div>
 
                     <!-- Reasignaciones -->
@@ -211,14 +211,14 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
                       <div class="flex flex-col pr-3">
                         <span class="text-xs font-bold text-gray-800">{{ lang.translations().notifications?.reassignments || 'Reasignación de Tareas' }}</span>
                       </div>
-                      <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" 
-                               [checked]="signalrService.notificationSettings().reassignments" 
-                               [disabled]="signalrService.notificationSettings().muteAll" 
-                               (change)="toggleSetting('reassignments')" 
-                               class="sr-only peer">
-                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                      </label>
+                      <button type="button"
+                              (click)="toggleSetting('reassignments')"
+                              [disabled]="signalrService.notificationSettings().muteAll"
+                              class="relative inline-flex items-center cursor-pointer w-9 h-5 rounded-full transition-colors duration-250 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
+                              [class]="signalrService.notificationSettings().reassignments ? 'bg-accent' : 'bg-gray-200'">
+                        <span class="inline-block w-4 h-4 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
+                              [class]="signalrService.notificationSettings().reassignments ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
+                      </button>
                     </div>
 
                     <!-- Footer Warning -->

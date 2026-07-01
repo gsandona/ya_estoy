@@ -262,7 +262,10 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
               </select>
             </div>
           }
-              @if (!collapseTasks()) {
+        </div>
+      </div>
+
+      @if (!collapseTasks()) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (task of myPendingTasks(); track task.id) {
             <div class="bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] rounded-2xl p-3.5 flex flex-col relative overflow-hidden transition-all group hover:border-amber-700/30 hover:-translate-y-0.5 shadow-sm">
@@ -461,8 +464,8 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
   `,
   styles: [`
     @keyframes fade-in {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     .animate-fade-in {
       animation: fade-in 0.4s ease-out forwards;
