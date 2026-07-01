@@ -21,20 +21,36 @@ public class VentasController : ControllerBase
     }
 
     [HttpGet("resumen")]
-    public async Task<IActionResult> GetResumen([FromQuery] Guid? restauranteId = null, [FromQuery] string? fecha = null)
+    public async Task<IActionResult> GetResumen(
+        [FromQuery] Guid? restauranteId = null, 
+        [FromQuery] string? fecha = null,
+        [FromQuery] string? startUtc = null,
+        [FromQuery] string? endUtc = null)
     {
-        DateTime targetDate;
-        if (!string.IsNullOrWhiteSpace(fecha) && DateTime.TryParse(fecha, out DateTime parsedDate))
+        DateTime targetStart;
+        DateTime targetEnd;
+
+        if (!string.IsNullOrWhiteSpace(startUtc) && DateTime.TryParse(startUtc, out DateTime parsedStart) &&
+            !string.IsNullOrWhiteSpace(endUtc) && DateTime.TryParse(endUtc, out DateTime parsedEnd))
         {
-            targetDate = parsedDate.Date;
+            targetStart = DateTime.SpecifyKind(parsedStart, DateTimeKind.Utc);
+            targetEnd = DateTime.SpecifyKind(parsedEnd, DateTimeKind.Utc);
         }
         else
         {
-            // Por defecto la fecha local/UTC actual
-            targetDate = DateTime.UtcNow.Date;
+            DateTime targetDate;
+            if (!string.IsNullOrWhiteSpace(fecha) && DateTime.TryParse(fecha, out DateTime parsedDate))
+            {
+                targetDate = parsedDate.Date;
+            }
+            else
+            {
+                // Por defecto la fecha local/UTC actual
+                targetDate = DateTime.UtcNow.Date;
+            }
+            targetStart = DateTime.SpecifyKind(targetDate, DateTimeKind.Utc);
+            targetEnd = DateTime.SpecifyKind(targetDate.AddDays(1), DateTimeKind.Utc);
         }
-
-        var nextDate = targetDate.AddDays(1);
 
         var query = _context.Ventas.IgnoreQueryFilters().AsQueryable();
 
@@ -52,7 +68,7 @@ public class VentasController : ControllerBase
         }
 
         // SQLite almacena fechas en formato de texto ISO. Hacemos filtrado entre inicio y fin de día en UTC
-        query = query.Where(v => v.FechaHora >= targetDate && v.FechaHora < nextDate);
+        query = query.Where(v => v.FechaHora >= targetStart && v.FechaHora < targetEnd);
 
         var ventasList = await query.OrderByDescending(v => v.FechaHora).ToListAsync();
 

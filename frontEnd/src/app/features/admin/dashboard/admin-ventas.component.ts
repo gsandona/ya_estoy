@@ -218,7 +218,16 @@ export class AdminVentasComponent implements OnInit {
     const token = localStorage.getItem('auth_token');
     if (!token) return;
 
-    let url = `${environment.apiUrl}/api/ventas/resumen?fecha=${this.selectedDate}`;
+    // Calcular el inicio y fin del día en UTC correspondiente a la fecha local seleccionada
+    const localDate = new Date(this.selectedDate + 'T00:00:00');
+    const startOfDay = new Date(localDate);
+    const endOfDay = new Date(localDate);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    const startUtc = startOfDay.toISOString();
+    const endUtc = endOfDay.toISOString();
+
+    let url = `${environment.apiUrl}/api/ventas/resumen?startUtc=${startUtc}&endUtc=${endUtc}`;
     if (this.filterRestauranteId) {
       url += `&restauranteId=${this.filterRestauranteId}`;
     }
