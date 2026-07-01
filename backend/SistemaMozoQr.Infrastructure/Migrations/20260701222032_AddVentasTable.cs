@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -15,13 +15,13 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "Ventas",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(nullable: false),
-                    RestauranteId = table.Column<Guid>(nullable: false),
-                    MesaNumero = table.Column<int>(nullable: false),
-                    CodigoAcceso = table.Column<string>(nullable: true),
-                    FechaHora = table.Column<DateTime>(nullable: false),
-                    Total = table.Column<decimal>(nullable: false),
-                    DetallesJson = table.Column<string>(nullable: true)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RestauranteId = table.Column<Guid>(type: "uuid", nullable: false),
+                    MesaNumero = table.Column<int>(type: "integer", nullable: false),
+                    CodigoAcceso = table.Column<string>(type: "text", nullable: false),
+                    FechaHora = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Total = table.Column<decimal>(type: "numeric", nullable: false),
+                    DetallesJson = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
