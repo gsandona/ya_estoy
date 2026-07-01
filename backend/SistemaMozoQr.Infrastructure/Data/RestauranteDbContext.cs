@@ -121,6 +121,10 @@ public class RestauranteDbContext : DbContext
 
             if (entry.State == EntityState.Added || entry.State == EntityState.Modified || entry.State == EntityState.Deleted)
             {
+                // No auditar la creación inicial (Added) de Pedido (envío de tareas/peticiones)
+                if (entry.Entity is Pedido && entry.State == EntityState.Added)
+                    continue;
+
                 string detalles = $"Cambio de estado de entidad a {entry.State}";
 
                 if (entry.Entity is Restaurante rest)

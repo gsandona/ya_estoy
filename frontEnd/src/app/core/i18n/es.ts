@@ -69,7 +69,16 @@ export const es = {
     location: "Ubicación / Detalles",
     waiter: "Mozo Asignado",
     unassigned: "Sin asignar",
-    activeTable: "Mesa Activa"
+    activeTable: "Mesa Activa",
+    controlPanel: "Panel de Control",
+    available: "Disponible / Libre",
+    openTable: "Abrir Mesa",
+    closeTable: "Cerrar Mesa",
+    noLocation: "Sin ubicación",
+    pinAccess: "PIN ACCESO",
+    consumed: "CONSUMIDO",
+    tablesBtn: "Mesas",
+    emptyList: "No hay mesas registradas."
   },
   kitchen: {
     title: "Monitoreo de Comandas",

@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RestauranteService } from '../../../core/services/restaurante.service';
 import { TenantContextService } from '../../../core/services/tenant-context.service';
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
 // ... (omitted changing imports array to not overwrite metadata incorrectly)
@@ -23,20 +24,19 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
           <span class="animate-spin">↻</span> Sin conexión. Intentando reconectar al servidor...
         </div>
       }
-      
-      <!-- Barra Superior de Navegación -->
+           <!-- Barra Superior de Navegación -->
       <div class="flex justify-between items-center bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] p-4 rounded-3xl shadow-sm mb-4">
         <div class="flex items-center gap-2">
           <span class="text-xl">🛎️</span>
-          <span class="text-base font-black text-gray-800 tracking-tight">Panel de Control</span>
+          <span class="text-base font-black text-gray-800 tracking-tight">{{ lang.translations().tables.controlPanel }}</span>
         </div>
         <button (click)="showControlMesas.set(!showControlMesas())"
                 [class]="showControlMesas() ? 'bg-primary text-white ring-4 ring-primary/10' : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'"
                 class="px-5 py-2.5 rounded-2xl text-xs font-black shadow-sm transition-all flex items-center gap-2 active:scale-95">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25zM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1 3.75 18v-2.25zM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25z" />
           </svg>
-          Mesas
+          {{ lang.translations().tables.tablesBtn }}
         </button>
       </div>
 
@@ -47,15 +47,15 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
             <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseMesas.set(!collapseMesas())">
               <div>
                 <h2 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                  Control de Mesas
+                  {{ lang.translations().tables.title }}
                   <span class="text-xs text-gray-400 inline-block transition-transform duration-300" [class.rotate-180]="collapseMesas()">▲</span>
                 </h2>
-                <p class="text-xs text-gray-400 font-medium mt-0.5">Administra los códigos QR, meseros asignados y estado de atención</p>
+                <p class="text-xs text-gray-400 font-medium mt-0.5">{{ lang.translations().tables.subtitle }}</p>
               </div>
             </div>
             @if (!collapseMesas() && (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin')) {
               <button (click)="openCreateForm()" class="bg-primary text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:bg-[#1a233b] transition-all flex items-center gap-1">
-                <span>+</span> Crear Mesa
+                <span>+</span> {{ lang.translations().tables.create }}
               </button>
             }
           </div>
@@ -64,11 +64,11 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
             @if (showForm()) {
               <div class="bg-surface p-5 rounded-3xl mb-6 border border-gray-200 shadow-inner animate-fade-in">
                 <h3 class="text-sm font-black text-gray-700 mb-3 flex items-center gap-1">
-                  {{ editingId() ? 'Editar Mesa' : 'Nueva Mesa' }}
+                  {{ editingId() ? lang.translations().tables.edit : lang.translations().tables.new }}
                 </h3>
                 <form #mesaForm="ngForm" class="flex flex-col md:flex-row gap-4 items-end" autocomplete="off" (submit)="saveForm($event)">
                   <div class="w-full md:w-32 relative">
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Número</label>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">{{ lang.translations().tables.number }}</label>
                     <input type="number" [(ngModel)]="formData.numero" name="numero" #numCtrl="ngModel" 
                            min="1" max="999"
                            class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent font-bold" required>
@@ -77,24 +77,24 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     }
                   </div>
                   <div class="flex-1 w-full relative">
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Ubicación / Detalles</label>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">{{ lang.translations().tables.location }}</label>
                     <input type="text" [(ngModel)]="formData.ubicacion" name="ubicacion" #ubicCtrl="ngModel"
                            maxlength="100" placeholder="Ej: Terraza Norte" 
                            class="w-full px-3 py-2 rounded-xl border border-gray-300 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
                   </div>
                   <div class="flex-1 w-full relative">
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">Mozo Asignado</label>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">{{ lang.translations().tables.waiter }}</label>
                     <select [(ngModel)]="formData.mozoId" name="mozoId" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent">
-                      <option [value]="null">Sin asignar</option>
+                      <option [value]="null">{{ lang.translations().tables.unassigned }}</option>
                       @for (mozo of dataService.mozos(); track mozo.id) {
                         <option [value]="mozo.id">{{ mozo.username }}</option>
                       }
                     </select>
                   </div>
                   <div class="flex gap-2 w-full md:w-auto">
-                    <button type="button" (click)="showForm.set(false)" class="flex-1 md:flex-none bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-colors">Cancelar</button>
+                    <button type="button" (click)="showForm.set(false)" class="flex-1 md:flex-none bg-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-bold hover:bg-gray-300 transition-colors">{{ lang.translations().common.cancel }}</button>
                     <button type="submit" [disabled]="mesaForm.invalid" class="flex-1 md:flex-none bg-accent text-white px-6 py-2.5 rounded-xl font-bold shadow-sm hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                      {{ editingId() ? 'Actualizar' : 'Guardar' }}
+                      {{ editingId() ? lang.translations().common.update : lang.translations().common.save }}
                     </button>
                   </div>
                 </form>
@@ -109,8 +109,8 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button (click)="openQrModal(mesa)" class="text-green-700 hover:text-green-900 font-bold text-[10px] bg-green-100/60 px-2.5 py-1 rounded-xl transition-colors border border-green-200/50">QR</button>
                       @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
-                        <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">Editar</button>
-                        <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">Borrar</button>
+                        <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">{{ lang.translations().common.edit }}</button>
+                        <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">{{ lang.translations().common.delete }}</button>
                       }
                     </div>
 
@@ -120,19 +120,19 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                           {{ mesa.numero }}
                         </div>
                         <div>
-                          <h3 class="font-black text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
-                          <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
+                          <h3 class="font-black text-gray-800 text-sm">{{ lang.translations().kitchen.table }} {{ mesa.numero }}</h3>
+                          <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || lang.translations().tables.noLocation }}</p>
                         </div>
                       </div>
 
                       <div class="grid grid-cols-2 gap-2">
                         <div class="bg-emerald-50/70 border border-emerald-100 rounded-2xl p-2 flex flex-col justify-center items-center">
-                          <span class="text-[8px] font-black text-emerald-600 uppercase tracking-wider">PIN ACCESO</span>
+                          <span class="text-[8px] font-black text-emerald-600 uppercase tracking-wider">{{ lang.translations().tables.pinAccess }}</span>
                           <span class="text-sm font-black tracking-wider text-emerald-700">{{ mesa.codigoAcceso }}</span>
                         </div>
 
                         <div class="bg-slate-50 border border-slate-100 rounded-2xl p-2 flex flex-col justify-center">
-                          <span class="text-[8px] font-black text-gray-400 uppercase tracking-wider text-center">CONSUMIDO</span>
+                          <span class="text-[8px] font-black text-gray-400 uppercase tracking-wider text-center">{{ lang.translations().tables.consumed }}</span>
                           <div class="flex gap-1 items-center justify-center mt-0.5">
                             <span class="text-[10px] text-gray-500 font-black">$</span>
                             <input type="number" 
@@ -148,14 +148,14 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
 
                     <div class="mt-4 pt-3 border-t border-slate-100/80 space-y-3">
                       <div class="flex justify-between items-center text-[10px]">
-                        <span class="font-semibold text-gray-400">Mozo:</span>
+                        <span class="font-semibold text-gray-400">{{ lang.translations().tables.waiter }}:</span>
                         <span class="font-bold px-2 py-0.5 bg-slate-100 rounded-md text-primary truncate max-w-[120px]">
                           {{ getMozoUsername(mesa.mozoId) }}
                         </span>
                       </div>
 
                       <button (click)="cerrarMesa(mesa.id)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
-                        Cerrar Mesa
+                        {{ lang.translations().tables.closeTable }}
                       </button>
                     </div>
                   </div>
@@ -165,8 +165,8 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                     <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <button (click)="openQrModal(mesa)" class="text-slate-600 hover:text-slate-800 font-bold text-[10px] bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">QR</button>
                       @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
-                        <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">Editar</button>
-                        <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">Borrar</button>
+                        <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">{{ lang.translations().common.edit }}</button>
+                        <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-500 hover:text-red-700 font-bold text-[10px] bg-red-50 px-2.5 py-1 rounded-xl transition-colors border border-red-100">{{ lang.translations().common.delete }}</button>
                       }
                     </div>
 
@@ -176,32 +176,32 @@ import { TenantContextService } from '../../../core/services/tenant-context.serv
                           {{ mesa.numero }}
                         </div>
                         <div>
-                          <h3 class="font-black text-gray-800 text-sm">Mesa {{ mesa.numero }}</h3>
-                          <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || 'Sin ubicación' }}</p>
+                          <h3 class="font-black text-gray-800 text-sm">{{ lang.translations().kitchen.table }} {{ mesa.numero }}</h3>
+                          <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || lang.translations().tables.noLocation }}</p>
                         </div>
                       </div>
 
                       <div class="bg-slate-50 border border-slate-100 rounded-2xl p-3 text-center">
-                        <span class="text-[10px] font-bold text-slate-400">Disponible / Libre</span>
+                        <span class="text-[10px] font-bold text-slate-400">{{ lang.translations().tables.available }}</span>
                       </div>
                     </div>
 
                     <div class="mt-4 pt-3 border-t border-slate-100 space-y-3">
                       <div class="flex justify-between items-center text-[10px]">
-                        <span class="font-semibold text-gray-400">Mozo:</span>
+                        <span class="font-semibold text-gray-400">{{ lang.translations().tables.waiter }}:</span>
                         <span class="font-bold px-2 py-0.5 bg-slate-100 rounded-md text-primary truncate max-w-[120px]">
                           {{ getMozoUsername(mesa.mozoId) }}
                         </span>
                       </div>
 
                       <button (click)="abrirMesa(mesa.id)" class="bg-primary hover:bg-[#1a233b] text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(15,23,42,0.15)] hover:shadow-[0_4px_16px_rgba(15,23,42,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
-                        Abrir Mesa
+                        {{ lang.translations().tables.openTable }}
                       </button>
                     </div>
                   </div>
                 }
               } @empty {
-                <p class="col-span-full text-center py-6 text-gray-400 text-sm">No hay mesas creadas.</p>
+                <p class="col-span-full text-center py-6 text-gray-400 text-sm">{{ lang.translations().tables.emptyList }}</p>
               }
             </div>
 
@@ -477,6 +477,7 @@ export class AdminDashboardComponent {
   dataService = inject(AdminDataService);
   auth = inject(AuthService);
   http = inject(HttpClient);
+  lang = inject(LanguageService);
   private restauranteService = inject(RestauranteService);
   private tenantContext = inject(TenantContextService);
   

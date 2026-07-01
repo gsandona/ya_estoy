@@ -28,6 +28,16 @@ interface Log {
   restauranteId: string;
 }
 
+interface ErrorLog {
+  id: string;
+  fechaHora: string;
+  mensaje: string;
+  stackTrace: string;
+  rutaAPI: string;
+  usuarioInvolucrado?: string;
+  restauranteId: string;
+}
+
 @Component({
   selector: 'app-super-admin-dashboard',
   standalone: true,
@@ -144,14 +154,38 @@ interface Log {
       <!-- Tab Auditoria -->
       @if (activeTab() === 'auditoria') {
         <div class="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-sm border border-gray-100 animate-fade-in">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-black text-gray-800">Logs de Auditoría</h2>
-            <select [(ngModel)]="filterRestauranteId" (change)="loadAuditoria()" class="px-4 py-2 bg-surface border border-gray-200 rounded-xl font-bold text-gray-700 outline-none focus:ring-2 focus:ring-primary/20">
-              <option value="">Todos los restaurantes</option>
-              @for (r of restaurantes(); track r.id) {
-                <option [value]="r.id">{{ r.nombre }}</option>
-              }
-            </select>
+          <div class="flex flex-col gap-4 mb-6">
+            <div class="flex justify-between items-center">
+              <h2 class="text-2xl font-black text-gray-800">Logs de Auditoría</h2>
+            </div>
+            
+            <!-- Filters bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-gray-50/50 p-4 rounded-2xl border border-gray-100">
+              <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Restaurante</label>
+                <select [(ngModel)]="filterRestauranteId" (change)="loadAuditoria()" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none">
+                  <option value="">Todos los restaurantes</option>
+                  @for (r of restaurantes(); track r.id) {
+                    <option [value]="r.id">{{ r.nombre }}</option>
+                  }
+                </select>
+              </div>
+              
+              <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Usuario (Mozo)</label>
+                <input type="text" [(ngModel)]="filterUsuario" (input)="loadAuditoria()" placeholder="Buscar por usuario..." class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:border-primary">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Fecha Desde</label>
+                <input type="date" [(ngModel)]="filterFechaInicio" (change)="loadAuditoria()" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none">
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-black text-gray-400 uppercase mb-1">Fecha Hasta</label>
+                <input type="date" [(ngModel)]="filterFechaFin" (change)="loadAuditoria()" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none">
+              </div>
+            </div>
           </div>
           
           <div class="overflow-x-auto rounded-2xl border border-gray-100 bg-white">
@@ -195,12 +229,40 @@ interface Log {
           
           <div class="space-y-4">
             @for (err of logsErrores(); track err.id) {
-              <div class="p-5 bg-[#fff5f5] border border-red-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex justify-between items-start mb-3 border-b border-red-100 pb-2">
-                  <span class="text-sm font-bold text-red-800">{{ err.fechaHora | date:'medium' }}</span>
-                  <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-lg font-bold">ERROR</span>
+              <div class="p-5 bg-red-50/20 border border-red-100 rounded-3xl shadow-sm space-y-3">
+                <div class="flex flex-wrap justify-between items-center gap-2 border-b border-red-100 pb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <span class="text-xs font-black text-red-800 uppercase tracking-wider">ERROR DETECTADO</span>
+                  </div>
+                  <span class="text-xs font-bold text-gray-500">{{ err.fechaHora | date:'medium' }}</span>
                 </div>
-                <pre class="bg-red-50/40 text-red-900/90 p-4 rounded-xl text-xs overflow-x-auto font-mono whitespace-pre-wrap leading-relaxed border border-red-100/50">{{ err.detalles }}</pre>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-bold text-gray-600">
+                  <div class="bg-white/80 p-2.5 rounded-xl border border-red-50/40">
+                    <span class="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Ruta API</span>
+                    <span class="font-mono text-gray-700">{{ err.rutaAPI }}</span>
+                  </div>
+                  <div class="bg-white/80 p-2.5 rounded-xl border border-red-50/40">
+                    <span class="block text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">Usuario</span>
+                    <span class="text-gray-700">{{ err.usuarioInvolucrado || 'Anónimo / Sistema' }}</span>
+                  </div>
+                </div>
+
+                <div class="bg-white/90 p-4 rounded-2xl border border-red-100 shadow-inner">
+                  <span class="block text-[9px] font-black text-red-700 mb-1.5 uppercase tracking-wide">Mensaje de Excepción</span>
+                  <p class="text-xs font-black text-red-900 whitespace-pre-wrap leading-relaxed">{{ err.mensaje }}</p>
+                </div>
+
+                @if (err.stackTrace) {
+                  <details class="group bg-gray-50 border border-gray-150 rounded-2xl p-3">
+                    <summary class="text-xs font-black text-gray-500 cursor-pointer select-none outline-none flex justify-between items-center">
+                      <span>Ver Stack Trace Completo</span>
+                      <span class="transition-transform group-open:rotate-180">▼</span>
+                    </summary>
+                    <pre class="mt-3 bg-white p-4 rounded-xl text-[10px] text-gray-600 overflow-x-auto font-mono whitespace-pre-wrap leading-relaxed border border-gray-200">{{ err.stackTrace }}</pre>
+                  </details>
+                }
               </div>
             } @empty {
               <div class="py-12 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center justify-center">
@@ -260,9 +322,12 @@ export class SuperAdminDashboardComponent {
   activeTab = signal<'restaurantes' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding'>('restaurantes');
   restaurantes = signal<Restaurante[]>([]);
   logsAuditoria = signal<Log[]>([]);
-  logsErrores = signal<Log[]>([]);
+  logsErrores = signal<ErrorLog[]>([]);
   
   filterRestauranteId = '';
+  filterUsuario = '';
+  filterFechaInicio = '';
+  filterFechaFin = '';
 
   globalAppName = '';
   globalLogoBase64 = '';
@@ -344,15 +409,21 @@ export class SuperAdminDashboardComponent {
   }
 
   loadAuditoria() {
-    let url = `${environment.apiUrl}/api/logs/auditoria`;
-    if (this.filterRestauranteId) url += `?restauranteId=${this.filterRestauranteId}`;
+    let url = `${environment.apiUrl}/api/logs/auditoria?`;
+    const params: string[] = [];
+    if (this.filterRestauranteId) params.push(`restauranteId=${this.filterRestauranteId}`);
+    if (this.filterUsuario) params.push(`usuario=${encodeURIComponent(this.filterUsuario)}`);
+    if (this.filterFechaInicio) params.push(`fechaInicio=${this.filterFechaInicio}`);
+    if (this.filterFechaFin) params.push(`fechaFin=${this.filterFechaFin}`);
+    
+    url += params.join('&');
     this.http.get<Log[]>(url).subscribe(data => this.logsAuditoria.set(data));
   }
 
   loadErrores() {
     let url = `${environment.apiUrl}/api/logs/errores`;
     if (this.filterRestauranteId) url += `?restauranteId=${this.filterRestauranteId}`;
-    this.http.get<Log[]>(url).subscribe(data => this.logsErrores.set(data));
+    this.http.get<ErrorLog[]>(url).subscribe(data => this.logsErrores.set(data));
   }
 
   // Dashboard configuration methods

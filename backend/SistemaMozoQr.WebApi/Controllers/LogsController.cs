@@ -20,7 +20,7 @@ public class LogsController : ControllerBase
     [HttpGet("auditoria")]
     public async Task<IActionResult> GetAuditoriaLogs([FromQuery] Guid? restauranteId = null)
     {
-        var query = _context.Auditorias.AsQueryable();
+        var query = _context.Auditorias.IgnoreQueryFilters().AsQueryable();
         if (restauranteId.HasValue)
         {
             query = query.Where(a => a.RestauranteId == restauranteId.Value);
@@ -32,7 +32,7 @@ public class LogsController : ControllerBase
     [HttpGet("errores")]
     public async Task<IActionResult> GetErrorLogs([FromQuery] Guid? restauranteId = null)
     {
-        var query = _context.ErrorLogs.AsQueryable();
+        var query = _context.ErrorLogs.IgnoreQueryFilters().AsQueryable();
         if (restauranteId.HasValue)
         {
             query = query.Where(a => a.RestauranteId == restauranteId.Value);

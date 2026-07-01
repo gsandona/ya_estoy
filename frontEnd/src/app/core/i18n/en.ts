@@ -69,7 +69,16 @@ export const en = {
     location: "Location / Details",
     waiter: "Assigned Waiter",
     unassigned: "Unassigned",
-    activeTable: "Active Table"
+    activeTable: "Active Table",
+    controlPanel: "Control Panel",
+    available: "Available / Free",
+    openTable: "Open Table",
+    closeTable: "Close Table",
+    noLocation: "No location",
+    pinAccess: "PIN ACCESS",
+    consumed: "CONSUMED",
+    tablesBtn: "Tables",
+    emptyList: "No tables registered."
   },
   kitchen: {
     title: "Order Monitoring",
