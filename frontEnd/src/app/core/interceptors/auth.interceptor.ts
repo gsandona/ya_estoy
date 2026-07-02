@@ -16,7 +16,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         console.warn('Unauthorized request - JWT might be expired');
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_user');
-        router.navigate(['/login']);
+        
+        // Solo redirigimos a login si el usuario está intentando navegar o se encuentra en una ruta de administración
+        const currentUrl = router.url;
+        if (currentUrl.includes('/admin') || currentUrl.includes('/sistema')) {
+          router.navigate(['/login']);
+        }
       }
       return throwError(() => error);
     })
