@@ -42,17 +42,6 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 columns: new[] { "Id", "Nombre", "IconoPrincipal", "Activo", "FechaCreacion", "LogoUrl", "ParentRestauranteId" },
                 values: new object[] { rest7Id, "TuRestaurante", "🍕", true, new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), null, null });
 
-            // Categorías de Menú
-            migrationBuilder.InsertData(
-                table: "MenuCategories",
-                columns: new[] { "Id", "Nombre", "Emoji", "ParentCategoryId" },
-                values: new object[,]
-                {
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000011"), "Entradas", "🥗", new Guid("cccccccc-cccc-cccc-cccc-000000000001") },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000012"), "Platos", "🍝", new Guid("cccccccc-cccc-cccc-cccc-000000000001") },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000013"), "Panes", "🍞", new Guid("cccccccc-cccc-cccc-cccc-000000000001") }
-                });
-
             // MenuItems
             migrationBuilder.InsertData(
                 table: "MenuItems",
@@ -103,10 +92,13 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 columns: new[] { "Id", "RestauranteId", "WidgetKey", "Orden", "Activo" },
                 values: new object[,]
                 {
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000001"), rest7Id, "ActiveTablesCount", 1, true },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000002"), rest7Id, "PendingTasksCount", 2, true },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000003"), rest7Id, "TopTables", 3, true },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000004"), rest7Id, "BusyTablesCount", 4, true }
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000043"), rest7Id, "KPI_Ventas", 1, true },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000044"), rest7Id, "KPI_Pedidos", 2, true },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000045"), rest7Id, "KPI_Llamados", 3, true },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000046"), rest7Id, "KPI_Alertas", 4, true },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000047"), rest7Id, "StaffPerformance", 5, true },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000048"), rest7Id, "TopTables", 6, true },
+                    { new Guid("aaaaaaaa-aaaa-aaaa-aaaa-000000000049"), rest7Id, "PeakHours", 7, true }
                 });
         }
 
