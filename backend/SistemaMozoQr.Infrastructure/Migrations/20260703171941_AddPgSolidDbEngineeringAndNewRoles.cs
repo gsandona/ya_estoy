@@ -11,7 +11,7 @@ namespace SistemaMozoQr.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // 1. Crear Índices Únicos y de Rendimiento
+            // 1. Crear Índices Únicos y de Rendimiento (excluyendo los auto-generados por claves foráneas)
             migrationBuilder.CreateIndex(
                 name: "IX_Usuarios_Username",
                 table: "Usuarios",
@@ -28,16 +28,6 @@ namespace SistemaMozoQr.Infrastructure.Migrations
                 name: "IX_Mesas_TokenQR",
                 table: "Mesas",
                 column: "TokenQR");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pedidos_RestauranteId",
-                table: "Pedidos",
-                column: "RestauranteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Pedidos_MesaId",
-                table: "Pedidos",
-                column: "MesaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ventas_RestauranteId_FechaHora",
@@ -126,8 +116,6 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             migrationBuilder.DropIndex(name: "IX_Usuarios_Username", table: "Usuarios");
             migrationBuilder.DropIndex(name: "IX_Mesas_RestauranteId_Numero", table: "Mesas");
             migrationBuilder.DropIndex(name: "IX_Mesas_TokenQR", table: "Mesas");
-            migrationBuilder.DropIndex(name: "IX_Pedidos_RestauranteId", table: "Pedidos");
-            migrationBuilder.DropIndex(name: "IX_Pedidos_MesaId", table: "Pedidos");
             migrationBuilder.DropIndex(name: "IX_Ventas_RestauranteId_FechaHora", table: "Ventas");
 
             var rest7Id = new Guid("77777777-7777-7777-7777-777777777777");
