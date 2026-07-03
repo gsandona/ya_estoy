@@ -12,7 +12,7 @@ using SistemaMozoQr.Infrastructure.Data;
 namespace SistemaMozoQr.Infrastructure.Migrations
 {
     [DbContext(typeof(RestauranteDbContext))]
-    [Migration("20260703171941_AddPgSolidDbEngineeringAndNewRoles")]
+    [Migration("20260703211836_AddPgSolidDbEngineeringAndNewRoles")]
     partial class AddPgSolidDbEngineeringAndNewRoles
     {
         /// <inheritdoc />
