@@ -55,12 +55,12 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             // Categorías de Menú
             migrationBuilder.InsertData(
                 table: "MenuCategories",
-                columns: new[] { "Id", "Emoji", "Nombre", "RestauranteId" },
+                columns: new[] { "Id", "Nombre", "Emoji", "ParentCategoryId" },
                 values: new object[,]
                 {
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000011"), "🥗", "Entradas", rest7Id },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000012"), "🍝", "Platos", rest7Id },
-                    { new Guid("cccccccc-cccc-cccc-cccc-000000000013"), "🍞", "Panes", rest7Id }
+                    { new Guid("cccccccc-cccc-cccc-cccc-000000000011"), "Entradas", "🥗", new Guid("cccccccc-cccc-cccc-cccc-000000000001") },
+                    { new Guid("cccccccc-cccc-cccc-cccc-000000000012"), "Platos", "🍝", new Guid("cccccccc-cccc-cccc-cccc-000000000001") },
+                    { new Guid("cccccccc-cccc-cccc-cccc-000000000013"), "Panes", "🍞", new Guid("cccccccc-cccc-cccc-cccc-000000000001") }
                 });
 
             // MenuItems
