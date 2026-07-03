@@ -49,8 +49,8 @@ namespace SistemaMozoQr.Infrastructure.Migrations
 
             migrationBuilder.InsertData(
                 table: "Restaurantes",
-                columns: new[] { "Id", "Nombre", "Email", "Telefono", "Direccion", "LogoUrl" },
-                values: new object[] { rest7Id, "TuRestaurante", "info@turestaurante.com", "123456", "Calle Principal 123", null });
+                columns: new[] { "Id", "Nombre", "IconoPrincipal", "Activo", "FechaCreacion", "LogoUrl", "ParentRestauranteId" },
+                values: new object[] { rest7Id, "TuRestaurante", "🍕", true, new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), null, null });
 
             // Categorías de Menú
             migrationBuilder.InsertData(
