@@ -8,7 +8,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "SuperAdmin,Admin")]
+[Authorize(Roles = "SuperAdmin,Admin,Caja")]
 public class RestaurantesController : ControllerBase
 {
     private readonly RestauranteDbContext _context;

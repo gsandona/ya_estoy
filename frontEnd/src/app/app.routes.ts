@@ -28,7 +28,7 @@ export const routes: Routes = [
         path: 'configuracion',
         loadComponent: () => import('./features/admin/config/config.component').then(m => m.ConfigComponent),
         canActivate: [roleGuard],
-        data: { roles: ['Admin', 'SuperAdmin'] }
+        data: { roles: ['Admin', 'SuperAdmin', 'Caja'] }
       },
       {
         path: 'sistema',

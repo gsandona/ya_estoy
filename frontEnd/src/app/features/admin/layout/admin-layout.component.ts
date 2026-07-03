@@ -96,7 +96,7 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
             </a>
           }
 
-          @if (auth.isAdmin()) {
+          @if (auth.isAdmin() || auth.isCaja()) {
             <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.personal : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -354,7 +354,7 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
                 </a>
               }
 
-              @if (auth.isAdmin()) {
+              @if (auth.isAdmin() || auth.isCaja()) {
                 <a routerLink="/admin/configuracion" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>

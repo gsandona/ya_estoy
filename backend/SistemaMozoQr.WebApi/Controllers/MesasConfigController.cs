@@ -55,7 +55,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Caja")]
     public async Task<IActionResult> Crear([FromBody] CrearMesaDto dto)
     {
         var mesa = new Mesa
@@ -72,7 +72,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Caja")]
     public async Task<IActionResult> Editar(Guid id, [FromBody] EditarMesaDto dto)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -88,7 +88,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Caja")]
     public async Task<IActionResult> Eliminar(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -99,7 +99,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("bulk")]
-    [Authorize(Roles = "Admin,SuperAdmin")]
+    [Authorize(Roles = "Admin,SuperAdmin,Caja")]
     public async Task<IActionResult> BulkSync([FromBody] List<BulkMesaDto> dtos)
     {
         var usuarios = await _usuarioRepository.GetAllAsync();

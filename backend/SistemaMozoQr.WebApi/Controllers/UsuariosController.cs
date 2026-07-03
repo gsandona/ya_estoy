@@ -7,7 +7,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = "Admin,SuperAdmin")]
+[Authorize(Roles = "Admin,SuperAdmin,Caja")]
 public class UsuariosController : ControllerBase
 {
     private readonly IUsuarioService _usuarioService;
@@ -68,7 +68,7 @@ public class UsuariosController : ControllerBase
     }
 
     [HttpGet("mozos")]
-    [Authorize(Roles = "Admin,SuperAdmin,MozoPortal")]
+    [Authorize(Roles = "Admin,SuperAdmin,Caja,MozoPortal")]
     public async Task<IActionResult> GetRestauranteMozos()
     {
         var users = await _usuarioService.GetAllAsync();

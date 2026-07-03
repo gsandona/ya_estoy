@@ -10,7 +10,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,SuperAdmin")]
+[Authorize(Roles = "Admin,SuperAdmin,Caja")]
 public class VentasController : ControllerBase
 {
     private readonly RestauranteDbContext _context;
@@ -58,7 +58,7 @@ public class VentasController : ControllerBase
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         var tenantIdClaim = User.FindFirst("RestauranteId")?.Value;
         
-        if (userRole == "Admin" && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
+        if ((userRole == "Admin" || userRole == "Caja") && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
         {
             query = query.Where(v => v.RestauranteId == adminTenantId);
         }
@@ -101,7 +101,7 @@ public class VentasController : ControllerBase
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         var tenantIdClaim = User.FindFirst("RestauranteId")?.Value;
         
-        if (userRole == "Admin" && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
+        if ((userRole == "Admin" || userRole == "Caja") && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
         {
             query = query.Where(v => v.RestauranteId == adminTenantId);
         }

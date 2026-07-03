@@ -8,7 +8,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/menu")]
-[Authorize(Roles = "Admin,SuperAdmin")]
+[Authorize(Roles = "Admin,SuperAdmin,Caja")]
 public class MenuController : ControllerBase
 {
     private readonly IMenuItemRepository _menuRepository;
