@@ -89,7 +89,10 @@ interface CocinaPedido {
                     <span class="text-base font-black text-primary bg-white/90 px-2.5 py-1 rounded-md border border-amber-900/10">Mesa {{ pedido.numeroMesa }}</span>
                     <p class="text-[9px] text-primary/60 font-bold mt-2 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <span class="text-[9px] font-bold text-primary/70 bg-white px-2 py-0.5 rounded-md border border-gray-150">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="text-[9px] font-bold text-primary/70 bg-white px-2 py-0.5 rounded-md border border-gray-150">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-gray-500 hover:text-primary font-bold bg-white px-2 py-1 rounded-md border border-gray-200 transition-colors shadow-sm" title="Imprimir Comanda">🖨️</button>
+                  </div>
                 </div>
                 
                 <!-- Items list -->
@@ -129,7 +132,10 @@ interface CocinaPedido {
                     <span class="text-base font-black text-primary bg-white/90 px-2.5 py-1 rounded-md border border-amber-900/10">Mesa {{ pedido.numeroMesa }}</span>
                     <p class="text-[9px] text-primary/60 font-bold mt-2 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <span class="text-[9px] font-bold text-primary/70 bg-white px-2 py-0.5 rounded-md border border-gray-150">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="text-[9px] font-bold text-primary/70 bg-white px-2 py-0.5 rounded-md border border-gray-150">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-gray-500 hover:text-primary font-bold bg-white px-2 py-1 rounded-md border border-gray-200 transition-colors shadow-sm" title="Imprimir Comanda">🖨️</button>
+                  </div>
                 </div>
                 
                 <div class="bg-white/80 rounded-lg p-2.5 space-y-1.5 border border-amber-900/5">
@@ -173,7 +179,10 @@ interface CocinaPedido {
                     <span class="text-base font-black text-primary bg-white/90 px-2.5 py-1 rounded-md border border-amber-900/10">Mesa {{ pedido.numeroMesa }}</span>
                     <p class="text-[9px] text-primary/60 font-bold mt-2 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <span class="text-[9px] font-black text-green-700 bg-green-50 border border-green-100 px-2.5 py-0.5 rounded-md">Listo</span>
+                  <div class="flex flex-col items-end gap-1.5 shrink-0">
+                    <span class="text-[9px] font-black text-green-700 bg-green-50 border border-green-100 px-2.5 py-0.5 rounded-md">Listo</span>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-gray-500 hover:text-primary font-bold bg-white px-2 py-1 rounded-md border border-gray-200 transition-colors shadow-sm" title="Imprimir Comanda">🖨️</button>
+                  </div>
                 </div>
                 
                 <div class="bg-white/80 rounded-lg p-2.5 space-y-1.5 border border-amber-900/5">
@@ -347,5 +356,74 @@ export class AdminCocinaComponent implements OnInit {
     const orderTime = new Date(fechaString).getTime();
     const diffMs = Date.now() - orderTime;
     return Math.max(0, Math.floor(diffMs / 60000));
+  }
+
+  imprimirPedidoCocina(pedido: any) {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const itemsHtml = pedido.items.map((item: any) => `
+        <tr style="border-bottom: 1px dashed #ccc;">
+          <td style="padding: 6px 0; font-size: 14px; font-weight: bold; width: 40px;">x${item.cantidad}</td>
+          <td style="padding: 6px 0; font-size: 14px; font-weight: bold;">${item.nombre}</td>
+        </tr>
+      `).join('');
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Comanda Cocina Mesa ${pedido.numeroMesa}</title>
+            <style>
+              @page { size: 80mm auto; margin: 0; }
+              body { font-family: 'Courier New', Courier, monospace; width: 280px; margin: 0 auto; padding: 15px 5px; color: #000; text-align: left; }
+              .header { text-align: center; margin-bottom: 10px; }
+              .header h2 { margin: 0 0 5px 0; font-size: 18px; font-weight: 900; text-transform: uppercase; }
+              .details { font-size: 11px; margin-bottom: 10px; line-height: 1.3; }
+              .details p { margin: 2px 0; }
+              .divider { border-top: 2px dashed #000; margin: 10px 0; }
+              table { width: 100%; border-collapse: collapse; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h2>COMANDA COCINA</h2>
+              <h1 style="font-size: 26px; margin: 5px 0; font-weight: 900; border: 2px solid #000; padding: 4px; display: inline-block;">MESA ${pedido.numeroMesa}</h1>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="details">
+              <p><b>Fecha:</b> ${new Date(pedido.fecha).toLocaleString()}</p>
+              <p><b>Mozo:</b> ${pedido.mozoEmail || 'Sin mozo asignado'}</p>
+              <p><b>Estado:</b> ${pedido.estado.toUpperCase()}</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <table>
+              <thead>
+                <tr style="border-bottom: 2px solid #000;">
+                  <th style="text-align: left; font-size: 12px; padding-bottom: 4px;">Cant</th>
+                  <th style="text-align: left; font-size: 12px; padding-bottom: 4px;">Descripción</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+            
+            <div class="divider"></div>
+            
+            <div style="text-align: center; font-size: 10px; margin-top: 15px; font-weight: bold; text-transform: uppercase;">
+              --- Fin de Comanda ---
+            </div>
+            
+            <script>
+              window.onload = function() { window.print(); window.close(); }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
   }
 }

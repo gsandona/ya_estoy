@@ -7,6 +7,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'mozo-select',
+    loadComponent: () => import('./features/auth/mozo-select/mozo-select.component').then(m => m.MozoSelectComponent),
+    canActivate: [authGuard]
+  },
+  {
     path: 'mesa/:restaurante/:numero',
     loadComponent: () => import('./features/client/pedido/pedido.component').then(m => m.PedidoComponent)
   },
@@ -41,11 +46,17 @@ export const routes: Routes = [
         path: 'cocina',
         loadComponent: () => import('./features/admin/dashboard/admin-cocina.component').then(m => m.AdminCocinaComponent),
         canActivate: [roleGuard],
-        data: { roles: ['Cocina', 'Admin', 'SuperAdmin'] }
+        data: { roles: ['Cocina', 'Admin', 'SuperAdmin', 'Caja'] }
       },
       {
         path: 'ventas',
         loadComponent: () => import('./features/admin/dashboard/admin-ventas.component').then(m => m.AdminVentasComponent),
+        canActivate: [roleGuard],
+        data: { roles: ['Admin', 'SuperAdmin', 'Caja'] }
+      },
+      {
+        path: 'metricas-menu',
+        loadComponent: () => import('./features/admin/dashboard/admin-menu-metrics.component').then(m => m.AdminMenuMetricsComponent),
         canActivate: [roleGuard],
         data: { roles: ['Admin', 'SuperAdmin'] }
       },

@@ -9,7 +9,7 @@ import { TenantContextService } from './tenant-context.service';
 export interface User {
   id: string;
   username: string;
-  role: 'Admin' | 'Mozo' | 'SuperAdmin' | 'Cocina';
+  role: 'Admin' | 'Mozo' | 'SuperAdmin' | 'Cocina' | 'Caja' | 'MozoPortal';
   token: string;
   restauranteId?: string;
   restauranteNombre?: string;
@@ -29,6 +29,8 @@ export class AuthService {
   public isSuperAdmin = computed(() => this._currentUser()?.role === 'SuperAdmin');
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
   public isCocina = computed(() => this._currentUser()?.role === 'Cocina');
+  public isCaja = computed(() => this._currentUser()?.role === 'Caja');
+  public isMozoPortal = computed(() => this._currentUser()?.role === 'MozoPortal');
 
   private parseJwt(token: string): any {
     try {
@@ -91,12 +93,30 @@ export class AuthService {
     );
   }
 
-  logout() {
+  logout(): boolean {
+    const portalToken = localStorage.getItem('portal_token');
+    const portalUserStr = localStorage.getItem('portal_user');
+    
     this._token = null;
     this._currentUser.set(null);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
     this.tenantContext.setTenantId(null);
+    
+    if (portalToken && portalUserStr) {
+      localStorage.setItem('auth_token', portalToken);
+      localStorage.setItem('auth_user', portalUserStr);
+      this._token = portalToken;
+      try {
+        const user = JSON.parse(portalUserStr);
+        this._currentUser.set(user);
+        if (user.restauranteId) {
+          this.tenantContext.setTenantId(user.restauranteId);
+        }
+      } catch (e) {}
+      return true; // Portal session restored
+    }
+    return false; // Full logout
   }
 
   getToken(): string | null {

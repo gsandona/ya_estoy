@@ -74,4 +74,94 @@ public class VentasController : ControllerBase
 
         return Ok(ventasList);
     }
+
+    [HttpGet("productos")]
+    public async Task<IActionResult> GetProductSales(
+        [FromQuery] Guid? restauranteId = null,
+        [FromQuery] string? startUtc = null,
+        [FromQuery] string? endUtc = null)
+    {
+        DateTime targetStart = DateTime.UtcNow.Date;
+        DateTime targetEnd = targetStart.AddDays(1);
+
+        if (!string.IsNullOrWhiteSpace(startUtc) && DateTime.TryParse(startUtc, out DateTime parsedStart) &&
+            !string.IsNullOrWhiteSpace(endUtc) && DateTime.TryParse(endUtc, out DateTime parsedEnd))
+        {
+            targetStart = DateTime.SpecifyKind(parsedStart, DateTimeKind.Utc);
+            targetEnd = DateTime.SpecifyKind(parsedEnd, DateTimeKind.Utc);
+        }
+        else
+        {
+            targetStart = DateTime.SpecifyKind(targetStart, DateTimeKind.Utc);
+            targetEnd = DateTime.SpecifyKind(targetEnd, DateTimeKind.Utc);
+        }
+
+        var query = _context.Ventas.IgnoreQueryFilters().AsQueryable();
+
+        var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+        var tenantIdClaim = User.FindFirst("RestauranteId")?.Value;
+        
+        if (userRole == "Admin" && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
+        {
+            query = query.Where(v => v.RestauranteId == adminTenantId);
+        }
+        else if (restauranteId.HasValue)
+        {
+            query = query.Where(v => v.RestauranteId == restauranteId.Value);
+        }
+
+        query = query.Where(v => v.FechaHora >= targetStart && v.FechaHora < targetEnd);
+
+        var ventasList = await query.ToListAsync();
+
+        var productSalesDict = new Dictionary<string, (int Cantidad, decimal Recaudacion)>();
+
+        foreach (var venta in ventasList)
+        {
+            if (string.IsNullOrWhiteSpace(venta.DetallesJson)) continue;
+            try
+            {
+                var items = System.Text.Json.JsonSerializer.Deserialize<List<VentaItemDto>>(venta.DetallesJson);
+                if (items == null) continue;
+
+                foreach (var item in items)
+                {
+                    var nombre = item.Nombre ?? "Desconocido";
+                    if (productSalesDict.ContainsKey(nombre))
+                    {
+                        var current = productSalesDict[nombre];
+                        productSalesDict[nombre] = (current.Cantidad + item.Cantidad, current.Recaudacion + (item.Cantidad * item.PrecioUnitario));
+                    }
+                    else
+                    {
+                        productSalesDict[nombre] = (item.Cantidad, item.Cantidad * item.PrecioUnitario);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Ignorar errores de deserialización
+            }
+        }
+
+        var result = productSalesDict.Select(kvp => new {
+            Producto = kvp.Key,
+            Cantidad = kvp.Value.Cantidad,
+            Recaudacion = kvp.Value.Recaudacion
+        }).OrderByDescending(r => r.Cantidad).ToList();
+
+        return Ok(result);
+    }
+
+    public class VentaItemDto
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("nombre")]
+        public string? Nombre { get; set; }
+        
+        [System.Text.Json.Serialization.JsonPropertyName("cantidad")]
+        public int Cantidad { get; set; }
+        
+        [System.Text.Json.Serialization.JsonPropertyName("precioUnitario")]
+        public decimal PrecioUnitario { get; set; }
+    }
 }

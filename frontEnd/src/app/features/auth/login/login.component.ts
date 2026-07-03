@@ -187,7 +187,12 @@ export class LoginComponent {
       this.authService.login(this.username, this.password).subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.router.navigate(['/admin']);
+          const user = this.authService.currentUser();
+          if (user?.role === 'MozoPortal') {
+            this.router.navigate(['/mozo-select']);
+          } else {
+            this.router.navigate(['/admin']);
+          }
         },
         error: (err) => {
           console.error(err);

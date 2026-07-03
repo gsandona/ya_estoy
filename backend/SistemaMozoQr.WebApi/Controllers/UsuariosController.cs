@@ -67,6 +67,15 @@ public class UsuariosController : ControllerBase
         }
     }
 
+    [HttpGet("mozos")]
+    [Authorize(Roles = "Admin,SuperAdmin,MozoPortal")]
+    public async Task<IActionResult> GetRestauranteMozos()
+    {
+        var users = await _usuarioService.GetAllAsync();
+        var mozos = users.Where(u => u.Role == "Mozo").ToList();
+        return Ok(mozos);
+    }
+
     [HttpPost("bulk")]
     public async Task<IActionResult> BulkSync([FromBody] List<BulkUsuarioDto> dtos)
     {

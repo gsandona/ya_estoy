@@ -117,6 +117,42 @@ public class RestauranteDbContext : DbContext
             .HasForeignKey(m => m.MenuCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // --- ÍNDICES Y RESTRICCIONES DE INTEGRIDAD (INGENIERÍA DE BD SÓLIDA) ---
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.HasIndex(u => u.Username).IsUnique();
+            entity.HasIndex(u => u.RestauranteId);
+        });
+
+        modelBuilder.Entity<Mesa>(entity =>
+        {
+            entity.HasIndex(m => new { m.RestauranteId, m.Numero }).IsUnique();
+            entity.HasIndex(m => m.TokenQR);
+        });
+
+        modelBuilder.Entity<Pedido>(entity =>
+        {
+            entity.HasIndex(p => p.RestauranteId);
+            entity.HasIndex(p => p.MesaId);
+            entity.HasIndex(p => new { p.MesaId, p.Estado });
+        });
+
+        modelBuilder.Entity<Venta>(entity =>
+        {
+            entity.HasIndex(v => new { v.RestauranteId, v.FechaHora });
+        });
+
+        modelBuilder.Entity<MenuItem>(entity =>
+        {
+            entity.HasIndex(m => m.RestauranteId);
+            entity.HasIndex(m => new { m.RestauranteId, m.Nombre });
+        });
+
+        modelBuilder.Entity<MesaTask>(entity =>
+        {
+            entity.HasIndex(t => new { t.RestauranteId, t.Status });
+        });
+
         // --- SEED DATA MULTI-TENANT ---
         modelBuilder.SeedData();
     }

@@ -63,7 +63,7 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
             </a>
           }
 
-          @if (auth.currentUser()?.role === 'Cocina' || auth.isAdmin() || auth.isSuperAdmin()) {
+          @if (auth.currentUser()?.role === 'Cocina' || auth.isAdmin() || auth.isSuperAdmin() || auth.isCaja()) {
             <a routerLink="/admin/cocina" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.kitchen : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
@@ -74,13 +74,24 @@ import { PushNotificationService } from '../../../core/services/push-notificatio
             </a>
           }
 
-          @if (auth.isAdmin() || auth.isSuperAdmin()) {
+          @if (auth.isAdmin() || auth.isSuperAdmin() || auth.isCaja()) {
             <a routerLink="/admin/ventas" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.sales : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
               </span>
               @if (!sidebarCollapsed()) {
                 <span class="truncate">{{ lang.translations().sidebar.sales }}</span>
+              }
+            </a>
+          }
+
+          @if (auth.isAdmin() || auth.isSuperAdmin()) {
+            <a routerLink="/admin/metricas-menu" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Platos Vendidos' : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5z" /></svg>
+              </span>
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">Platos Vendidos</span>
               }
             </a>
           }
@@ -434,8 +445,12 @@ export class AdminLayoutComponent {
 
   logout() {
     this.pushNotification.unsubscribeFromNotifications().finally(() => {
-      this.auth.logout();
-      this.router.navigate(['/login']);
+      const restored = this.auth.logout();
+      if (restored) {
+        this.router.navigate(['/mozo-select']);
+      } else {
+        this.router.navigate(['/login']);
+      }
     });
   }
 }

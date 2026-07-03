@@ -18,13 +18,16 @@ public static class ModelBuilderExtensions
         var rest4Id = Guid.Parse("44444444-4444-4444-4444-444444444444");
         var rest5Id = Guid.Parse("55555555-5555-5555-5555-555555555555");
         var rest6Id = Guid.Parse("66666666-6666-6666-6666-666666666666");
+        var rest7Id = Guid.Parse("77777777-7777-7777-7777-777777777777");
 
         // Seed Roles
         modelBuilder.Entity<Role>().HasData(
             new Role { Id = 1, Nombre = "Mozo", Descripcion = "Mozo del restaurante" },
             new Role { Id = 2, Nombre = "Admin", Descripcion = "Administrador del restaurante" },
             new Role { Id = 3, Nombre = "SuperAdmin", Descripcion = "Super Administrador global del sistema" },
-            new Role { Id = 4, Nombre = "Cocina", Descripcion = "Personal de cocina" }
+            new Role { Id = 4, Nombre = "Cocina", Descripcion = "Personal de cocina" },
+            new Role { Id = 5, Nombre = "Caja", Descripcion = "Cajero del restaurante" },
+            new Role { Id = 6, Nombre = "MozoPortal", Descripcion = "Portal de selección para Mozos" }
         );
 
         // Seed Restaurantes
@@ -34,7 +37,8 @@ public static class ModelBuilderExtensions
             new Restaurante { Id = rest3Id, Nombre = "La Pasiva", IconoPrincipal = "🌭", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Restaurante { Id = rest4Id, Nombre = "La Merienda", IconoPrincipal = "☕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Restaurante { Id = rest5Id, Nombre = "Bella Italia", IconoPrincipal = "🍕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest6Id, Nombre = "Cordon Beer", IconoPrincipal = "🍺", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+            new Restaurante { Id = rest6Id, Nombre = "Cordon Beer", IconoPrincipal = "🍺", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Restaurante { Id = rest7Id, Nombre = "TuRestaurante", IconoPrincipal = "🍕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
         );
 
         // Seed Usuarios (Email -> Username)
@@ -78,7 +82,17 @@ public static class ModelBuilderExtensions
             new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000002"), Username = "bartender2cordonbeer", PasswordHash = passHash, NombreCompleto = "Bartender 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
             new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000003"), Username = "mesero1cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
             new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000004"), Username = "mesero2cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000005"), Username = "mesero3cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 3", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo }
+            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000005"), Username = "mesero3cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 3", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+
+            // TuRestaurante (Rest7) - Admin, Caja, Cocina, MozoPortal, 4 Mozos
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000000"), Username = "admin_turestaurante", PasswordHash = passHash, NombreCompleto = "Admin TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000005"), Username = "caja_turestaurante", PasswordHash = passHash, NombreCompleto = "Caja TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Caja },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000006"), Username = "cocina_turestaurante", PasswordHash = passHash, NombreCompleto = "Cocina TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Cocina },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000007"), Username = "mozo_portal_turestaurante", PasswordHash = passHash, NombreCompleto = "Portal Mozo TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.MozoPortal },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000001"), Username = "mozo_juan", PasswordHash = passHash, NombreCompleto = "Juan Pérez", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000002"), Username = "mozo_pedro", PasswordHash = passHash, NombreCompleto = "Pedro Gómez", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000003"), Username = "mozo_maria", PasswordHash = passHash, NombreCompleto = "María López", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000004"), Username = "mozo_ana", PasswordHash = passHash, NombreCompleto = "Ana Silva", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo }
         );
 
         // Seed Mesas
@@ -106,7 +120,14 @@ public static class ModelBuilderExtensions
             // Beer
             new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000011"), Numero = 1, RestauranteId = rest6Id, TokenQR = "BEER_QR_1", Ubicacion = "Barra 1", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000001") },
             new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000012"), Numero = 2, RestauranteId = rest6Id, TokenQR = "BEER_QR_2", Ubicacion = "Mesa Alta", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000003") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000013"), Numero = 3, RestauranteId = rest6Id, TokenQR = "BEER_QR_3", Ubicacion = "Sector Pool", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000005") }
+            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000013"), Numero = 3, RestauranteId = rest6Id, TokenQR = "BEER_QR_3", Ubicacion = "Sector Pool", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000005") },
+
+            // TuRestaurante (Rest7) - 5 Mesas
+            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000001"), Numero = 1, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_1", Ubicacion = "Terraza Vista Calle", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000001") },
+            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000002"), Numero = 2, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_2", Ubicacion = "Salón Principal Ventana", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000002") },
+            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000003"), Numero = 3, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_3", Ubicacion = "Salón Centro", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000003") },
+            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000004"), Numero = 4, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_4", Ubicacion = "VIP Box", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000004") },
+            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000005"), Numero = 5, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_5", Ubicacion = "Barra Alta", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000001") }
         );
 
         // Seed MenuItems
@@ -132,11 +153,20 @@ public static class ModelBuilderExtensions
             // Beer
             new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000025"), RestauranteId = rest6Id, Categoria = "Cervezas", Nombre = "Cerveza IPA Cordon", Precio = 350, Activo = true },
             new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000026"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Hamburguesa Completa con Fritas", Precio = 650, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000027"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Papas Cheddar y Bacon", Precio = 450, Activo = true }
+            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000027"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Papas Cheddar y Bacon", Precio = 450, Activo = true },
+
+            // TuRestaurante (Rest7) - 7 MenuItems
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000011"), RestauranteId = rest7Id, Categoria = "Comidas", Nombre = "Pizza Pepperoni", Descripcion = "Salsa de tomate, muzzarella y abundante pepperoni premium", Precio = 750, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Activo = true },
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000012"), RestauranteId = rest7Id, Categoria = "Comidas", Nombre = "Hamburguesa Especial", Descripcion = "Doble carne smash, queso cheddar, panceta crujiente y salsa secreta", Precio = 680, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Activo = true },
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000013"), RestauranteId = rest7Id, Categoria = "Comidas", Nombre = "Papas Rústicas", Descripcion = "Papas horneadas con romero y alioli casero", Precio = 350, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000011"), Activo = true },
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000014"), RestauranteId = rest7Id, Categoria = "Bebidas", Nombre = "Cerveza IPA Artesanal", Descripcion = "Medida pinta, sabor lúpulo intenso", Precio = 420, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000002"), Activo = true },
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000015"), RestauranteId = rest7Id, Categoria = "Bebidas", Nombre = "Refresco Cola 500ml", Descripcion = "Botella individual fría", Precio = 250, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000003"), Activo = true },
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000016"), RestauranteId = rest7Id, Categoria = "Postres", Nombre = "Volcán de Chocolate", Descripcion = "Con helado de crema americana", Precio = 480, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000004"), Activo = true },
+            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000017"), RestauranteId = rest7Id, Categoria = "Bebidas", Nombre = "Café Capuccino", Descripcion = "Con espuma de leche y canela", Precio = 290, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000005"), Activo = true }
         );
 
-        // Seed Default DashboardWidgetConfigs for all 6 Restaurants
-        var restaurants = new List<Guid> { rest1Id, rest2Id, rest3Id, rest4Id, rest5Id, rest6Id };
+        // Seed Default DashboardWidgetConfigs for all 7 Restaurants
+        var restaurants = new List<Guid> { rest1Id, rest2Id, rest3Id, rest4Id, rest5Id, rest6Id, rest7Id };
         var widgets = new List<string> { "KPI_Ventas", "KPI_Pedidos", "KPI_Llamados", "KPI_Alertas", "StaffPerformance", "TopTables", "PeakHours" };
 
         var configs = new List<DashboardWidgetConfig>();

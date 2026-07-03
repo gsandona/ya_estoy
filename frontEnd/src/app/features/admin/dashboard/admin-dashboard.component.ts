@@ -576,10 +576,15 @@ import { LanguageService } from '../../../core/services/language.service';
                 <span class="text-emerald-700 text-sm">\${{ getPreviewTotal() | number:'1.2-2' }}</span>
               </div>
 
-              <!-- Cerrar Mesa -->
-              <button (click)="showConfirmCloseModal.set(true)" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-1">
-                🧾 Registrar Pago y Cerrar Mesa
-              </button>
+              <!-- Botones de Acción -->
+              <div class="flex gap-3">
+                <button (click)="imprimirTicketFactura()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1.5 border border-slate-250">
+                  🖨️ Imprimir
+                </button>
+                <button (click)="showConfirmCloseModal.set(true)" class="flex-[2] bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-1">
+                  🧾 Cerrar Mesa
+                </button>
+              </div>
             </div>
           </div>
           
@@ -1019,6 +1024,116 @@ export class AdminDashboardComponent {
         alert('Hubo un error al cerrar la mesa.');
       }
     });
+  }
+
+  imprimirTicketFactura() {
+    const mesa = this.billingMesa();
+    if (!mesa) return;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      let itemsHtml = '';
+      
+      this.billingItems().forEach(item => {
+        itemsHtml += `
+          <tr style="border-bottom: 1px dashed #ccc;">
+            <td style="padding: 6px 0; font-size: 13px;">${item.nombre}</td>
+            <td style="padding: 6px 0; font-size: 13px; text-align: center;">${item.cantidad}</td>
+            <td style="padding: 6px 0; font-size: 13px; text-align: right;">$${item.precioUnitario.toFixed(2)}</td>
+            <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${item.total.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      this.extraItems().forEach(item => {
+        itemsHtml += `
+          <tr style="border-bottom: 1px dashed #ccc; color: #155724; background-color: #d4edda;">
+            <td style="padding: 6px 0; font-size: 13px;">* ${item.nombre} (Extra)</td>
+            <td style="padding: 6px 0; font-size: 13px; text-align: center;">${item.cantidad}</td>
+            <td style="padding: 6px 0; font-size: 13px; text-align: right;">$${item.precioUnitario.toFixed(2)}</td>
+            <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${item.total.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      this.manualCharges().forEach(charge => {
+        itemsHtml += `
+          <tr style="border-bottom: 1px dashed #ccc; color: #155724; background-color: #d4edda;">
+            <td style="padding: 6px 0; font-size: 13px;" colspan="3">* ${charge.descripcion} (Cargo)</td>
+            <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${charge.monto.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      const restName = this.auth.currentUser()?.restauranteNombre || 'MozoGo';
+
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Factura Mesa ${mesa.numero}</title>
+            <style>
+              @page { size: 80mm auto; margin: 0; }
+              body { font-family: 'Courier New', Courier, monospace; width: 280px; margin: 0 auto; padding: 15px 5px; color: #000; text-align: left; }
+              .header { text-align: center; margin-bottom: 10px; }
+              .header h2 { margin: 0 0 5px 0; font-size: 18px; font-weight: 900; text-transform: uppercase; }
+              .details { font-size: 11px; margin-bottom: 10px; line-height: 1.3; }
+              .details p { margin: 2px 0; }
+              .divider { border-top: 2px dashed #000; margin: 10px 0; }
+              table { width: 100%; border-collapse: collapse; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h2>${restName.toUpperCase()}</h2>
+              <p style="font-size: 11px; margin: 2px 0; font-weight: bold;">TICKET DE CONSUMO</p>
+              <h1 style="font-size: 22px; margin: 5px 0; font-weight: 900;">MESA ${mesa.numero}</h1>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="details">
+              <p><b>Fecha:</b> ${new Date().toLocaleString()}</p>
+              <p><b>Mozo:</b> ${mesa.mozo?.nombreCompleto || mesa.mozo?.username || 'Sin mozo asignado'}</p>
+              <p><b>Código de Acceso:</b> ${mesa.codigoAcceso || 'N/A'}</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <table>
+              <thead>
+                <tr style="border-bottom: 2px solid #000;">
+                  <th style="text-align: left; font-size: 12px; padding-bottom: 4px;">Item</th>
+                  <th style="text-align: center; font-size: 12px; padding-bottom: 4px;">Cant</th>
+                  <th style="text-align: right; font-size: 12px; padding-bottom: 4px;">P.Unit</th>
+                  <th style="text-align: right; font-size: 12px; padding-bottom: 4px;">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsHtml}
+              </tbody>
+            </table>
+            
+            <div class="divider"></div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 900; margin: 15px 0;">
+              <span>TOTAL A PAGAR:</span>
+              <span>$${this.getPreviewTotal().toFixed(2)}</span>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div style="text-align: center; font-size: 11px; margin-top: 15px; font-weight: bold;">
+              ¡Muchas gracias por su visita!
+            </div>
+            
+            <script>
+              window.onload = function() { window.print(); window.close(); }
+            </script>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
   }
 
   openBillingModal(mesa: any) {

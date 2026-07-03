@@ -7,3 +7,9 @@
 /frontEnd/node_modules/
 /frontEnd/dist/
 /frontEnd/.angular/
+
+# Database and secrets
+*.db
+*.db-shm
+*.db-wal
+firebase-service-account.json

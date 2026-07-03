@@ -13,7 +13,7 @@ namespace SistemaMozoQr.WebApi.Controllers;
 
 [ApiController]
 [Route("api/mesas")]
-[Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+[Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
 public class MesasConfigController : ControllerBase
 {
     private readonly IMesaRepository _mesaRepository;
@@ -132,7 +132,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("{id:guid}/abrir")]
-    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
     public async Task<IActionResult> Abrir(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -148,7 +148,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("{id:guid}/cerrar")]
-    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
     public async Task<IActionResult> Cerrar(Guid id)
     {
         var mesa = await _dbContext.Mesas.IgnoreQueryFilters().Include(m => m.Mozo).FirstOrDefaultAsync(m => m.Id == id);
@@ -310,7 +310,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("{id:guid}/monto")]
-    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
     public async Task<IActionResult> ActualizarMonto(Guid id, [FromBody] decimal? monto)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -326,7 +326,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpGet("{id:guid}/consumos")]
-    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
     public async Task<IActionResult> GetConsumos(Guid id)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
@@ -355,7 +355,7 @@ public class MesasConfigController : ControllerBase
     }
 
     [HttpPost("{id:guid}/agregar-consumo")]
-    [Authorize(Roles = "Admin,SuperAdmin,Mozo")]
+    [Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
     public async Task<IActionResult> AgregarConsumo(Guid id, [FromBody] AgregarConsumoDto dto)
     {
         var mesa = await _mesaRepository.GetByIdAsync(id);
