@@ -32,6 +32,15 @@ public static class DependencyInjection
                 options.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
             });
         }
+        else if (!string.IsNullOrEmpty(connectionString) && 
+                 (connectionString.Contains("Server=", StringComparison.OrdinalIgnoreCase) || 
+                  connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)))
+        {
+            services.AddDbContext<RestauranteDbContext>(options => {
+                options.UseNpgsql(connectionString);
+                options.ConfigureWarnings(warnings => warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+            });
+        }
         else
         {
             // Fallback a SQLite local si no hay DB en la nube o si usa "Data Source="
