@@ -67,8 +67,11 @@ import { environment } from '../../../../environments/environment';
               <div class="w-full md:w-32">
                 <label class="block text-xs font-bold text-slate-500 mb-1">Rol</label>
                 <select [(ngModel)]="formData.role" name="role" class="w-full px-3 py-2 rounded-xl border border-gray-300 bg-white text-sm">
-                  <option value="Mozo">Mozo</option>
                   <option value="Admin">Admin</option>
+                  <option value="Caja">Caja</option>
+                  <option value="Cocina">Cocina</option>
+                  <option value="Mozo">Mozo</option>
+                  <option value="MozoPortal">MozoPortal</option>
                 </select>
               </div>
             </div>
@@ -98,8 +101,16 @@ import { environment } from '../../../../environments/environment';
                 <tr class="border-b border-gray-100 hover:bg-gray-50/50 transition">
                   <td class="py-3 px-4 font-semibold text-gray-800">{{ user.username }}</td>
                   <td class="py-3 px-4">
-                    <span class="px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-wider" [ngClass]="user.role === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'">
-                      {{ user.role }}
+                    <span class="px-2.5 py-1 text-[10px] font-black rounded-lg uppercase tracking-wider" 
+                      [ngClass]="{
+                        'bg-purple-100 text-purple-700': user.role === 'Admin',
+                        'bg-green-100 text-green-700': user.role === 'Caja',
+                        'bg-amber-100 text-amber-700': user.role === 'Cocina',
+                        'bg-blue-100 text-blue-700': user.role === 'Mozo',
+                        'bg-teal-100 text-teal-700': user.role === 'MozoPortal',
+                        'bg-gray-100 text-gray-700': user.role === 'SuperAdmin'
+                      }">
+                      {{ user.role === 'MozoPortal' ? 'Mozo Portal' : user.role }}
                     </span>
                   </td>
                   <td class="py-3 px-4 text-right">
