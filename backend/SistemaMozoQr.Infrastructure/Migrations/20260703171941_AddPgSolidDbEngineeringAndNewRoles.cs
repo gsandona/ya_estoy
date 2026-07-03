@@ -110,7 +110,7 @@ namespace SistemaMozoQr.Infrastructure.Migrations
             // DashboardWidgetConfigs
             migrationBuilder.InsertData(
                 table: "DashboardWidgetConfigs",
-                columns: new[] { "Id", "RestauranteId", "WidgetKey", "Position", "IsVisible" },
+                columns: new[] { "Id", "RestauranteId", "WidgetKey", "Orden", "Activo" },
                 values: new object[,]
                 {
                     { new Guid("cccccccc-cccc-cccc-cccc-000000000001"), rest7Id, "ActiveTablesCount", 1, true },
