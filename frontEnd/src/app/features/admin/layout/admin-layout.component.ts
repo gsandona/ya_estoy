@@ -9,6 +9,8 @@ import { AdminDataService } from '../config/admin-data.service';
 import { LanguageService } from '../../../core/services/language.service';
 import { SignalrService } from '../../../core/services/signalr.service';
 import { PushNotificationService } from '../../../core/services/push-notification.service';
+import { RestauranteService } from '../../../core/services/restaurante.service';
+import { BrandingService } from '../../../core/services/branding.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -406,6 +408,8 @@ export class AdminLayoutComponent {
   lang = inject(LanguageService);
   public signalrService = inject(SignalrService);
   private pushNotification = inject(PushNotificationService);
+  private restauranteService = inject(RestauranteService);
+  private brandingService = inject(BrandingService);
   
   mobileMenuOpen = signal(false);
   sidebarCollapsed = signal(false);
@@ -420,6 +424,22 @@ export class AdminLayoutComponent {
       if (appName) this.globalAppName.set(appName);
       if (appLogo) this.globalLogoBase64.set(appLogo);
     });
+
+    const user = this.auth.currentUser();
+    if (user && user.restauranteId) {
+      this.restauranteService.getById(user.restauranteId).subscribe({
+        next: (res) => {
+          if (res) {
+            this.brandingService.applyBranding({
+              primary: res.colorPrimario,
+              secondary: res.colorSecundario,
+              background: res.colorFondo
+            });
+          }
+        },
+        error: (err) => console.warn('Error cargando branding global:', err)
+      });
+    }
 
     // Solicitar y registrar notificaciones push al iniciar sesión
     this.pushNotification.subscribeToNotifications().catch(e => {
