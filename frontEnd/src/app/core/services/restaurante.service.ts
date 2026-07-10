@@ -10,6 +10,10 @@ export interface Restaurante {
   parentRestauranteId?: string;
   activo: boolean;
   logoUrl?: string;
+  imagenFondoUrl?: string;
+  colorPrimario?: string;
+  colorSecundario?: string;
+  colorFondo?: string;
 }
 
 @Injectable({

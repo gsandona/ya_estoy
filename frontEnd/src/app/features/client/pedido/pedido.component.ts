@@ -5,6 +5,7 @@ import { SignalrService } from '../../../core/services/signalr.service';
 import { CartService } from '../../../core/services/cart.service';
 import { MenuComponent } from '../components/menu/menu.component';
 import { environment } from '../../../../environments/environment';
+import { BrandingService } from '../../../core/services/branding.service';
 
 import { FormsModule } from '@angular/forms';
 
@@ -70,104 +71,89 @@ import { FormsModule } from '@angular/forms';
       </div>
 
     } @else {
-      <div class="min-h-screen bg-surface flex flex-col items-center py-12 px-4 pb-32 animate-fade-in">
-        <div class="mb-10 text-center w-full max-w-sm">
-          <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-primary text-white text-3xl font-bold mb-4 shadow-lg ring-4 ring-primary/10">
-            {{ numeroMesa() || '...' }}
-          </div>
-          <h1 class="text-3xl font-serif font-black text-primary mb-1 tracking-tight">Menú Interactivo</h1>
-          <p class="text-primary/40 text-xs font-semibold mb-4">Mesa {{ numeroMesa() }}</p>
-          
-          @if (montoConsumo() !== null && montoConsumo() !== undefined) {
-            <div class="bg-sand border border-gray-200 rounded-2xl p-4 shadow-inner mb-2 animate-fade-in flex justify-between items-center w-full">
-              <div class="text-left">
-                <span class="text-[10px] uppercase font-black text-primary/60 tracking-wider">Consumo Acumulado</span>
-                <h2 class="text-2xl font-black text-accent mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
-              </div>
-              <button 
-                (click)="abrirDividirCuenta()"
-                class="bg-accent hover:bg-accent/90 text-white font-black text-xs py-2.5 px-4 rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-1.5 whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Dividir Cuenta
-              </button>
+      <div class="min-h-screen bg-sand flex flex-col animate-fade-in relative">
+        <!-- Background Image Header -->
+        <div class="h-64 w-full bg-primary/20 relative" [style.backgroundImage]="restauranteFondo() ? 'url(' + restauranteFondo() + ')' : 'none'" style="background-size: cover; background-position: center;">
+            <!-- Top bar -->
+            <div class="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
+               <button class="text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+               <button class="text-white relative"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></button>
             </div>
-          }
         </div>
 
-        <div class="w-full max-w-sm space-y-4">
-          @if (yaLlamo()) {
-            <div class="flex gap-2 w-full animate-fade-in">
-              <div class="flex-1 h-16 bg-primary/10 border border-primary/20 text-primary rounded-2xl font-semibold text-lg flex justify-center items-center gap-2 select-none">
-                <span class="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shrink-0"></span>
-                Mozo notificado
-              </div>
-              <button 
-                (click)="cancelarLlamado()"
-                [disabled]="loadingCancelarLlamar()"
-                class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-2xl flex justify-center items-center transition-all active:scale-95 shadow-md">
-                @if (loadingCancelarLlamar()) {
-                  <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-                } @else {
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                }
-              </button>
-            </div>
-          } @else {
-            <button 
-              (click)="llamarMozo()"
-              [disabled]="loadingLlamar()"
-              class="w-full h-16 bg-primary text-white rounded-2xl shadow-[0_8px_30px_rgba(15,81,50,0.12)] font-semibold text-lg flex justify-center items-center gap-2 transition-all active:scale-95 hover:brightness-105">
-              @if (loadingLlamar()) {
-                <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Llamando...
+        <!-- Content Card -->
+        <div class="flex-1 bg-surface rounded-t-[2.5rem] -mt-12 p-6 pt-16 relative shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col items-center">
+           
+           <!-- Mesa Circle -->
+           <div class="absolute -top-16 left-1/2 -translate-x-1/2">
+             <div class="relative group">
+                <div class="w-32 h-32 bg-primary rounded-full border-8 border-surface shadow-xl flex items-center justify-center text-white font-black text-6xl shadow-primary/20">
+                   {{ numeroMesa() || '...' }}
+                </div>
+                <!-- Bubble '¡Hola, Mesa X!' -->
+                <div class="absolute -right-28 top-2 bg-white text-primary text-sm font-bold py-2.5 px-5 rounded-2xl shadow-lg rounded-bl-none border border-gray-100 whitespace-nowrap animate-bounce" style="animation-duration: 2s;">
+                   ¡Hola, Mesa {{ numeroMesa() }}!
+                </div>
+             </div>
+           </div>
+
+           <h1 class="text-2xl font-black text-gray-800 mt-2 mb-2 tracking-tight">Menú Interactivo</h1>
+           <p class="text-gray-500 text-sm text-center mb-8 max-w-xs leading-relaxed font-medium">Decida en el menú interactivo el servicio que prefiere para comenzar.</p>
+           
+           <!-- Consumo -->
+           @if (montoConsumo() !== null && montoConsumo() !== undefined) {
+             <div class="bg-sand/50 border border-gray-100 rounded-2xl p-4 mb-6 w-full max-w-sm flex justify-between items-center animate-fade-in">
+               <div>
+                 <span class="text-[10px] uppercase font-black text-gray-500 tracking-wider">Consumo Acumulado</span>
+                 <h2 class="text-2xl font-black text-primary mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
+               </div>
+               <button (click)="abrirDividirCuenta()" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all active:scale-95 flex items-center gap-2">
+                 <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                 Dividir
+               </button>
+             </div>
+           }
+
+           <!-- Buttons -->
+           <div class="w-full max-w-sm space-y-3.5">
+              <!-- Llamar Mozo button -->
+              @if (yaLlamo()) {
+                <div class="flex gap-2 w-full animate-fade-in">
+                  <div class="flex-1 h-[60px] bg-primary/10 border border-primary/20 text-primary rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Mozo notificado
+                  </div>
+                  <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="w-[60px] h-[60px] bg-red-50 hover:bg-red-100 text-red-500 rounded-[1.25rem] flex justify-center items-center transition-all active:scale-95">
+                    @if (loadingCancelarLlamar()) { <span class="animate-spin h-5 w-5 border-2 border-red-500 border-t-transparent rounded-full"></span> } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg> }
+                  </button>
+                </div>
               } @else {
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Llamar Mozo
+                <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="w-full h-[60px] bg-primary text-white rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2.5 shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all">
+                  @if (loadingLlamar()) { <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Llamando... } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Llamar Mozo }
+                </button>
               }
-            </button>
-          }
-
-          @if (yaPidioCuenta()) {
-            <div class="flex gap-2 w-full animate-fade-in">
-              <div class="flex-1 h-16 bg-accent/10 border border-accent/20 text-accent rounded-2xl font-semibold text-lg flex justify-center items-center gap-2 select-none">
-                <span class="w-2.5 h-2.5 rounded-full bg-accent animate-pulse shrink-0"></span>
-                Cuenta solicitada
-              </div>
-              <button 
-                (click)="cancelarCuenta()"
-                [disabled]="loadingCancelarCuenta()"
-                class="w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-2xl flex justify-center items-center transition-all active:scale-95 shadow-md">
-                @if (loadingCancelarCuenta()) {
-                  <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-                } @else {
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                }
-              </button>
-            </div>
-          } @else {
-            <button 
-              (click)="pedirCuenta()"
-              [disabled]="loadingCuenta()"
-              class="w-full h-16 bg-accent text-white rounded-2xl shadow-[0_8px_30px_rgba(25,135,84,0.15)] font-semibold text-lg flex justify-center items-center gap-2 transition-all active:scale-95 hover:brightness-105">
-              @if (loadingCuenta()) {
-                <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Procesando...
+              
+              <!-- Pedir Cuenta button -->
+              @if (yaPidioCuenta()) {
+                <div class="flex gap-2 w-full animate-fade-in">
+                  <div class="flex-1 h-[60px] bg-accent/10 border border-accent/20 text-accent rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Cuenta solicitada
+                  </div>
+                  <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="w-[60px] h-[60px] bg-red-50 hover:bg-red-100 text-red-500 rounded-[1.25rem] flex justify-center items-center transition-all active:scale-95">
+                    @if (loadingCancelarCuenta()) { <span class="animate-spin h-5 w-5 border-2 border-red-500 border-t-transparent rounded-full"></span> } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg> }
+                  </button>
+                </div>
               } @else {
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-19.5 5.25h19.5m-19.5 0h19.5M4 18h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1z"></path></svg>
-                Pedir Cuenta
+                <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="w-full h-[60px] bg-accent text-white rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2.5 shadow-lg shadow-accent/20 hover:brightness-110 active:scale-95 transition-all">
+                  @if (loadingCuenta()) { <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Procesando... } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Pedir Cuenta }
+                </button>
               }
-            </button>
-          }
 
-          <button 
-            (click)="showMenu.set(!showMenu())"
-            class="w-full h-16 bg-white border-2 border-gray-100 text-primary rounded-2xl shadow-sm font-semibold text-lg hover:border-gray-200 flex justify-center items-center transition-all outline-none">
-            @if (showMenu()) {
-              Ocultar Menú
-            } @else {
-              Ver Menú
-            }
-          </button>
-        </div>
-
+              <!-- Ver Menu button -->
+              <button (click)="showMenu.set(!showMenu())" class="w-full h-[60px] bg-white text-gray-700 border-2 border-gray-100 rounded-[1.25rem] font-bold text-lg hover:bg-gray-50 active:scale-95 transition-all flex justify-center items-center gap-2 mt-4 shadow-sm">
+                @if (showMenu()) { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg> Ocultar Menú } @else { <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg> Ver Menú }
+              </button>
+           </div>
+           
         <!-- Pending Order Card -->
         @if (activePedidoTaskId()) {
           <div class="w-full max-w-sm rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3 border"
@@ -455,7 +441,8 @@ import { FormsModule } from '@angular/forms';
                ¡Pedido orquestado con éxito!
              </div>
           </div>
-        }
+         }
+         </div>
       </div>
     }
   `,
@@ -467,6 +454,9 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class PedidoComponent implements OnInit {
+  private brandingService = inject(BrandingService);
+  restauranteFondo = signal<string | null>(null);
+
   @Input() restaurante!: string;
   @Input() numero!: string;
 
@@ -677,6 +667,8 @@ export class PedidoComponent implements OnInit {
         if (res.numero) {
           this.numeroMesa.set(res.numero.toString());
         }
+        
+        this.applyRestaurantBranding(res);
 
         setTimeout(() => this.isValidSession.set(true), 800);
       },
@@ -691,10 +683,12 @@ export class PedidoComponent implements OnInit {
           this.isValidSession.set(undefined);
         } else if (err.status === 400 && pinParam && err.error?.code === 'PIN_INVALIDO') {
           // PIN Incorrecto
+          this.applyRestaurantBranding(err.error);
           localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.pinError.set('El PIN ingresado es incorrecto.');
         } else if (err.status === 400 && err.error?.code === 'INACTIVA') {
           // Mesa inactiva
+          this.applyRestaurantBranding(err.error);
           this.clearSplitState();
           localStorage.removeItem(`mesa_pin_${this.restaurante}_${this.numero}`);
           this.requirePin.set(false);
@@ -716,6 +710,18 @@ export class PedidoComponent implements OnInit {
     }
     this.pinError.set(null);
     this.verifyMesa(sanitizedPin);
+  }
+  private applyRestaurantBranding(res: any) {
+    if (res) {
+      this.brandingService.applyBranding({
+        primary: res.colorPrimario,
+        secondary: res.colorSecundario,
+        background: res.colorFondo
+      });
+      if (res.restauranteFondo) {
+        this.restauranteFondo.set(res.restauranteFondo);
+      }
+    }
   }
 
   async llamarMozo() {

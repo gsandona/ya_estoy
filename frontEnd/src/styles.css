@@ -12,7 +12,7 @@
     color: #0f5132;
   }
   input, select, textarea {
-    @apply focus:border-accent/40 focus:ring-accent/10;
+    @apply focus:border-accent focus:ring-accent;
   }
 }
 

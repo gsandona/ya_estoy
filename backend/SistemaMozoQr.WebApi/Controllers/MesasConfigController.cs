@@ -250,17 +250,48 @@ public class MesasConfigController : ControllerBase
 
         // Validar que la mesa esté activa (PIN configurado)
         if (string.IsNullOrEmpty(mesa.CodigoAcceso) || mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible)
-            return BadRequest(new { message = "La mesa se encuentra inactiva. Solicite al mozo que la habilite.", code = "INACTIVA" });
+            return BadRequest(new { 
+                message = "La mesa se encuentra inactiva. Solicite al mozo que la habilite.", 
+                code = "INACTIVA",
+                restauranteNombre = mesa.Restaurante?.Nombre,
+                restauranteLogo = mesa.Restaurante?.LogoUrl,
+                restauranteIcon = mesa.Restaurante?.IconoPrincipal,
+                restauranteFondo = mesa.Restaurante?.ImagenFondoUrl,
+                colorPrimario = mesa.Restaurante?.ColorPrimario,
+                colorSecundario = mesa.Restaurante?.ColorSecundario,
+                colorFondo = mesa.Restaurante?.ColorFondo
+            });
 
         // Si no envía PIN, retornamos 401 para que el front pida el PIN
         if (string.IsNullOrEmpty(pin))
         {
-            return Unauthorized(new { message = "Se requiere el PIN de la mesa.", mesaId = mesa.Id, numero = mesa.Numero });
+            return Unauthorized(new { 
+                message = "Se requiere el PIN de la mesa.", 
+                mesaId = mesa.Id, 
+                numero = mesa.Numero,
+                restauranteNombre = mesa.Restaurante?.Nombre,
+                restauranteLogo = mesa.Restaurante?.LogoUrl,
+                restauranteIcon = mesa.Restaurante?.IconoPrincipal,
+                restauranteFondo = mesa.Restaurante?.ImagenFondoUrl,
+                colorPrimario = mesa.Restaurante?.ColorPrimario,
+                colorSecundario = mesa.Restaurante?.ColorSecundario,
+                colorFondo = mesa.Restaurante?.ColorFondo
+            });
         }
 
         if (mesa.CodigoAcceso != pin)
         {
-            return BadRequest(new { message = "PIN incorrecto.", code = "PIN_INVALIDO" });
+            return BadRequest(new { 
+                message = "PIN incorrecto.", 
+                code = "PIN_INVALIDO",
+                restauranteNombre = mesa.Restaurante?.Nombre,
+                restauranteLogo = mesa.Restaurante?.LogoUrl,
+                restauranteIcon = mesa.Restaurante?.IconoPrincipal,
+                restauranteFondo = mesa.Restaurante?.ImagenFondoUrl,
+                colorPrimario = mesa.Restaurante?.ColorPrimario,
+                colorSecundario = mesa.Restaurante?.ColorSecundario,
+                colorFondo = mesa.Restaurante?.ColorFondo
+            });
         }
 
         var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
@@ -305,7 +336,14 @@ public class MesasConfigController : ControllerBase
             pedidoTaskId = pedidoTask?.Id,
             pedidoDetails = pedidoTask?.Details,
             pedidoEstado = pedidoEstado,
-            itemsConsumidos = itemsRes
+            itemsConsumidos = itemsRes,
+            restauranteNombre = mesa.Restaurante?.Nombre,
+            restauranteLogo = mesa.Restaurante?.LogoUrl,
+            restauranteIcon = mesa.Restaurante?.IconoPrincipal,
+            restauranteFondo = mesa.Restaurante?.ImagenFondoUrl,
+            colorPrimario = mesa.Restaurante?.ColorPrimario,
+            colorSecundario = mesa.Restaurante?.ColorSecundario,
+            colorFondo = mesa.Restaurante?.ColorFondo
         });
     }
 

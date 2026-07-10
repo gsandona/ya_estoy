@@ -34,11 +34,11 @@ public static class ModelBuilderExtensions
         modelBuilder.Entity<Restaurante>().HasData(
             new Restaurante { Id = rest1Id, Nombre = "El Gran Sabor", IconoPrincipal = "🍽️", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Restaurante { Id = rest2Id, Nombre = "La Parrilla de Juan", IconoPrincipal = "🥩", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest3Id, Nombre = "La Pasiva", IconoPrincipal = "🌭", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Restaurante { Id = rest3Id, Nombre = "La Pasiva", IconoPrincipal = "🌭", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), ColorPrimario = "#b91c1c", ColorSecundario = "#dc2626", ColorFondo = "#fef2f2", ImagenFondoUrl = "https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" },
             new Restaurante { Id = rest4Id, Nombre = "La Merienda", IconoPrincipal = "☕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Restaurante { Id = rest5Id, Nombre = "Bella Italia", IconoPrincipal = "🍕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
             new Restaurante { Id = rest6Id, Nombre = "Cordon Beer", IconoPrincipal = "🍺", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest7Id, Nombre = "TuRestaurante", IconoPrincipal = "🍕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+            new Restaurante { Id = rest7Id, Nombre = "TuRestaurante", IconoPrincipal = "🍔", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), ImagenFondoUrl = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" }
         );
 
         // Seed Usuarios (Email -> Username)

@@ -56,6 +56,38 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
             </label>
           </div>
 
+          <!-- Estilos y Branding -->
+          <div class="col-span-full mt-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+            <h3 class="text-lg font-black text-gray-800 mb-4">Personalización y Estilos</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Color Primario (Hex)</label>
+                <div class="flex gap-2 items-center">
+                  <input type="color" formControlName="colorPrimario" class="h-10 w-10 p-0 border-0 rounded cursor-pointer">
+                  <input type="text" formControlName="colorPrimario" class="flex-1 px-4 py-2 rounded-xl border outline-none" placeholder="#0f5132">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Color Secundario (Hex)</label>
+                <div class="flex gap-2 items-center">
+                  <input type="color" formControlName="colorSecundario" class="h-10 w-10 p-0 border-0 rounded cursor-pointer">
+                  <input type="text" formControlName="colorSecundario" class="flex-1 px-4 py-2 rounded-xl border outline-none" placeholder="#198754">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Color Fondo (Hex)</label>
+                <div class="flex gap-2 items-center">
+                  <input type="color" formControlName="colorFondo" class="h-10 w-10 p-0 border-0 rounded cursor-pointer">
+                  <input type="text" formControlName="colorFondo" class="flex-1 px-4 py-2 rounded-xl border outline-none" placeholder="#f4f9f4">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">URL Imagen Fondo Menú</label>
+                <input type="text" formControlName="imagenFondoUrl" class="w-full px-4 py-2 rounded-xl border outline-none" placeholder="https://ejemplo.com/fondo.jpg">
+              </div>
+            </div>
+          </div>
+
           <div class="col-span-full flex justify-end gap-3 mt-4">
             <button type="button" (click)="cancelForm()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-colors">
               Cancelar
@@ -120,7 +152,11 @@ export class AbmRestaurantesComponent implements OnInit {
     this.restauranteForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       logoUrl: [''],
-      activo: [true]
+      activo: [true],
+      colorPrimario: ['#0f5132'],
+      colorSecundario: ['#198754'],
+      colorFondo: ['#f4f9f4'],
+      imagenFondoUrl: ['']
     });
   }
 
@@ -156,7 +192,14 @@ export class AbmRestaurantesComponent implements OnInit {
   openCreateForm(): void {
     this.isEditing = false;
     this.currentEditId = null;
-    this.restauranteForm.reset({ activo: true, logoUrl: '' });
+    this.restauranteForm.reset({ 
+      activo: true, 
+      logoUrl: '',
+      colorPrimario: '#0f5132',
+      colorSecundario: '#198754',
+      colorFondo: '#f4f9f4',
+      imagenFondoUrl: ''
+    });
     this.showForm = true;
   }
 
@@ -166,7 +209,11 @@ export class AbmRestaurantesComponent implements OnInit {
     this.restauranteForm.patchValue({
       nombre: rest.nombre,
       logoUrl: rest.logoUrl || '',
-      activo: rest.activo
+      activo: rest.activo,
+      colorPrimario: rest.colorPrimario || '#0f5132',
+      colorSecundario: rest.colorSecundario || '#198754',
+      colorFondo: rest.colorFondo || '#f4f9f4',
+      imagenFondoUrl: rest.imagenFondoUrl || ''
     });
     this.showForm = true;
   }

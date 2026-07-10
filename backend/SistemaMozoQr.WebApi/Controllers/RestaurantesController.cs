@@ -76,6 +76,11 @@ public class RestaurantesController : ControllerBase
         existing.Nombre = restaurante.Nombre;
         existing.Activo = restaurante.Activo;
         existing.LogoUrl = restaurante.LogoUrl;
+        existing.IconoPrincipal = restaurante.IconoPrincipal;
+        existing.ImagenFondoUrl = restaurante.ImagenFondoUrl;
+        existing.ColorPrimario = restaurante.ColorPrimario;
+        existing.ColorSecundario = restaurante.ColorSecundario;
+        existing.ColorFondo = restaurante.ColorFondo;
 
         _context.Restaurantes.Update(existing);
         await _context.SaveChangesAsync();

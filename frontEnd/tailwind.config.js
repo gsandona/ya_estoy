@@ -6,10 +6,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#0f5132', // Deep professional dark forest green
-        accent: '#198754',  // Clean green accent
+        primary: 'var(--color-primary, #0f5132)', // Deep professional dark forest green fallback
+        accent: 'var(--color-accent, #198754)',  // Clean green accent fallback
         surface: '#ffffff', // Pure white
-        sand: '#f4f9f4',    // Very soft mint green-white
+        sand: 'var(--color-sand, #f4f9f4)',    // Very soft background fallback
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

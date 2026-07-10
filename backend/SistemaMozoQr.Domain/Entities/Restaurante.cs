@@ -9,6 +9,10 @@ public class Restaurante
     public Guid? ParentRestauranteId { get; set; }
     public bool Activo { get; set; } = true;
     public DateTime FechaCreacion { get; set; } = DateTime.UtcNow;
+    public string? ImagenFondoUrl { get; set; }
+    public string? ColorPrimario { get; set; } = "#0f5132";
+    public string? ColorSecundario { get; set; } = "#198754";
+    public string? ColorFondo { get; set; } = "#f4f9f4";
 
     // Relaciones (Opcional si quieres navegación)
     public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
