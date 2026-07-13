@@ -31,7 +31,8 @@ import { FormsModule } from '@angular/forms';
       </div>
 
       <!-- Selector de Categorías (Pestañas Premium) -->
-      <div class="grid grid-cols-4 gap-1 mb-4 bg-gray-50 p-1.5 rounded-2xl border border-gray-150">
+      @if (!searchQuery()) {
+        <div class="grid grid-cols-4 gap-1 mb-4 bg-gray-50 p-1.5 rounded-2xl border border-gray-150">
         <button (click)="selectTab('Comidas')"
                 [ngClass]="activeTab() === 'Comidas' ? 'bg-primary text-white shadow-md' : 'text-slate-500 hover:text-slate-800 hover:bg-gray-100/60'"
                 class="flex flex-col items-center justify-center py-2.5 rounded-xl transition active:scale-95 outline-none">
@@ -56,10 +57,11 @@ import { FormsModule } from '@angular/forms';
           <span class="text-lg mb-0.5">🏷️</span>
           <span class="text-[9px] font-black uppercase tracking-wider">Otros</span>
         </button>
-      </div>
+        </div>
+      }
 
       <!-- Chips de Subcategorías Dinámicas -->
-      @if (subCategories().length > 0) {
+      @if (!searchQuery() && subCategories().length > 0) {
         <div class="flex gap-1.5 mb-5 overflow-x-auto pb-2 scrollbar-none select-none">
           <button (click)="selectedSubCategory.set(null)"
                   [ngClass]="selectedSubCategory() === null ? 'bg-accent/15 border-accent/25 text-accent font-black shadow-sm shadow-accent/5' : 'bg-gray-50 border-gray-200 text-slate-500 font-semibold hover:bg-gray-100'"
@@ -77,7 +79,12 @@ import { FormsModule } from '@angular/forms';
       }
 
       <!-- Listado de Productos Filtrados -->
-      <div class="space-y-4 max-h-[480px] overflow-y-auto pr-1">
+      @if (filteredItems().length === 0) {
+        <div class="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+          <p class="text-gray-500 font-bold">No se encontraron productos.</p>
+        </div>
+      }
+      <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1 pb-4">
         @for (item of filteredItems(); track item.id) {
           @if (item.activo !== false) {
             <div class="bg-white p-4 rounded-2xl border border-gray-150 shadow-sm flex justify-between items-start gap-4 transition-all hover:border-accent/30 hover:shadow-md animate-fade-in-quick">
@@ -165,19 +172,20 @@ export class MenuComponent implements OnInit {
     return this.menuItems().filter(item => {
       const cat = (item.categoria || '').toLowerCase().trim();
       
-      // 1. Filter by primary category
-      const group = this.getGroupForCategory(cat);
-      if (group !== tab) return false;
-      
-      // 2. Filter by subcategory
-      if (sub && item.categoria !== sub) return false;
-      
-      // 3. Filter by search query
+      // Si hay búsqueda, buscar en todos los productos sin importar la categoría
       if (query) {
         const matchesName = (item.nombre || '').toLowerCase().includes(query);
         const matchesDesc = (item.descripcion || '').toLowerCase().includes(query);
-        if (!matchesName && !matchesDesc) return false;
+        const matchesCat = cat.includes(query);
+        return matchesName || matchesDesc || matchesCat;
       }
+      
+      // 1. Filtrar por pestaña principal
+      const group = this.getGroupForCategory(cat);
+      if (group !== tab) return false;
+      
+      // 2. Filtrar por subcategoría (si hay una seleccionada)
+      if (sub && item.categoria !== sub) return false;
       
       return true;
     });

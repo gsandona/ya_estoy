@@ -74,10 +74,8 @@ import { FormsModule } from '@angular/forms';
       <div class="min-h-screen bg-sand flex flex-col animate-fade-in relative">
         <!-- Background Image Header -->
         <div class="h-64 w-full bg-primary/20 relative" [style.backgroundImage]="restauranteFondo() ? 'url(' + restauranteFondo() + ')' : 'none'" style="background-size: cover; background-position: center;">
-            <!-- Top bar -->
-            <div class="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent">
-               <button class="text-white"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
-               <button class="text-white relative"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></button>
+            <div class="absolute top-0 left-0 right-0 p-4 h-16 bg-gradient-to-b from-black/50 to-transparent">
+               <!-- Espacio para notificaciones futuras o barra limpia -->
             </div>
         </div>
 
@@ -97,22 +95,12 @@ import { FormsModule } from '@angular/forms';
              </div>
            </div>
 
-           <h1 class="text-2xl font-black text-gray-800 mt-2 mb-2 tracking-tight">Menú Interactivo</h1>
-           <p class="text-gray-500 text-sm text-center mb-8 max-w-xs leading-relaxed font-medium">Decida en el menú interactivo el servicio que prefiere para comenzar.</p>
-           
-           <!-- Consumo -->
-           @if (montoConsumo() !== null && montoConsumo() !== undefined) {
-             <div class="bg-sand/50 border border-gray-100 rounded-2xl p-4 mb-6 w-full max-w-sm flex justify-between items-center animate-fade-in">
-               <div>
-                 <span class="text-[10px] uppercase font-black text-gray-500 tracking-wider">Consumo Acumulado</span>
-                 <h2 class="text-2xl font-black text-primary mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
-               </div>
-               <button (click)="abrirDividirCuenta()" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs py-2 px-4 rounded-xl shadow-sm transition-all active:scale-95 flex items-center gap-2">
-                 <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                 Dividir
-               </button>
-             </div>
-           }
+           <!-- CONTENIDO DINÁMICO SEGÚN TAB -->
+
+           @if (activeBottomTab() === 'inicio') {
+             <div class="w-full max-w-sm animate-fade-in flex flex-col items-center mt-2">
+               <h1 class="text-2xl font-black text-gray-800 mb-2 tracking-tight text-center">Menú Interactivo</h1>
+               <p class="text-gray-500 text-sm text-center mb-8 leading-relaxed font-medium">Decida en el menú interactivo el servicio que prefiere para comenzar.</p>
 
            <!-- Buttons -->
            <div class="w-full max-w-sm space-y-3.5">
@@ -148,89 +136,114 @@ import { FormsModule } from '@angular/forms';
                 </button>
               }
 
-              <!-- Ver Menu button -->
-              <button (click)="showMenu.set(!showMenu())" class="w-full h-[60px] bg-white text-gray-700 border-2 border-gray-100 rounded-[1.25rem] font-bold text-lg hover:bg-gray-50 active:scale-95 transition-all flex justify-center items-center gap-2 mt-4 shadow-sm">
-                @if (showMenu()) { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg> Ocultar Menú } @else { <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg> Ver Menú }
-              </button>
+            </div>
            </div>
-           
-        <!-- Pending Order Card -->
-        @if (activePedidoTaskId()) {
-          <div class="w-full max-w-sm rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3 border"
-               [ngClass]="{
-                 'bg-blue-50/50 border-blue-100 text-blue-800': activePedidoEstado() === 'Recibido',
-                 'bg-sand border-gray-200 text-primary': activePedidoEstado() === 'Aprobado',
-                 'bg-amber-50/50 border-amber-100 text-amber-800': activePedidoEstado() === 'EnPreparacion',
-                 'bg-green-50/50 border-green-100 text-green-800': activePedidoEstado() === 'Listo'
-               }">
-            <div class="flex justify-between items-start">
-              <div class="flex items-center gap-3">
-                <span class="text-accent flex items-center justify-center shrink-0">
-                  @if (activePedidoEstado() === 'Recibido') {
-                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  }
-                  @if (activePedidoEstado() === 'Aprobado') {
-                    <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  }
-                  @if (activePedidoEstado() === 'EnPreparacion') {
-                    <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
-                  }
-                  @if (activePedidoEstado() === 'Listo') {
-                    <svg class="w-5 h-5 text-green-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  }
-                </span>
-                <div>
-                  <h3 class="font-bold text-gray-800 text-sm">Estado de tu Pedido</h3>
-                  <p class="text-[10px] font-black uppercase tracking-wider"
-                     [ngClass]="{
-                       'text-blue-500': activePedidoEstado() === 'Recibido',
-                       'text-primary/70': activePedidoEstado() === 'Aprobado',
-                       'text-amber-600': activePedidoEstado() === 'EnPreparacion',
-                       'text-green-600 animate-pulse': activePedidoEstado() === 'Listo'
-                     }">
-                    @if (activePedidoEstado() === 'Recibido') { Pendiente de Aprobación }
-                    @if (activePedidoEstado() === 'Aprobado') { Aprobado }
-                    @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
-                    @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
-                  </p>
-                </div>
-              </div>
-              @if (activePedidoEstado() === 'Recibido') {
-                <button 
-                  (click)="cancelarPedido()"
-                  [disabled]="loadingCancelarPedido()"
-                  class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center gap-1">
-                  @if (loadingCancelarPedido()) {
-                    <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full"></span>
-                  } @else {
-                    Cancelar Pedido
-                  }
-                </button>
-              }
-            </div>
-            <div class="bg-white/80 p-3 rounded-2xl text-xs font-semibold text-gray-600 border line-clamp-3"
-                 [ngClass]="{
-                   'border-blue-50/50': activePedidoEstado() === 'Recibido',
-                   'border-amber-50/50': activePedidoEstado() === 'EnPreparacion',
-                   'border-green-50/50': activePedidoEstado() === 'Listo'
-                 }">
-              {{ activePedidoDetails() }}
-            </div>
-          </div>
-        }
+           }
 
-        @if (showMenu()) {
-          <div class="w-full max-w-md mt-10 animate-fade-in pb-20">
-             <app-menu [restauranteId]="restauranteId()"></app-menu>
-          </div>
-        }
+           @if (activeBottomTab() === 'consultas') {
+             <div class="w-full max-w-sm animate-fade-in flex flex-col gap-6 mt-2">
+               
+               <!-- Consumo y Cuenta -->
+               @if (montoConsumo() !== null && montoConsumo() !== undefined) {
+                 <div class="bg-sand/50 border border-gray-100 rounded-2xl p-4 w-full flex justify-between items-center shadow-sm">
+                   <div>
+                     <span class="text-[10px] uppercase font-black text-gray-500 tracking-wider">Consumo Acumulado</span>
+                     <h2 class="text-2xl font-black text-primary mt-0.5">\${{ formatCurrency(montoConsumo()) }}</h2>
+                   </div>
+                   <button (click)="abrirDividirCuenta()" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95 flex items-center gap-2">
+                     <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                     Dividir
+                   </button>
+                 </div>
+               } @else {
+                 <div class="bg-gray-50 border border-gray-100 border-dashed rounded-2xl p-6 w-full text-center">
+                    <p class="text-sm font-bold text-gray-500">Todavía no tienes consumos cargados en la mesa.</p>
+                 </div>
+               }
 
-        <!-- Floating Cart -->
+               <!-- Tickets Activos (Pending Order Card) -->
+               @if (activePedidoTaskId()) {
+                 <div>
+                   <h3 class="text-xs font-black uppercase text-gray-400 mb-3 ml-1 tracking-wider">Tu Pedido Actual</h3>
+                   <div class="w-full rounded-3xl p-5 shadow-sm animate-fade-in flex flex-col gap-3 border"
+                        [ngClass]="{
+                          'bg-blue-50/50 border-blue-100 text-blue-800': activePedidoEstado() === 'Recibido',
+                          'bg-sand border-gray-200 text-primary': activePedidoEstado() === 'Aprobado',
+                          'bg-amber-50/50 border-amber-100 text-amber-800': activePedidoEstado() === 'EnPreparacion',
+                          'bg-green-50/50 border-green-100 text-green-800': activePedidoEstado() === 'Listo'
+                        }">
+                     <div class="flex justify-between items-start">
+                       <div class="flex items-center gap-3">
+                         <span class="text-accent flex items-center justify-center shrink-0">
+                           @if (activePedidoEstado() === 'Recibido') {
+                             <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                           }
+                           @if (activePedidoEstado() === 'Aprobado') {
+                             <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                           }
+                           @if (activePedidoEstado() === 'EnPreparacion') {
+                             <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
+                           }
+                           @if (activePedidoEstado() === 'Listo') {
+                             <svg class="w-5 h-5 text-green-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                           }
+                         </span>
+                         <div>
+                           <h3 class="font-bold text-gray-800 text-sm">Estado de tu Pedido</h3>
+                           <p class="text-[10px] font-black uppercase tracking-wider"
+                              [ngClass]="{
+                                'text-blue-500': activePedidoEstado() === 'Recibido',
+                                'text-primary/70': activePedidoEstado() === 'Aprobado',
+                                'text-amber-600': activePedidoEstado() === 'EnPreparacion',
+                                'text-green-600 animate-pulse': activePedidoEstado() === 'Listo'
+                              }">
+                             @if (activePedidoEstado() === 'Recibido') { Pendiente de Aprobación }
+                             @if (activePedidoEstado() === 'Aprobado') { Aprobado }
+                             @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
+                             @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
+                           </p>
+                         </div>
+                       </div>
+                       @if (activePedidoEstado() === 'Recibido') {
+                         <button 
+                           (click)="cancelarPedido()"
+                           [disabled]="loadingCancelarPedido()"
+                           class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center gap-1">
+                           @if (loadingCancelarPedido()) {
+                             <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full"></span>
+                           } @else {
+                             Cancelar
+                           }
+                         </button>
+                       }
+                     </div>
+                     <div class="bg-white/80 p-3 rounded-2xl text-xs font-semibold text-gray-600 border line-clamp-3"
+                          [ngClass]="{
+                            'border-blue-50/50': activePedidoEstado() === 'Recibido',
+                            'border-amber-50/50': activePedidoEstado() === 'EnPreparacion',
+                            'border-green-50/50': activePedidoEstado() === 'Listo'
+                          }">
+                       {{ activePedidoDetails() }}
+                     </div>
+                   </div>
+                 </div>
+               }
+             </div>
+           }
+
+           @if (activeBottomTab() === 'menu') {
+             <div class="w-full max-w-md animate-fade-in flex flex-col items-center pb-8 mt-4">
+                <app-menu [restauranteId]="restauranteId()"></app-menu>
+             </div>
+           }
+
+
+        <!-- Floating Cart (Only show if not in Consultas where maybe they don't need it, but let's show it everywhere if items > 0) -->
         @if (cart.totalItems() > 0 && !showCartModal()) {
-          <div class="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-40 animate-fade-in">
+          <div class="fixed bottom-24 left-0 right-0 px-4 flex justify-center z-40 animate-fade-in pointer-events-none">
             <button 
               (click)="showCartModal.set(true)"
-              class="w-full max-w-md bg-accent text-white rounded-2xl shadow-[0_10px_30px_rgba(128,26,45,0.15)] p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-accent/20">
+              class="w-full max-w-md bg-accent text-white rounded-2xl shadow-[0_10px_30px_rgba(128,26,45,0.15)] p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-accent/20 pointer-events-auto">
               <div class="flex items-center gap-3">
                  <div class="bg-white/20 rounded-full h-8 w-8 flex items-center justify-center font-black text-sm">
                    {{ cart.totalItems() }}
@@ -444,6 +457,40 @@ import { FormsModule } from '@angular/forms';
          }
          </div>
       </div>
+
+      
+      <!-- Bottom Navigation Bar -->
+      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-50 h-20 px-6 pb-safe">
+        <div class="max-w-md mx-auto flex justify-between items-center h-full">
+          <!-- Inicio Tab -->
+          <button (click)="activeBottomTab.set('inicio')" class="flex flex-col items-center justify-center gap-1.5 w-20 h-full transition-all active:scale-95 group">
+            <div class="p-2 rounded-xl transition-all duration-300" [ngClass]="activeBottomTab() === 'inicio' ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:bg-gray-50'">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            </div>
+            <span class="text-[10px] font-bold tracking-wide" [ngClass]="activeBottomTab() === 'inicio' ? 'text-primary' : 'text-gray-400'">Inicio</span>
+          </button>
+          
+          <!-- Menu Tab -->
+          <button (click)="activeBottomTab.set('menu')" class="flex flex-col items-center justify-center gap-1.5 w-20 h-full transition-all active:scale-95 group relative">
+            <div class="p-2 rounded-xl transition-all duration-300" [ngClass]="activeBottomTab() === 'menu' ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:bg-gray-50'">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+            <span class="text-[10px] font-bold tracking-wide" [ngClass]="activeBottomTab() === 'menu' ? 'text-primary' : 'text-gray-400'">Menú</span>
+          </button>
+          
+          <!-- Consultas Tab -->
+          <button (click)="activeBottomTab.set('consultas')" class="flex flex-col items-center justify-center gap-1.5 w-20 h-full transition-all active:scale-95 group relative">
+            <!-- Badge Notification for active ticket -->
+            @if (activePedidoTaskId()) {
+              <span class="absolute top-2 right-4 w-2.5 h-2.5 bg-accent rounded-full border-2 border-white"></span>
+            }
+            <div class="p-2 rounded-xl transition-all duration-300" [ngClass]="activeBottomTab() === 'consultas' ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:bg-gray-50'">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            </div>
+            <span class="text-[10px] font-bold tracking-wide" [ngClass]="activeBottomTab() === 'consultas' ? 'text-primary' : 'text-gray-400'">Consultas</span>
+          </button>
+        </div>
+      </nav>
     }
   `,
   styles: [`
@@ -456,6 +503,8 @@ import { FormsModule } from '@angular/forms';
 export class PedidoComponent implements OnInit {
   private brandingService = inject(BrandingService);
   restauranteFondo = signal<string | null>(null);
+  
+  activeBottomTab = signal<'inicio' | 'menu' | 'consultas'>('inicio');
 
   @Input() restaurante!: string;
   @Input() numero!: string;
@@ -501,7 +550,7 @@ export class PedidoComponent implements OnInit {
   activePedidoEstado = signal<string>('Recibido');
   montoConsumo = signal<number | null>(null);
 
-  showMenu = signal(false);
+
   showCartModal = signal(false);
   showSuccessToast = signal(false);
 

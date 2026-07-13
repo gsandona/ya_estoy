@@ -17,7 +17,23 @@ import { BrandingService } from '../../../core/services/branding.service';
   standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, TenantSelectorComponent],
   template: `
-    <div class="min-h-screen bg-surface flex">
+    @if (!isBrandingLoaded()) {
+      <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center animate-fade-in relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50 opacity-50"></div>
+        <div class="relative flex flex-col items-center">
+          <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2">
+            <span class="animate-spin absolute h-16 w-16 border-4 border-gray-300 border-t-gray-600 rounded-full"></span>
+            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-200 flex">
+              <img src="logo.png" class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <h2 class="text-xl font-black text-gray-800 tracking-tight mb-2">{{ globalAppName() || 'MozoGo' }}</h2>
+          <p class="text-gray-400 text-xs font-semibold uppercase tracking-widest animate-pulse">Cargando Sistema...</p>
+        </div>
+      </div>
+    } @else {
+      <div class="min-h-screen bg-surface flex">
+
       <!-- Desktop Sidebar -->
       <aside [ngClass]="sidebarCollapsed() ? 'w-20' : 'w-72'" class="bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all duration-300">
         <div class="p-4 border-b border-white/10 mt-4 flex items-center justify-between">
@@ -386,7 +402,8 @@ import { BrandingService } from '../../../core/services/branding.service';
           </aside>
         }
       </main>
-    </div>
+      </div>
+    }
   `,
   styles: [`
     @keyframes slide-right {
@@ -416,6 +433,7 @@ export class AdminLayoutComponent {
   globalAppName = signal<string>('');
   globalLogoBase64 = signal<string>('');
   showNotificationSettings = signal(false);
+  isBrandingLoaded = signal(false);
 
   constructor() {
     this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
@@ -436,9 +454,15 @@ export class AdminLayoutComponent {
               background: res.colorFondo
             });
           }
+          setTimeout(() => this.isBrandingLoaded.set(true), 150); // Pequeño delay para aplicar estilos CSS
         },
-        error: (err) => console.warn('Error cargando branding global:', err)
+        error: (err) => {
+          console.warn('Error cargando branding global:', err);
+          this.isBrandingLoaded.set(true);
+        }
       });
+    } else {
+      this.isBrandingLoaded.set(true);
     }
 
     // Solicitar y registrar notificaciones push al iniciar sesión
