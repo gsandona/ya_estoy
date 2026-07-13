@@ -99,45 +99,80 @@ import { FormsModule } from '@angular/forms';
 
            @if (activeBottomTab() === 'inicio') {
              <div class="w-full max-w-sm animate-fade-in flex flex-col items-center mt-2">
-               <h1 class="text-2xl font-black text-gray-800 mb-2 tracking-tight text-center">Menú Interactivo</h1>
-               <p class="text-gray-500 text-sm text-center mb-8 leading-relaxed font-medium">Decida en el menú interactivo el servicio que prefiere para comenzar.</p>
+               <div class="text-center mb-6">
+                 <h1 class="text-3xl font-black text-gray-800 tracking-tight">¿Qué necesitas?</h1>
+                 <p class="text-gray-500 text-sm mt-1.5 font-medium">Selecciona una de las opciones debajo</p>
+               </div>
 
-           <!-- Buttons -->
-           <div class="w-full max-w-sm space-y-3.5">
-              <!-- Llamar Mozo button -->
-              @if (yaLlamo()) {
-                <div class="flex gap-2 w-full animate-fade-in">
-                  <div class="flex-1 h-[60px] bg-primary/10 border border-primary/20 text-primary rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Mozo notificado
-                  </div>
-                  <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="w-[60px] h-[60px] bg-red-50 hover:bg-red-100 text-red-500 rounded-[1.25rem] flex justify-center items-center transition-all active:scale-95">
-                    @if (loadingCancelarLlamar()) { <span class="animate-spin h-5 w-5 border-2 border-red-500 border-t-transparent rounded-full"></span> } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg> }
-                  </button>
-                </div>
-              } @else {
-                <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="w-full h-[60px] bg-primary text-white rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2.5 shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all">
-                  @if (loadingLlamar()) { <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Llamando... } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Llamar Mozo }
-                </button>
-              }
-              
-              <!-- Pedir Cuenta button -->
-              @if (yaPidioCuenta()) {
-                <div class="flex gap-2 w-full animate-fade-in">
-                  <div class="flex-1 h-[60px] bg-accent/10 border border-accent/20 text-accent rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> Cuenta solicitada
-                  </div>
-                  <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="w-[60px] h-[60px] bg-red-50 hover:bg-red-100 text-red-500 rounded-[1.25rem] flex justify-center items-center transition-all active:scale-95">
-                    @if (loadingCancelarCuenta()) { <span class="animate-spin h-5 w-5 border-2 border-red-500 border-t-transparent rounded-full"></span> } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg> }
-                  </button>
-                </div>
-              } @else {
-                <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="w-full h-[60px] bg-accent text-white rounded-[1.25rem] font-bold text-lg flex justify-center items-center gap-2.5 shadow-lg shadow-accent/20 hover:brightness-110 active:scale-95 transition-all">
-                  @if (loadingCuenta()) { <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span> Procesando... } @else { <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Pedir Cuenta }
-                </button>
-              }
+               <div class="w-full max-w-sm grid grid-cols-2 gap-4 mb-4">
+                 <!-- Botón Ir al Menú (Acceso rápido) -->
+                 <button (click)="activeBottomTab.set('menu')" class="col-span-2 bg-gradient-to-r from-primary to-primary/80 text-white rounded-[1.5rem] p-5 shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-between border border-primary/20">
+                   <div class="text-left">
+                     <h3 class="font-black text-xl mb-1">Ver Menú</h3>
+                     <p class="text-white/80 text-xs font-semibold">Explorá nuestras opciones</p>
+                   </div>
+                   <div class="bg-white/20 p-3 rounded-full">
+                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                   </div>
+                 </button>
 
-            </div>
-           </div>
+                 <!-- Botón Llamar Mozo -->
+                 @if (yaLlamo()) {
+                   <div class="col-span-1 bg-green-50 rounded-[1.5rem] p-4 border border-green-200 flex flex-col items-center justify-center relative shadow-sm">
+                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="absolute top-2 right-2 text-green-600 hover:text-green-800 active:scale-90 transition-all bg-green-100 p-1.5 rounded-full">
+                        @if (loadingCancelarLlamar()) {
+                          <span class="animate-spin h-3.5 w-3.5 border-2 border-green-600 border-t-transparent rounded-full block"></span>
+                        } @else {
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        }
+                     </button>
+                     <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                       <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+                     </div>
+                     <span class="text-green-700 font-bold text-sm text-center leading-tight">Mozo notificado</span>
+                   </div>
+                 } @else {
+                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="col-span-1 bg-white border border-gray-200 hover:border-primary/50 hover:bg-primary/5 text-gray-700 rounded-[1.5rem] p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex flex-col items-center justify-center gap-2 group">
+                     <div class="w-12 h-12 bg-gray-50 group-hover:bg-primary/10 rounded-full flex items-center justify-center transition-colors">
+                       @if (loadingLlamar()) { 
+                         <span class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full block"></span> 
+                       } @else { 
+                         <svg class="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+                       }
+                     </div>
+                     <span class="font-bold text-sm group-hover:text-primary transition-colors">Llamar Mozo</span>
+                   </button>
+                 }
+
+                 <!-- Botón Pedir Cuenta -->
+                 @if (yaPidioCuenta()) {
+                   <div class="col-span-1 bg-accent/10 rounded-[1.5rem] p-4 border border-accent/20 flex flex-col items-center justify-center relative shadow-sm">
+                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="absolute top-2 right-2 text-accent hover:text-accent-hover active:scale-90 transition-all bg-accent/20 p-1.5 rounded-full">
+                        @if (loadingCancelarCuenta()) {
+                          <span class="animate-spin h-3.5 w-3.5 border-2 border-accent border-t-transparent rounded-full block"></span>
+                        } @else {
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        }
+                     </button>
+                     <div class="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mb-2">
+                       <span class="w-3 h-3 rounded-full bg-accent animate-pulse"></span>
+                     </div>
+                     <span class="text-accent font-bold text-sm text-center leading-tight">Cuenta solicitada</span>
+                   </div>
+                 } @else {
+                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="col-span-1 bg-white border border-gray-200 hover:border-accent/50 hover:bg-accent/5 text-gray-700 rounded-[1.5rem] p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex flex-col items-center justify-center gap-2 group">
+                     <div class="w-12 h-12 bg-gray-50 group-hover:bg-accent/10 rounded-full flex items-center justify-center transition-colors">
+                       @if (loadingCuenta()) { 
+                         <span class="animate-spin h-6 w-6 border-2 border-accent border-t-transparent rounded-full block"></span> 
+                       } @else { 
+                         <svg class="w-6 h-6 text-gray-500 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
+                       }
+                     </div>
+                     <span class="font-bold text-sm group-hover:text-accent transition-colors">Pedir Cuenta</span>
+                   </button>
+                 }
+               </div>
+             </div>
            }
 
            @if (activeBottomTab() === 'consultas') {
@@ -460,34 +495,34 @@ import { FormsModule } from '@angular/forms';
 
       
       <!-- Bottom Navigation Bar -->
-      <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 shadow-[0_-5px_20px_rgba(0,0,0,0.05)] z-50 h-20 px-6 pb-safe">
-        <div class="max-w-md mx-auto flex justify-between items-center h-full">
+      <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-[0_-10px_30px_rgba(0,0,0,0.04)] z-50 h-16 pb-safe">
+        <div class="max-w-md mx-auto flex justify-around items-center h-full px-2">
           <!-- Inicio Tab -->
-          <button (click)="activeBottomTab.set('inicio')" class="flex flex-col items-center justify-center gap-1.5 w-20 h-full transition-all active:scale-95 group">
-            <div class="p-2 rounded-xl transition-all duration-300" [ngClass]="activeBottomTab() === 'inicio' ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:bg-gray-50'">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          <button (click)="activeBottomTab.set('inicio')" class="flex flex-col items-center justify-center w-full h-full transition-all active:scale-95 group">
+            <div class="flex flex-col items-center justify-center p-1" [ngClass]="activeBottomTab() === 'inicio' ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600'">
+              <svg class="w-6 h-6 mb-0.5 transition-all duration-300" [ngClass]="activeBottomTab() === 'inicio' ? 'stroke-[2.5px] scale-110' : 'stroke-2'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+              <span class="text-[10px] font-bold tracking-wide transition-all duration-300" [ngClass]="activeBottomTab() === 'inicio' ? 'opacity-100' : 'opacity-80'">Inicio</span>
             </div>
-            <span class="text-[10px] font-bold tracking-wide" [ngClass]="activeBottomTab() === 'inicio' ? 'text-primary' : 'text-gray-400'">Inicio</span>
           </button>
           
           <!-- Menu Tab -->
-          <button (click)="activeBottomTab.set('menu')" class="flex flex-col items-center justify-center gap-1.5 w-20 h-full transition-all active:scale-95 group relative">
-            <div class="p-2 rounded-xl transition-all duration-300" [ngClass]="activeBottomTab() === 'menu' ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:bg-gray-50'">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          <button (click)="activeBottomTab.set('menu')" class="flex flex-col items-center justify-center w-full h-full transition-all active:scale-95 group relative">
+            <div class="flex flex-col items-center justify-center p-1" [ngClass]="activeBottomTab() === 'menu' ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600'">
+              <svg class="w-6 h-6 mb-0.5 transition-all duration-300" [ngClass]="activeBottomTab() === 'menu' ? 'stroke-[2.5px] scale-110' : 'stroke-2'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              <span class="text-[10px] font-bold tracking-wide transition-all duration-300" [ngClass]="activeBottomTab() === 'menu' ? 'opacity-100' : 'opacity-80'">Menú</span>
             </div>
-            <span class="text-[10px] font-bold tracking-wide" [ngClass]="activeBottomTab() === 'menu' ? 'text-primary' : 'text-gray-400'">Menú</span>
           </button>
           
           <!-- Consultas Tab -->
-          <button (click)="activeBottomTab.set('consultas')" class="flex flex-col items-center justify-center gap-1.5 w-20 h-full transition-all active:scale-95 group relative">
+          <button (click)="activeBottomTab.set('consultas')" class="flex flex-col items-center justify-center w-full h-full transition-all active:scale-95 group relative">
             <!-- Badge Notification for active ticket -->
             @if (activePedidoTaskId()) {
-              <span class="absolute top-2 right-4 w-2.5 h-2.5 bg-accent rounded-full border-2 border-white"></span>
+              <span class="absolute top-2.5 right-[35%] w-2.5 h-2.5 bg-accent rounded-full border-2 border-white"></span>
             }
-            <div class="p-2 rounded-xl transition-all duration-300" [ngClass]="activeBottomTab() === 'consultas' ? 'bg-primary/10 text-primary' : 'text-gray-400 group-hover:bg-gray-50'">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <div class="flex flex-col items-center justify-center p-1" [ngClass]="activeBottomTab() === 'consultas' ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600'">
+              <svg class="w-6 h-6 mb-0.5 transition-all duration-300" [ngClass]="activeBottomTab() === 'consultas' ? 'stroke-[2.5px] scale-110' : 'stroke-2'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+              <span class="text-[10px] font-bold tracking-wide transition-all duration-300" [ngClass]="activeBottomTab() === 'consultas' ? 'opacity-100' : 'opacity-80'">Consultas</span>
             </div>
-            <span class="text-[10px] font-bold tracking-wide" [ngClass]="activeBottomTab() === 'consultas' ? 'text-primary' : 'text-gray-400'">Consultas</span>
           </button>
         </div>
       </nav>
