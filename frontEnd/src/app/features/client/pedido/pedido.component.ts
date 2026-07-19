@@ -178,7 +178,7 @@ import { FormsModule } from '@angular/forms';
                  <!-- Botón Ver Menú -->
                  <button (click)="activeBottomTab.set('menu')" class="w-full bg-gradient-to-r from-primary to-primary/80 text-white rounded-2xl p-4 shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-between border border-primary/20">
                    <div class="text-left flex items-center gap-4">
-                     <div class="bg-white/20 p-3 rounded-full">
+                     <div class="bg-white/20 p-3 rounded-full flex shrink-0">
                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                      </div>
                      <div>
@@ -186,66 +186,86 @@ import { FormsModule } from '@angular/forms';
                        <p class="text-white/80 text-xs font-semibold">Explorá nuestras opciones</p>
                      </div>
                    </div>
-                   <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                   <svg class="w-5 h-5 text-white/50 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                  </button>
 
-                 <div class="grid grid-cols-2 gap-3">
-                   <!-- Botón Llamar Mozo -->
-                   @if (yaLlamo()) {
-                     <div class="bg-green-50 rounded-2xl p-4 border border-green-200 flex flex-col items-center justify-center relative shadow-sm h-[100px]">
-                       <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="absolute top-2 right-2 text-green-600 hover:text-green-800 active:scale-90 transition-all bg-green-100 p-1 rounded-full">
-                          @if (loadingCancelarLlamar()) {
-                            <span class="animate-spin h-3.5 w-3.5 border-2 border-green-600 border-t-transparent rounded-full block"></span>
-                          } @else {
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                          }
-                       </button>
-                       <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                 <!-- Botón Llamar Mozo -->
+                 @if (yaLlamo()) {
+                   <div class="w-full bg-green-50 rounded-2xl p-4 border border-green-200 flex items-center justify-between relative shadow-sm h-auto">
+                     <div class="flex items-center gap-4">
+                       <div class="bg-green-100 p-3 rounded-full flex items-center justify-center shrink-0">
                          <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
                        </div>
-                       <span class="text-green-700 font-bold text-xs text-center leading-tight">Mozo notificado</span>
+                       <div class="text-left">
+                         <h3 class="text-green-700 font-black text-lg mb-0.5 leading-tight">Mozo Notificado</h3>
+                         <p class="text-green-600/80 text-xs font-semibold">En breve estará contigo</p>
+                       </div>
                      </div>
-                   } @else {
-                     <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="bg-white border border-gray-200 hover:border-primary/50 hover:bg-primary/5 text-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex flex-col items-center justify-center gap-2 h-[100px] group">
-                       <div class="w-10 h-10 bg-gray-50 group-hover:bg-primary/10 rounded-full flex items-center justify-center transition-colors">
+                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="text-green-600 hover:text-green-800 active:scale-90 transition-all bg-green-100 p-2 rounded-full shrink-0">
+                        @if (loadingCancelarLlamar()) {
+                          <span class="animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full block"></span>
+                        } @else {
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        }
+                     </button>
+                   </div>
+                 } @else {
+                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="w-full bg-white border border-gray-200 hover:border-primary/50 hover:bg-primary/5 text-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-between group h-auto">
+                     <div class="flex items-center gap-4 text-left">
+                       <div class="bg-gray-50 group-hover:bg-primary/10 p-3 rounded-full flex items-center justify-center transition-colors shrink-0">
                          @if (loadingLlamar()) { 
-                           <span class="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full block"></span> 
+                           <span class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full block"></span> 
                          } @else { 
-                           <svg class="w-5 h-5 text-gray-500 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
+                           <svg class="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
                          }
                        </div>
-                       <span class="font-bold text-xs group-hover:text-primary transition-colors">Llamar Mozo</span>
-                     </button>
-                   }
+                       <div>
+                         <h3 class="font-black text-lg mb-0.5 group-hover:text-primary transition-colors">Llamar Mozo</h3>
+                         <p class="text-gray-400 text-xs font-semibold">Si necesitas asistencia</p>
+                       </div>
+                     </div>
+                     <svg class="w-5 h-5 text-gray-300 group-hover:text-primary/50 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                   </button>
+                 }
 
-                   <!-- Botón Pedir Cuenta -->
-                   @if (yaPidioCuenta()) {
-                     <div class="bg-accent/10 rounded-2xl p-4 border border-accent/20 flex flex-col items-center justify-center relative shadow-sm h-[100px]">
-                       <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="absolute top-2 right-2 text-accent hover:text-accent-hover active:scale-90 transition-all bg-accent/20 p-1 rounded-full">
-                          @if (loadingCancelarCuenta()) {
-                            <span class="animate-spin h-3.5 w-3.5 border-2 border-accent border-t-transparent rounded-full block"></span>
-                          } @else {
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                          }
-                       </button>
-                       <div class="w-10 h-10 bg-accent/20 rounded-full flex items-center justify-center mb-2">
+                 <!-- Botón Pedir Cuenta -->
+                 @if (yaPidioCuenta()) {
+                   <div class="w-full bg-accent/10 rounded-2xl p-4 border border-accent/20 flex items-center justify-between relative shadow-sm h-auto">
+                     <div class="flex items-center gap-4">
+                       <div class="bg-accent/20 p-3 rounded-full flex items-center justify-center shrink-0">
                          <span class="w-3 h-3 rounded-full bg-accent animate-pulse"></span>
                        </div>
-                       <span class="text-accent font-bold text-xs text-center leading-tight">Cuenta solicitada</span>
+                       <div class="text-left">
+                         <h3 class="text-accent font-black text-lg mb-0.5 leading-tight">Cuenta Solicitada</h3>
+                         <p class="text-accent/80 text-xs font-semibold">Procesando tu pago</p>
+                       </div>
                      </div>
-                   } @else {
-                     <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="bg-white border border-gray-200 hover:border-accent/50 hover:bg-accent/5 text-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex flex-col items-center justify-center gap-2 h-[100px] group">
-                       <div class="w-10 h-10 bg-gray-50 group-hover:bg-accent/10 rounded-full flex items-center justify-center transition-colors">
+                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="text-accent hover:text-accent-hover active:scale-90 transition-all bg-accent/20 p-2 rounded-full shrink-0">
+                        @if (loadingCancelarCuenta()) {
+                          <span class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full block"></span>
+                        } @else {
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        }
+                     </button>
+                   </div>
+                 } @else {
+                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="w-full bg-white border border-gray-200 hover:border-accent/50 hover:bg-accent/5 text-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-between group h-auto">
+                     <div class="flex items-center gap-4 text-left">
+                       <div class="bg-gray-50 group-hover:bg-accent/10 p-3 rounded-full flex items-center justify-center transition-colors shrink-0">
                          @if (loadingCuenta()) { 
-                           <span class="animate-spin h-5 w-5 border-2 border-accent border-t-transparent rounded-full block"></span> 
+                           <span class="animate-spin h-6 w-6 border-2 border-accent border-t-transparent rounded-full block"></span> 
                          } @else { 
-                           <svg class="w-5 h-5 text-gray-500 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
+                           <svg class="w-6 h-6 text-gray-500 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
                          }
                        </div>
-                       <span class="font-bold text-xs group-hover:text-accent transition-colors">Pedir Cuenta</span>
-                     </button>
-                   }
-                 </div>
+                       <div>
+                         <h3 class="font-black text-lg mb-0.5 group-hover:text-accent transition-colors">Pedir Cuenta</h3>
+                         <p class="text-gray-400 text-xs font-semibold">Finalizar tu visita</p>
+                       </div>
+                     </div>
+                     <svg class="w-5 h-5 text-gray-300 group-hover:text-accent/50 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                   </button>
+                 }
                </div>
              </div>
            }
