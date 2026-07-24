@@ -12,11 +12,10 @@ export class AdminLandingComponent implements OnInit {
 
   ngOnInit() {
     const role = this.auth.currentUser()?.role;
-    if (role === 'Admin' || role === 'SuperAdmin') {
-      this.router.navigate(['/admin/inicio']);
-    } else if (role === 'Cocina') {
+    if (role === 'Cocina') {
       this.router.navigate(['/admin/cocina']);
     } else {
+      // Admin, SuperAdmin, Caja, Mozo, etc go to dashboard (Mesas y Tareas)
       this.router.navigate(['/admin/dashboard']);
     }
   }

@@ -24,23 +24,23 @@ import { LanguageService } from '../../../core/services/language.service';
           <span class="animate-spin">↻</span> Sin conexión. Intentando reconectar al servidor...
         </div>
       }
-           <!-- Barra Superior de Navegación -->
-      <div class="flex justify-between items-center bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] p-4 rounded-3xl shadow-sm mb-4">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">🛎️</span>
-          <span class="text-base font-black text-gray-800 tracking-tight">{{ lang.translations().tables.controlPanel }}</span>
+      <!-- Tab Toggle Superior -->
+      <div class="flex justify-center mb-6">
+        <div class="bg-gray-100 p-1 rounded-2xl flex shadow-inner">
+          <button (click)="activeTab.set('tareas')" 
+                  [class]="activeTab() === 'tareas' ? 'bg-white text-primary shadow-sm font-black' : 'text-gray-500 font-bold hover:text-gray-700'"
+                  class="px-8 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+            📋 Tareas
+          </button>
+          <button (click)="activeTab.set('mesas')" 
+                  [class]="activeTab() === 'mesas' ? 'bg-white text-primary shadow-sm font-black' : 'text-gray-500 font-bold hover:text-gray-700'"
+                  class="px-8 py-3 rounded-xl text-sm transition-all flex items-center gap-2">
+            🍽️ Mesas
+          </button>
         </div>
-        <button (click)="showControlMesas.set(!showControlMesas())"
-                [class]="showControlMesas() ? 'bg-primary text-white ring-4 ring-primary/10' : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'"
-                class="px-5 py-2.5 rounded-2xl text-xs font-black shadow-sm transition-all flex items-center gap-2 active:scale-95">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1 3.75 18v-2.25zM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25z" />
-          </svg>
-          {{ lang.translations().tables.tablesBtn }}
-        </button>
       </div>
 
-      @if (showControlMesas()) {
+      @if (activeTab() === 'mesas') {
         <!-- Panel de Mesas (Control y Administración) -->
         <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -225,21 +225,21 @@ import { LanguageService } from '../../../core/services/language.service';
         </div>
       }
 
-      <!-- Panel de Solicitudes Activas -->
-      <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseTasks.set(!collapseTasks())">
-            <div>
-              <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                Solicitudes Activas
-                <span class="text-xs text-gray-400 inline-block transition-transform duration-300" [class.rotate-180]="collapseTasks()">▲</span>
-              </h1>
-              <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
+      @if (activeTab() === 'tareas') {
+        <!-- Panel de Solicitudes Activas -->
+        <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div class="flex items-center gap-2 select-none">
+              <div>
+                <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
+                  Solicitudes Activas
+                </h1>
+                <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
+              </div>
             </div>
-          </div>
-          
-          <!-- Filtros (Solo Admin) -->
-          @if(!collapseTasks() && auth.currentUser()?.role === 'Admin') {
+            
+            <!-- Filtros (Solo Admin) -->
+            @if(auth.currentUser()?.role === 'Admin') {
             <div class="flex flex-wrap items-center gap-3 bg-surface/50 px-4 py-2 rounded-2xl border border-gray-200 backdrop-blur-sm">
               <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
                 <option value="All">Todos los Tipos</option>
@@ -260,7 +260,6 @@ import { LanguageService } from '../../../core/services/language.service';
         </div>
       </div>
 
-      @if (!collapseTasks()) {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (task of myPendingTasks(); track task.id) {
             <div class="bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] rounded-2xl p-3.5 flex flex-col relative overflow-hidden transition-all group hover:border-amber-700/30 hover:-translate-y-0.5 shadow-sm">
@@ -659,6 +658,8 @@ import { LanguageService } from '../../../core/services/language.service';
   `]
 })
 export class AdminDashboardComponent {
+  activeTab = signal<'tareas' | 'mesas'>('tareas');
+
   service = inject(SignalrService);
   dataService = inject(AdminDataService);
   auth = inject(AuthService);
