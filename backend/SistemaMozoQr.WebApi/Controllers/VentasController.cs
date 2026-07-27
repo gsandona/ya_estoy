@@ -101,7 +101,8 @@ public class VentasController : ControllerBase
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
         var tenantIdClaim = User.FindFirst("RestauranteId")?.Value;
         
-        if ((userRole == "Admin" || userRole == "Caja") && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
+        Guid adminTenantId = Guid.Empty;
+        if ((userRole == "Admin" || userRole == "Caja") && Guid.TryParse(tenantIdClaim, out adminTenantId))
         {
             query = query.Where(v => v.RestauranteId == adminTenantId);
         }

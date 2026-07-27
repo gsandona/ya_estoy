@@ -109,7 +109,7 @@ public class RestaurantesController : ControllerBase
         await _context.PedidoItems.IgnoreQueryFilters().Where(pi => orderIds.Contains(pi.PedidoId)).ExecuteDeleteAsync();
         
         await _context.Ventas.IgnoreQueryFilters().Where(v => v.RestauranteId == id).ExecuteDeleteAsync();
-        await _context.UserPushSubscriptions.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.PushSubscriptions.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
         await _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).ExecuteDeleteAsync();
         await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ExecuteDeleteAsync();
         await _context.Mesas.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ExecuteDeleteAsync();
@@ -126,8 +126,8 @@ public class RestaurantesController : ControllerBase
         if (existing == null) return NotFound();
 
         // Crear categorías
-        var catBebidas = new MenuCategory { Id = Guid.NewGuid(), Nombre = "Bebidas", Orden = 1 };
-        var catComidas = new MenuCategory { Id = Guid.NewGuid(), Nombre = "Comidas", Orden = 2 };
+        var catBebidas = new MenuCategory { Id = Guid.NewGuid(), Nombre = "Bebidas", Emoji = "🥤" };
+        var catComidas = new MenuCategory { Id = Guid.NewGuid(), Nombre = "Comidas", Emoji = "🍔" };
         _context.MenuCategories.AddRange(catBebidas, catComidas);
 
         // Crear items
