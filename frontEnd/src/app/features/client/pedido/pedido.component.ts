@@ -82,7 +82,7 @@ import { FormsModule } from '@angular/forms';
         </div>
 
         <!-- CONTENIDO CENTRAL -->
-        <div class="flex-1 px-6 flex flex-col items-center">
+        <div class="flex-1 px-6 flex flex-col items-center pb-24">
            @if (activeBottomTab() === 'inicio') {
              <div class="w-full max-w-sm animate-fade-in flex flex-col gap-4 w-full">
                
@@ -211,6 +211,23 @@ import { FormsModule } from '@angular/forms';
              </div>
            }
 
+        <!-- Floating Bottom Navigation Bar (Las 3 Barras) -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 z-30 pb-safe">
+           <div class="flex justify-around items-center h-16 max-w-md mx-auto">
+              <button (click)="activeBottomTab.set('inicio')" class="flex flex-col items-center justify-center w-full h-full text-xs font-bold transition-colors" [ngClass]="activeBottomTab() === 'inicio' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Inicio
+              </button>
+              <button (click)="activeBottomTab.set('menu')" class="flex flex-col items-center justify-center w-full h-full text-xs font-bold transition-colors" [ngClass]="activeBottomTab() === 'menu' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Menú
+              </button>
+              <button (click)="abrirDividirCuenta()" class="flex flex-col items-center justify-center w-full h-full text-xs font-bold transition-colors text-gray-400 hover:text-gray-600 active:scale-95">
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                Cuenta
+              </button>
+           </div>
+        </div>
 
         <!-- Floating Cart (Only show if not in Consultas where maybe they don't need it, but let's show it everywhere if items > 0) -->
         @if (cart.totalItems() > 0 && !showCartModal()) {

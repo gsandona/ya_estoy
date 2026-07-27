@@ -110,21 +110,29 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    try
+    if (context.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
     {
-        context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations
+        // Para SQLite (local) usamos EnsureCreated y NO ejecutamos las migraciones que son de Postgres
+        context.Database.EnsureCreated();
     }
-    catch (Exception ex) when (ex.Message.Contains("42P07") || ex.Message.Contains("already exists"))
+    else
     {
-        if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+        try
         {
-            // Wipe old schema and retry (only for Postgres in dev/staging reset scenarios)
-            context.Database.ExecuteSqlRaw("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
-            context.Database.Migrate();
+            context.Database.Migrate(); // <- Esto ejecuta los scripts de EF Migrations (Postgres)
         }
-        else
+        catch (Exception ex) when (ex.Message.Contains("42P07") || ex.Message.Contains("already exists"))
         {
-            throw;
+            if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
+            {
+                // Wipe old schema and retry (only for Postgres in dev/staging reset scenarios)
+                context.Database.ExecuteSqlRaw("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
+                context.Database.Migrate();
+            }
+            else
+            {
+                throw;
+            }
         }
     }
 
