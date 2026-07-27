@@ -5,6 +5,7 @@ namespace SistemaMozoQr.Domain.Interfaces;
 public interface IMesaRepository
 {
     Task<Mesa?> GetByIdAsync(Guid id);
+    Task<Mesa?> GetByIdIgnoreQueryFiltersAsync(Guid id);
     Task<Mesa?> GetByTokenQRAsync(string tokenQR);
     Task<Mesa?> GetByNumeroIgnoreQueryFiltersAsync(int numero);
     Task<Mesa?> GetByRestauranteIdAndNumeroIgnoreQueryFiltersAsync(Guid restauranteId, int numero);

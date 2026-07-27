@@ -16,7 +16,12 @@ public class MesaRepository : IMesaRepository
 
     public async Task<Mesa?> GetByIdAsync(Guid id)
     {
-        return await _context.Mesas.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == id);
+        return await _context.Mesas.FirstOrDefaultAsync(m => m.Id == id);
+    }
+
+    public async Task<Mesa?> GetByIdIgnoreQueryFiltersAsync(Guid id)
+    {
+        return await _context.Mesas.IgnoreQueryFilters().Include(m => m.Restaurante).FirstOrDefaultAsync(m => m.Id == id);
     }
 
     public async Task<Mesa?> GetByTokenQRAsync(string tokenQR)

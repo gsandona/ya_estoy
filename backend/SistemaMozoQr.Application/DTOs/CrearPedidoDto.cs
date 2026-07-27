@@ -6,6 +6,9 @@ public class CrearPedidoDto
 {
     [Required]
     public Guid MesaId { get; set; }
+
+    [Required]
+    public string CodigoAcceso { get; set; } = string.Empty;
     
     [Required]
     [MinLength(1, ErrorMessage = "El pedido debe contener al menos un item.")]

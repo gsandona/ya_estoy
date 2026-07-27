@@ -34,8 +34,10 @@ builder.Services.AddAuthentication(options =>
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false, // En MVP desactivamos emisor local
-        ValidateAudience = false // En MVP desactivamos audiencia local
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "MozoGo.Server",
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["JwtSettings:Audience"] ?? "MozoGo.Clients"
     };
 });
 

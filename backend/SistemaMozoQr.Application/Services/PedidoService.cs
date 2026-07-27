@@ -30,8 +30,12 @@ public class PedidoService : IPedidoService
 
     public async Task<Pedido> CrearPedidoAsync(CrearPedidoDto pedidoDto)
     {
-        var mesa = await _mesaRepository.GetByIdAsync(pedidoDto.MesaId);
+        var mesa = await _mesaRepository.GetByIdIgnoreQueryFiltersAsync(pedidoDto.MesaId);
         if (mesa == null) throw new Exception("Mesa no encontrada.");
+        if (mesa.Estado != EstadoMesa.Ocupada || mesa.CodigoAcceso != pedidoDto.CodigoAcceso)
+        {
+            throw new Exception("La mesa no está activa o el PIN es incorrecto.");
+        }
 
         var pedido = new Pedido
         {
@@ -48,10 +52,12 @@ public class PedidoService : IPedidoService
         {
             var menuItem = await _menuItemRepository.GetByIdAsync(itemDto.MenuItemId);
             if (menuItem == null) throw new Exception($"MenuItem {itemDto.MenuItemId} no encontrado.");
+            if (menuItem.RestauranteId != mesa.RestauranteId) throw new Exception($"MenuItem {itemDto.MenuItemId} no pertenece al restaurante de la mesa.");
 
             pedido.Items.Add(new PedidoItem
             {
                 Id = Guid.NewGuid(),
+                RestauranteId = mesa.RestauranteId,
                 PedidoId = pedido.Id,
                 MenuItemId = menuItem.Id,
                 Cantidad = itemDto.Cantidad,

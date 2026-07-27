@@ -44,6 +44,7 @@ public class RestauranteDbContext : DbContext
         modelBuilder.Entity<Mesa>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<MenuItem>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<Pedido>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
+        modelBuilder.Entity<PedidoItem>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<MesaTask>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<AuditoriaLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<ErrorLog>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);

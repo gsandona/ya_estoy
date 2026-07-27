@@ -96,36 +96,51 @@ public class RestaurantesController : ControllerBase
         if (!_context.IsSuperAdmin && existing.ParentRestauranteId != _context.CurrentTenantId)
             return Forbid();
 
-        // Eliminar entidades dependientes primero para evitar violación de claves foráneas en SQLite
-        var users = await _context.Usuarios.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ToListAsync();
-        _context.Usuarios.RemoveRange(users);
-
-        var tables = await _context.Mesas.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ToListAsync();
-        _context.Mesas.RemoveRange(tables);
-
-        var menuItems = await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ToListAsync();
-        _context.MenuItems.RemoveRange(menuItems);
-
-        var orders = await _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).ToListAsync();
-        var orderIds = orders.Select(o => o.Id).ToList();
-        var orderItems = await _context.PedidoItems.Where(pi => orderIds.Contains(pi.PedidoId)).ToListAsync();
-        _context.PedidoItems.RemoveRange(orderItems);
-        _context.Pedidos.RemoveRange(orders);
-
-        var tasks = await _context.Tasks.IgnoreQueryFilters().Where(t => t.RestauranteId == id).ToListAsync();
-        _context.Tasks.RemoveRange(tasks);
-
-        var auditLogs = await _context.Auditorias.IgnoreQueryFilters().Where(a => a.RestauranteId == id).ToListAsync();
-        _context.Auditorias.RemoveRange(auditLogs);
-
-        var errorLogs = await _context.ErrorLogs.IgnoreQueryFilters().Where(e => e.RestauranteId == id).ToListAsync();
-        _context.ErrorLogs.RemoveRange(errorLogs);
-
-        var widgetConfigs = await _context.DashboardWidgetConfigs.IgnoreQueryFilters().Where(w => w.RestauranteId == id).ToListAsync();
-        _context.DashboardWidgetConfigs.RemoveRange(widgetConfigs);
+        // Eliminar entidades dependientes usando ExecuteDeleteAsync para evitar sobrecarga de memoria
+        await _context.Usuarios.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
+        
+        await _context.Tasks.IgnoreQueryFilters().Where(t => t.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.Auditorias.IgnoreQueryFilters().Where(a => a.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.ErrorLogs.IgnoreQueryFilters().Where(e => e.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.DashboardWidgetConfigs.IgnoreQueryFilters().Where(w => w.RestauranteId == id).ExecuteDeleteAsync();
+        
+        // Para PedidoItems, necesitamos borrar los asociados a los pedidos del restaurante
+        var orderIds = _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).Select(p => p.Id);
+        await _context.PedidoItems.IgnoreQueryFilters().Where(pi => orderIds.Contains(pi.PedidoId)).ExecuteDeleteAsync();
+        
+        await _context.Ventas.IgnoreQueryFilters().Where(v => v.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.UserPushSubscriptions.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.Mesas.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ExecuteDeleteAsync();
 
         _context.Restaurantes.Remove(existing);
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+    
+    [HttpPost("{id:guid}/seed")]
+    public async Task<IActionResult> Seed(Guid id)
+    {
+        var existing = await _context.Restaurantes.FindAsync(id);
+        if (existing == null) return NotFound();
+
+        // Crear categorías
+        var catBebidas = new MenuCategory { Id = Guid.NewGuid(), Nombre = "Bebidas", Orden = 1 };
+        var catComidas = new MenuCategory { Id = Guid.NewGuid(), Nombre = "Comidas", Orden = 2 };
+        _context.MenuCategories.AddRange(catBebidas, catComidas);
+
+        // Crear items
+        var item1 = new MenuItem { Id = Guid.NewGuid(), RestauranteId = id, Nombre = "Cerveza Artesanal", Precio = 250, Categoria = "Bebidas", Activo = true, MenuCategoryId = catBebidas.Id };
+        var item2 = new MenuItem { Id = Guid.NewGuid(), RestauranteId = id, Nombre = "Hamburguesa Completa", Precio = 550, Categoria = "Comidas", Activo = true, MenuCategoryId = catComidas.Id };
+        _context.MenuItems.AddRange(item1, item2);
+
+        // Crear mesas
+        var mesa1 = new Mesa { Id = Guid.NewGuid(), RestauranteId = id, Numero = 1, Estado = SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible, TokenQR = Guid.NewGuid().ToString() };
+        var mesa2 = new Mesa { Id = Guid.NewGuid(), RestauranteId = id, Numero = 2, Estado = SistemaMozoQr.Domain.Enums.EstadoMesa.Disponible, TokenQR = Guid.NewGuid().ToString() };
+        _context.Mesas.AddRange(mesa1, mesa2);
+
+        await _context.SaveChangesAsync();
+        return Ok(new { message = "Datos de prueba generados exitosamente." });
     }
 }

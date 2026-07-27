@@ -241,7 +241,7 @@ public class MesasConfigController : ControllerBase
             }
             else if (Guid.TryParse(mesaId, out Guid parsedId))
             {
-                mesa = await _mesaRepository.GetByIdAsync(parsedId);
+                mesa = await _mesaRepository.GetByIdIgnoreQueryFiltersAsync(parsedId);
             }
         }
 
@@ -427,6 +427,7 @@ public class MesasConfigController : ControllerBase
                     pedido.Items.Add(new PedidoItem
                     {
                         Id = Guid.NewGuid(),
+                        RestauranteId = mesa.RestauranteId,
                         PedidoId = pedido.Id,
                         MenuItemId = menuItem.Id,
                         Cantidad = itemDto.Cantidad.Value,
@@ -459,6 +460,7 @@ public class MesasConfigController : ControllerBase
                 pedido.Items.Add(new PedidoItem
                 {
                     Id = Guid.NewGuid(),
+                    RestauranteId = mesa.RestauranteId,
                     PedidoId = pedido.Id,
                     MenuItemId = manualItem.Id,
                     Cantidad = 1,

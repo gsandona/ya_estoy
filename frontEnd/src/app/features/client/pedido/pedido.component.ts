@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { SignalrService } from '../../../core/services/signalr.service';
 import { CartService } from '../../../core/services/cart.service';
 import { MenuComponent } from '../components/menu/menu.component';
+import { SplitCheckWizardComponent } from './split-check-wizard/split-check-wizard.component';
 import { environment } from '../../../../environments/environment';
 import { BrandingService } from '../../../core/services/branding.service';
 
@@ -12,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-pedido',
   standalone: true,
-  imports: [CommonModule, MenuComponent, FormsModule],
+  imports: [CommonModule, MenuComponent, FormsModule, SplitCheckWizardComponent],
   template: `
     @if (requirePin()) {
       <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center">
@@ -71,199 +72,129 @@ import { FormsModule } from '@angular/forms';
       </div>
 
     } @else {
-      <div class="min-h-screen bg-sand flex flex-col animate-fade-in relative">
-        <!-- Background Image Header -->
-        <div class="h-64 w-full bg-primary/20 relative" [style.backgroundImage]="restauranteFondo() ? 'url(' + restauranteFondo() + ')' : 'none'" style="background-size: cover; background-position: center;">
-            <div class="absolute top-0 left-0 right-0 p-4 h-16 bg-gradient-to-b from-black/50 to-transparent">
-               <!-- Espacio para notificaciones futuras o barra limpia -->
-            </div>
+      <div class="min-h-screen bg-surface flex flex-col animate-fade-in">
+        <!-- Header minimalista -->
+        <div class="pt-10 pb-6 px-6 text-center">
+            <h1 class="text-2xl font-black tracking-tight text-gray-800">
+              Mesa {{ numeroMesa() || '...' }}
+            </h1>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-1">¿Qué necesitas?</p>
         </div>
 
-        <!-- Content Card -->
-        <div class="flex-1 bg-surface rounded-t-[2.5rem] -mt-12 p-6 pt-16 relative shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col items-center">
-           
-           <!-- Mesa Circle -->
-           <div class="absolute -top-16 left-1/2 -translate-x-1/2">
-             <div class="relative group">
-                <div class="w-32 h-32 bg-primary rounded-full border-8 border-surface shadow-xl flex items-center justify-center text-white font-black text-6xl shadow-primary/20">
-                   {{ numeroMesa() || '...' }}
-                </div>
-                <!-- Bubble '¡Hola, Mesa X!' -->
-                <div class="absolute -right-28 top-2 bg-white text-primary text-sm font-bold py-2.5 px-5 rounded-2xl shadow-lg rounded-bl-none border border-gray-100 whitespace-nowrap animate-bounce" style="animation-duration: 2s;">
-                   ¡Hola, Mesa {{ numeroMesa() }}!
-                </div>
-             </div>
-           </div>
-
-           <!-- CONTENIDO DINÁMICO SEGÚN TAB -->
+        <!-- CONTENIDO CENTRAL -->
+        <div class="flex-1 px-6 flex flex-col items-center">
            @if (activeBottomTab() === 'inicio') {
-             <div class="w-full max-w-sm animate-fade-in flex flex-col mt-2 gap-4">
+             <div class="w-full max-w-sm animate-fade-in flex flex-col gap-4 w-full">
                
-               <!-- Monto Consumido (Real-time) -->
+               <!-- Monto Consumido (Minimalista) -->
                @if (montoConsumo() !== null && montoConsumo() !== undefined && montoConsumo()! > 0) {
-                 <div class="bg-sand/50 border border-gray-100 rounded-2xl p-5 w-full flex justify-between items-center shadow-sm">
+                 <div class="bg-white border border-gray-100 rounded-2xl p-5 w-full flex justify-between items-center shadow-sm">
                    <div>
-                     <span class="text-xs uppercase font-black text-gray-500 tracking-wider">Monto Consumido</span>
-                     <h2 class="text-3xl font-black text-primary mt-1">\${{ formatCurrency(montoConsumo()) }}</h2>
+                     <span class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Total Consumido</span>
+                     <h2 class="text-2xl font-black text-gray-900 leading-none mt-1">\${{ formatCurrency(montoConsumo()) }}</h2>
                    </div>
-                   <button (click)="abrirDividirCuenta()" class="bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition-all active:scale-95 flex flex-col items-center gap-1">
-                     <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                     <span>Dividir</span>
+                   <button (click)="abrirDividirCuenta()" class="text-xs font-bold text-accent bg-accent/10 px-4 py-2 rounded-xl transition-all active:scale-95">
+                     Dividir
                    </button>
                  </div>
                }
 
-               <!-- Tickets Activos (Pending Order Card) -->
+               <!-- Tickets Activos / Estado (Minimalista) -->
                @if (activePedidoTaskId()) {
-                 <div>
-                   <h3 class="text-xs font-black uppercase text-gray-400 mb-2 ml-1 tracking-wider">Tu Pedido Actual</h3>
-                   <div class="w-full rounded-2xl p-4 shadow-sm animate-fade-in flex flex-col gap-3 border"
-                        [ngClass]="{
-                          'bg-blue-50/50 border-blue-100 text-blue-800': activePedidoEstado() === 'Recibido',
-                          'bg-sand border-gray-200 text-primary': activePedidoEstado() === 'Aprobado',
-                          'bg-amber-50/50 border-amber-100 text-amber-800': activePedidoEstado() === 'EnPreparacion',
-                          'bg-green-50/50 border-green-100 text-green-800': activePedidoEstado() === 'Listo'
-                        }">
-                     <div class="flex justify-between items-start">
-                       <div class="flex items-center gap-3">
-                         <span class="text-accent flex items-center justify-center shrink-0">
-                           @if (activePedidoEstado() === 'Recibido') {
-                             <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                           }
-                           @if (activePedidoEstado() === 'Aprobado') {
-                             <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                           }
-                           @if (activePedidoEstado() === 'EnPreparacion') {
-                             <svg class="w-5 h-5 text-amber-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
-                           }
-                           @if (activePedidoEstado() === 'Listo') {
-                             <svg class="w-5 h-5 text-green-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                           }
-                         </span>
-                         <div>
-                           <h3 class="font-bold text-gray-800 text-sm">Estado de tu Pedido</h3>
-                           <p class="text-[10px] font-black uppercase tracking-wider"
-                              [ngClass]="{
-                                'text-blue-500': activePedidoEstado() === 'Recibido',
-                                'text-primary/70': activePedidoEstado() === 'Aprobado',
-                                'text-amber-600': activePedidoEstado() === 'EnPreparacion',
-                                'text-green-600 animate-pulse': activePedidoEstado() === 'Listo'
-                              }">
-                             @if (activePedidoEstado() === 'Recibido') { Pendiente de Aprobación }
-                             @if (activePedidoEstado() === 'Aprobado') { Aprobado }
-                             @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
-                             @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
-                           </p>
-                         </div>
+                 <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm animate-fade-in flex flex-col gap-3">
+                   <div class="flex justify-between items-center">
+                     <div class="flex items-center gap-3">
+                       <span class="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-gray-50">
+                         @if (activePedidoEstado() === 'Recibido') {
+                           <span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
+                         }
+                         @if (activePedidoEstado() === 'Aprobado') {
+                           <span class="w-2.5 h-2.5 bg-primary rounded-full"></span>
+                         }
+                         @if (activePedidoEstado() === 'EnPreparacion') {
+                           <span class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse"></span>
+                         }
+                         @if (activePedidoEstado() === 'Listo') {
+                           <span class="w-2.5 h-2.5 bg-green-500 rounded-full"></span>
+                         }
+                       </span>
+                       <div>
+                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Estado del Pedido</p>
+                         <h3 class="font-black text-sm text-gray-800">
+                           @if (activePedidoEstado() === 'Recibido') { Pendiente }
+                           @if (activePedidoEstado() === 'Aprobado') { Aprobado }
+                           @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
+                           @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
+                         </h3>
                        </div>
-                       @if (activePedidoEstado() === 'Recibido') {
-                         <button 
-                           (click)="cancelarPedido()"
-                           [disabled]="loadingCancelarPedido()"
-                           class="text-xs text-red-500 hover:text-red-700 font-bold bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 hover:bg-red-100 transition-colors flex items-center gap-1">
-                           @if (loadingCancelarPedido()) {
-                             <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full"></span>
-                           } @else {
-                             Cancelar
-                           }
-                         </button>
-                       }
                      </div>
+                     @if (activePedidoEstado() === 'Recibido') {
+                       <button 
+                         (click)="cancelarPedido()"
+                         [disabled]="loadingCancelarPedido()"
+                         class="text-xs text-red-500 font-bold active:scale-95 transition-all">
+                         @if (loadingCancelarPedido()) {
+                           <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
+                         } @else {
+                           Cancelar
+                         }
+                       </button>
+                     }
                    </div>
                  </div>
                }
 
-               <!-- Botones Principales -->
-               <div class="flex flex-col gap-3 mt-2">
-                 <!-- Botón Ver Menú -->
-                 <button (click)="activeBottomTab.set('menu')" class="w-full bg-gradient-to-r from-primary to-primary/80 text-white rounded-2xl p-4 shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all flex items-center justify-between border border-primary/20">
-                   <div class="text-left flex items-center gap-4">
-                     <div class="bg-white/20 p-3 rounded-full flex shrink-0">
-                       <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                     </div>
-                     <div>
-                       <h3 class="font-black text-lg mb-0.5">Pedir de Menú</h3>
-                       <p class="text-white/80 text-xs font-semibold">Explorá nuestras opciones</p>
-                     </div>
-                   </div>
-                   <svg class="w-5 h-5 text-white/50 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                 </button>
-
-                 <!-- Botón Llamar Mozo -->
+               <!-- Menú de 3 Barras Simplificado -->
+               <div class="flex flex-col gap-3 mt-4 w-full">
+                 <!-- 1. Llamar Mozo -->
                  @if (yaLlamo()) {
-                   <div class="w-full bg-green-50 rounded-2xl p-4 border border-green-200 flex items-center justify-between relative shadow-sm h-auto">
-                     <div class="flex items-center gap-4">
-                       <div class="bg-green-100 p-3 rounded-full flex items-center justify-center shrink-0">
-                         <span class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
-                       </div>
-                       <div class="text-left">
-                         <h3 class="text-green-700 font-black text-lg mb-0.5 leading-tight">Mozo Notificado</h3>
-                         <p class="text-green-600/80 text-xs font-semibold">En breve estará contigo</p>
-                       </div>
-                     </div>
-                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="text-green-600 hover:text-green-800 active:scale-90 transition-all bg-green-100 p-2 rounded-full shrink-0">
+                   <div class="w-full bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                     <span class="font-black text-gray-800">Mozo Notificado</span>
+                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="text-gray-400 hover:text-red-500 transition-colors">
                         @if (loadingCancelarLlamar()) {
-                          <span class="animate-spin h-4 w-4 border-2 border-green-600 border-t-transparent rounded-full block"></span>
+                          <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
                         } @else {
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                         }
                      </button>
                    </div>
                  } @else {
-                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="w-full bg-white border border-gray-200 hover:border-primary/50 hover:bg-primary/5 text-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-between group h-auto">
-                     <div class="flex items-center gap-4 text-left">
-                       <div class="bg-gray-50 group-hover:bg-primary/10 p-3 rounded-full flex items-center justify-center transition-colors shrink-0">
-                         @if (loadingLlamar()) { 
-                           <span class="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full block"></span> 
-                         } @else { 
-                           <svg class="w-6 h-6 text-gray-500 group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 
-                         }
-                       </div>
-                       <div>
-                         <h3 class="font-black text-lg mb-0.5 group-hover:text-primary transition-colors">Llamar Mozo</h3>
-                         <p class="text-gray-400 text-xs font-semibold">Si necesitas asistencia</p>
-                       </div>
-                     </div>
-                     <svg class="w-5 h-5 text-gray-300 group-hover:text-primary/50 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="w-full bg-white border border-gray-200 rounded-2xl p-4 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between">
+                     <span class="font-black text-gray-800">Llamar al Mozo</span>
+                     @if (loadingLlamar()) { 
+                       <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
+                     } @else { 
+                       <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                     }
                    </button>
                  }
 
-                 <!-- Botón Pedir Cuenta -->
+                 <!-- 2. Pedir de Menú -->
+                 <button (click)="activeBottomTab.set('menu')" class="w-full bg-primary text-white border border-primary rounded-2xl p-4 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between">
+                   <span class="font-black">Ver el Menú</span>
+                   <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                 </button>
+
+                 <!-- 3. Pedir Cuenta -->
                  @if (yaPidioCuenta()) {
-                   <div class="w-full bg-accent/10 rounded-2xl p-4 border border-accent/20 flex items-center justify-between relative shadow-sm h-auto">
-                     <div class="flex items-center gap-4">
-                       <div class="bg-accent/20 p-3 rounded-full flex items-center justify-center shrink-0">
-                         <span class="w-3 h-3 rounded-full bg-accent animate-pulse"></span>
-                       </div>
-                       <div class="text-left">
-                         <h3 class="text-accent font-black text-lg mb-0.5 leading-tight">Cuenta Solicitada</h3>
-                         <p class="text-accent/80 text-xs font-semibold">Procesando tu pago</p>
-                       </div>
-                     </div>
-                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="text-accent hover:text-accent-hover active:scale-90 transition-all bg-accent/20 p-2 rounded-full shrink-0">
+                   <div class="w-full bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                     <span class="font-black text-gray-800">Cuenta Solicitada</span>
+                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="text-gray-400 hover:text-red-500 transition-colors">
                         @if (loadingCancelarCuenta()) {
-                          <span class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full block"></span>
+                          <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
                         } @else {
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                         }
                      </button>
                    </div>
                  } @else {
-                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="w-full bg-white border border-gray-200 hover:border-accent/50 hover:bg-accent/5 text-gray-700 rounded-2xl p-4 shadow-sm hover:shadow-md active:scale-95 transition-all flex items-center justify-between group h-auto">
-                     <div class="flex items-center gap-4 text-left">
-                       <div class="bg-gray-50 group-hover:bg-accent/10 p-3 rounded-full flex items-center justify-center transition-colors shrink-0">
-                         @if (loadingCuenta()) { 
-                           <span class="animate-spin h-6 w-6 border-2 border-accent border-t-transparent rounded-full block"></span> 
-                         } @else { 
-                           <svg class="w-6 h-6 text-gray-500 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> 
-                         }
-                       </div>
-                       <div>
-                         <h3 class="font-black text-lg mb-0.5 group-hover:text-accent transition-colors">Pedir Cuenta</h3>
-                         <p class="text-gray-400 text-xs font-semibold">Finalizar tu visita</p>
-                       </div>
-                     </div>
-                     <svg class="w-5 h-5 text-gray-300 group-hover:text-accent/50 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="w-full bg-white border border-gray-200 rounded-2xl p-4 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between">
+                     <span class="font-black text-gray-800">Pedir la Cuenta</span>
+                     @if (loadingCuenta()) { 
+                       <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
+                     } @else { 
+                       <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                     }
                    </button>
                  }
                </div>
@@ -511,6 +442,7 @@ import { FormsModule } from '@angular/forms';
   `]
 })
 export class PedidoComponent implements OnInit {
+  showSplitCheck = false;
   private brandingService = inject(BrandingService);
   restauranteFondo = signal<string | null>(null);
   
@@ -818,8 +750,10 @@ export class PedidoComponent implements OnInit {
     const detailsArray = this.cart.items().map(i => `${i.quantity}x ${i.nombre}`);
     const fullDetails = detailsArray.join(', ');
 
+    const pin = localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`) || '';
     const body = {
       mesaId: this.id,
+      codigoAcceso: pin,
       items: this.cart.items().map(i => ({ menuItemId: i.id, cantidad: i.quantity }))
     };
 

@@ -49,6 +49,8 @@ public class AuthService : IAuthService
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddHours(12),
+            Issuer = _configuration["JwtSettings:Issuer"] ?? "MozoGo.Server",
+            Audience = _configuration["JwtSettings:Audience"] ?? "MozoGo.Clients",
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

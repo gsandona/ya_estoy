@@ -34,13 +34,13 @@ public class CurrentUserService : ICurrentUserService
         var isSuperAdmin = role == "SuperAdmin";
         var isAdmin = role == "Admin";
 
-        if (isSuperAdmin || isAdmin)
+        if (isSuperAdmin)
         {
             if (httpContext.Request.Headers.TryGetValue("X-Tenant-ID", out var tenantHeader) && Guid.TryParse(tenantHeader, out var parsedTenantId))
             {
                 return parsedTenantId;
             }
-            if (isSuperAdmin) return null; // SuperAdmin global view
+            return null; // SuperAdmin global view
         }
 
         var tenantClaim = httpContext.User?.FindFirst("TenantId")?.Value;
