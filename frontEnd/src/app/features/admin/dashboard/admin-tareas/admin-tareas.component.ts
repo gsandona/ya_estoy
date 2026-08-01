@@ -161,36 +161,7 @@ import { LanguageService } from '../../../../core/services/language.service';
       </div>
     }
 
-    <!-- Modal QR -->
-    @if (showQrModal()) {
-      <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl relative text-center border border-white/20">
-          <button (click)="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-          </button>
-          <h2 class="text-2xl font-black text-gray-800 mb-1">Mesa {{ showQrModal()?.numero }}</h2>
-          <p class="text-sm text-gray-500 font-medium mb-6">{{ showQrModal()?.ubicacion || 'Sin ubicación' }}</p>
-          
-          <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 mb-6 inline-block shadow-inner">
-            <img [src]="getQrImageUrl(showQrModal()!)" alt="Código QR de la mesa" class="w-48 h-48 mx-auto rounded-lg" />
-          </div>
 
-          <p class="text-xs text-primary bg-surface py-2 px-4 rounded-xl mb-6 font-bold truncate">
-            URL: /mesa/{{ restauranteNombre() }}/{{ showQrModal()?.numero }}
-          </p>
-
-          <div class="flex flex-col gap-3">
-            <a [href]="getQrImageUrl(showQrModal()!)" download="Mesa_QR.png" target="_blank"
-               class="w-full bg-primary text-white py-3 rounded-xl font-bold shadow-sm hover:bg-[#1a233b] transition-all text-center text-xs text-sm">
-              ↓ Descargar Imagen QR
-            </a>
-            <button (click)="imprimirQr()" class="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all text-xs text-sm">
-              Imprimir Cartel
-            </button>
-          </div>
-        </div>
-      </div>
-    }
 
     <!-- Modal Ver Detalle de Tarea -->
     @if (selectedTaskForView()) {
@@ -358,7 +329,6 @@ export class AdminTareasComponent {
   isSaving = signal(false);
   saveSuccess = signal(false);
   formData: AdminMesa = { id: '', numero: 1, ubicacion: '', mozoId: 'Sin asignar' };
-  showQrModal = signal<AdminMesa | null>(null);
   restauranteNombre = signal<string>('restaurante');
   collapseMesas = signal(false);
   collapseTasks = signal(false);
@@ -453,43 +423,7 @@ export class AdminTareasComponent {
       .replace(/-+$/, '');
   }
 
-  openQrModal(mesa: AdminMesa) {
-    this.showQrModal.set(mesa);
-  }
 
-  closeQrModal() {
-    this.showQrModal.set(null);
-  }
-
-  getQrImageUrl(mesa: AdminMesa) {
-    const baseUrl = window.location.origin;
-    const targetUrl = `${baseUrl}/mesa/${this.restauranteNombre()}/${mesa.numero}`;
-    return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
-  }
-
-  imprimirQr() {
-    if (!this.showQrModal()) return;
-    const imgUrl = this.getQrImageUrl(this.showQrModal()!);
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head><title>Imprimir QR Mesa ${this.showQrModal()?.numero}</title></head>
-          <body style="text-align: center; font-family: sans-serif; padding-top: 50px;">
-            <h1>Mesa ${this.showQrModal()?.numero}</h1>
-            <p>${this.showQrModal()?.ubicacion || 'Sin ubicación'}</p>
-            <img src="${imgUrl}" style="width: 300px; height: 300px; border: 2px solid #000; padding: 10px; border-radius: 10px;" />
-            <br/><br/>
-            <p style="color: #666;">Escanea para pedir</p>
-            <script>
-              window.onload = function() { window.print(); window.close(); }
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
-  }
 
   openCreateForm() {
     this.editingId.set(null);
