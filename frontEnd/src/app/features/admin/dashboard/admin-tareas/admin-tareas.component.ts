@@ -26,7 +26,6 @@ import { LanguageService } from '../../../../core/services/language.service';
       }
       
 
-      @if (activeTab() === 'tareas') {
         <!-- Panel de Solicitudes Activas -->
         <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -139,7 +138,6 @@ import { LanguageService } from '../../../../core/services/language.service';
             </div>
           }
         </div>
-      }
     </div>
 
     <!-- Modal Reasignar -->
@@ -324,7 +322,6 @@ import { LanguageService } from '../../../../core/services/language.service';
   `]
 })
 export class AdminTareasComponent {
-  activeTab = signal<'tareas' | 'mesas'>('tareas');
 
   service = inject(SignalrService);
   dataService = inject(AdminDataService);

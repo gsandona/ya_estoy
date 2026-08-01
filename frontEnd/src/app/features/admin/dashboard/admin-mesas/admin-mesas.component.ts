@@ -26,7 +26,6 @@ import { LanguageService } from '../../../../core/services/language.service';
       }
       
 
-      @if (activeTab() === 'mesas') {
         <!-- Panel de Mesas (Control y Administración) -->
         <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -209,7 +208,6 @@ import { LanguageService } from '../../../../core/services/language.service';
             }
           }
         </div>
-      }
 
       <!-- Modal POS de Facturación y Consumos Extra (Caja) -->
     @if (showBillingModal() && billingMesa()) {
@@ -413,7 +411,6 @@ import { LanguageService } from '../../../../core/services/language.service';
   `]
 })
 export class AdminMesasComponent {
-  activeTab = signal<'tareas' | 'mesas'>('tareas');
 
   service = inject(SignalrService);
   dataService = inject(AdminDataService);
