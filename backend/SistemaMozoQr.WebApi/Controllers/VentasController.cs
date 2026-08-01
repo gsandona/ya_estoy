@@ -113,58 +113,39 @@ public class VentasController : ControllerBase
 
         query = query.Where(v => v.FechaHora >= targetStart && v.FechaHora < targetEnd);
 
-        var restauranteQueryId = adminTenantId != Guid.Empty ? adminTenantId : (restauranteId ?? Guid.Empty);
-        
+        // Cargamos las ventas filtradas en memoria para deserializar y agregar de forma agnóstica a la base de datos (evita incompatibilidades Postgres/SQLite)
+        var ventas = await query.Select(v => new { v.DetallesJson }).ToListAsync();
+
         var productSalesDict = new Dictionary<string, (int Cantidad, decimal Recaudacion)>();
 
-        using (var command = _context.Database.GetDbConnection().CreateCommand())
+        foreach (var venta in ventas)
         {
-            var sql = @"
-                SELECT 
-                    json_extract(value, '$.nombre') as Producto,
-                    SUM(CAST(json_extract(value, '$.cantidad') AS INTEGER)) as Cantidad,
-                    SUM(CAST(json_extract(value, '$.cantidad') AS INTEGER) * CAST(json_extract(value, '$.precioUnitario') AS REAL)) as Recaudacion
-                FROM Ventas, json_each(Ventas.DetallesJson)
-                WHERE FechaHora >= @start AND FechaHora < @end ";
+            if (string.IsNullOrWhiteSpace(venta.DetallesJson))
+                continue;
 
-            if (restauranteQueryId != Guid.Empty)
+            try
             {
-                sql += " AND RestauranteId = @tenantId ";
-            }
-            
-            sql += " GROUP BY json_extract(value, '$.nombre') ORDER BY Cantidad DESC";
+                var items = System.Text.Json.JsonSerializer.Deserialize<List<VentaItemDto>>(venta.DetallesJson);
+                if (items == null)
+                    continue;
 
-            command.CommandText = sql;
-            
-            var pStart = command.CreateParameter();
-            pStart.ParameterName = "@start";
-            pStart.Value = targetStart.ToString("yyyy-MM-dd HH:mm:ss");
-            command.Parameters.Add(pStart);
-
-            var pEnd = command.CreateParameter();
-            pEnd.ParameterName = "@end";
-            pEnd.Value = targetEnd.ToString("yyyy-MM-dd HH:mm:ss");
-            command.Parameters.Add(pEnd);
-
-            if (restauranteQueryId != Guid.Empty)
-            {
-                var pTenant = command.CreateParameter();
-                pTenant.ParameterName = "@tenantId";
-                pTenant.Value = restauranteQueryId.ToString().ToUpper();
-                command.Parameters.Add(pTenant);
-            }
-
-            await _context.Database.OpenConnectionAsync();
-            using (var reader = await command.ExecuteReaderAsync())
-            {
-                while (await reader.ReadAsync())
+                foreach (var item in items)
                 {
-                    var producto = reader.IsDBNull(0) ? "Desconocido" : reader.GetString(0);
-                    var cantidad = reader.IsDBNull(1) ? 0 : reader.GetInt32(1);
-                    var recaudacion = reader.IsDBNull(2) ? 0m : reader.GetDecimal(2);
-                    
-                    productSalesDict[producto] = (cantidad, recaudacion);
+                    var nombre = item.Nombre ?? "Producto Desconocido";
+                    if (productSalesDict.ContainsKey(nombre))
+                    {
+                        var current = productSalesDict[nombre];
+                        productSalesDict[nombre] = (current.Cantidad + item.Cantidad, current.Recaudacion + (item.Cantidad * item.PrecioUnitario));
+                    }
+                    else
+                    {
+                        productSalesDict[nombre] = (item.Cantidad, item.Cantidad * item.PrecioUnitario);
+                    }
                 }
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                // Ignorar JSON malformado
             }
         }
 
@@ -172,7 +153,7 @@ public class VentasController : ControllerBase
             Producto = kvp.Key,
             Cantidad = kvp.Value.Cantidad,
             Recaudacion = kvp.Value.Recaudacion
-        }).ToList();
+        }).OrderByDescending(r => r.Cantidad).ToList();
 
         return Ok(result);
     }
