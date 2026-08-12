@@ -16,26 +16,35 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, MenuComponent, FormsModule, SplitCheckWizardComponent],
   template: `
     @if (requirePin()) {
-      <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full border border-gray-100">
-          <div class="h-20 w-20 bg-accent/10 text-accent rounded-full mx-auto flex items-center justify-center mb-6">
-            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path></svg>
+      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden">
+        <!-- Radial light accent -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] max-w-sm w-full border border-white/80 relative z-10">
+          <div class="h-20 w-20 bg-accent/10 text-accent rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-inner animate-pulse">
+            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path>
+            </svg>
           </div>
-          <h2 class="text-2xl font-serif font-black text-primary mb-2">Mesa Protegida</h2>
-          <p class="text-primary/60 text-sm mb-6">Por favor ingrese el PIN de acceso proporcionado por su Mozo para ver el menú.</p>
+          <h2 class="text-3xl font-serif font-black text-primary mb-2">Mesa Protegida</h2>
+          <p class="text-primary/60 text-sm mb-8">Por favor, ingrese el PIN de acceso proporcionado por su Mozo para ver el menú y ordenar.</p>
           
           <input type="tel" #pinInputRef (focus)="pinInputRef.scrollIntoView({behavior: 'smooth', block: 'center'})" 
                  [(ngModel)]="pinInput" name="pin"
-                 placeholder="Ej: 4921" maxlength="4" pattern="[0-9]*"
-                 class="w-full text-center text-3xl font-black tracking-widest px-4 py-4 rounded-xl border-2 border-[#E2DACF] focus:border-accent focus:ring-4 focus:ring-accent/10 outline-none transition-all mb-4">
+                 placeholder="••••" maxlength="4" pattern="[0-9]*"
+                 class="w-full text-center text-4xl font-black tracking-[0.75em] pl-[0.75em] py-5 rounded-2xl border-2 border-gray-250 focus:border-accent focus:ring-8 focus:ring-accent/10 outline-none transition-all mb-4 bg-gray-50/50 shadow-inner">
           
           @if(pinError()) {
-            <p class="text-red-700 text-sm font-bold mb-4 animate-fade-in">{{ pinError() }}</p>
+            <div class="bg-red-50 text-red-700 text-xs font-bold py-2.5 px-4 rounded-xl mb-4 border border-red-100 flex items-center justify-center gap-2 animate-[shake_0.5s_ease-out]">
+              <span class="w-1.5 h-1.5 bg-red-600 rounded-full shrink-0"></span>
+              {{ pinError() }}
+            </div>
           }
 
-          <button (click)="submitPin()" [disabled]="validatingPin()" class="w-full bg-accent text-white font-bold py-4 rounded-xl shadow-lg hover:bg-accent/90 transition active:scale-95 flex justify-center items-center">
+          <button (click)="submitPin()" [disabled]="validatingPin()" 
+                  class="w-full bg-accent hover:bg-accent/90 text-white font-black py-4.5 rounded-2xl shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 active:scale-95 transition-all flex justify-center items-center gap-2 text-sm uppercase tracking-wider">
             @if(validatingPin()) {
-               <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+               <span class="animate-spin h-5 w-5 border-3 border-white border-t-transparent rounded-full"></span>
             } @else {
                Desbloquear Menú
             }
@@ -43,158 +52,269 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === undefined) {
-      <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5"></div>
-        <div class="relative flex flex-col items-center">
-          <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2">
-            <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
-            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex">
-              <img src="logo.png" class="w-full h-full object-cover" />
+      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden">
+        <!-- Radial light accent -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative flex flex-col items-center z-10">
+          <div class="h-24 w-24 flex items-center justify-center mb-8 relative p-2">
+            <span class="animate-spin absolute h-20 w-20 border-4 border-accent border-t-transparent rounded-full"></span>
+            <div class="w-14 h-14 rounded-2xl overflow-hidden shadow-lg border border-white flex bg-white p-2">
+              <img src="logo.png" class="w-full h-full object-contain" />
             </div>
           </div>
-          <h2 class="text-2xl font-black text-gray-800 tracking-tight mb-2">MozoGo</h2>
-          <p class="text-gray-400 text-sm font-semibold uppercase tracking-widest animate-pulse">Validando Código QR...</p>
+          <h2 class="text-3xl font-serif font-black text-primary tracking-tight mb-2">MozoGo</h2>
+          <div class="flex items-center gap-2 px-4 py-1.5 bg-accent/10 rounded-full">
+            <span class="w-2 h-2 bg-accent rounded-full animate-ping"></span>
+            <p class="text-accent text-xs font-black uppercase tracking-widest">Validando Código QR</p>
+          </div>
         </div>
       </div>
     } @else if (isValidSession() === false) {
-      <div class="min-h-screen bg-red-50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in">
-        <div class="h-28 w-28 bg-white text-red-500 rounded-full shadow-2xl flex items-center justify-center mb-8 border-4 border-red-100 animate-[shake_0.5s_ease-out]">
-          <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      <div class="min-h-screen bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-red-500/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="h-28 w-28 bg-white text-red-500 rounded-[2rem] shadow-xl flex items-center justify-center mb-8 border border-red-100 animate-[shake_0.5s_ease-out] relative z-10">
+          <svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
         </div>
-        <h1 class="text-4xl font-black text-gray-900 mb-4 tracking-tight">Acceso Denegado</h1>
-        <p class="text-lg text-gray-600 font-medium mb-8">
-          El código QR ha expirado o la mesa está inactiva. Por favor avise al Mozo.
+        <h1 class="text-4xl font-serif font-black text-gray-900 mb-4 tracking-tight relative z-10">Acceso Denegado</h1>
+        <p class="text-lg text-gray-600 font-medium mb-8 max-w-xs mx-auto relative z-10">
+          El código QR ha expirado o la mesa está inactiva. Por favor, solicita asistencia a tu Mozo.
         </p>
-        <button (click)="verifyMesa()" class="bg-white text-gray-800 font-bold py-3 px-8 rounded-full shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all flex items-center gap-2">
-          <svg class="w-4 h-4 text-gray-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path></svg>
+        <button (click)="verifyMesa()" class="bg-white text-gray-800 font-black py-4 px-8 rounded-2xl shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all flex items-center gap-2.5 active:scale-95 relative z-10 text-sm">
+          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
+          </svg>
           Reintentar Conexión
         </button>
       </div>
-
     } @else {
-      <div class="min-h-screen bg-surface flex flex-col animate-fade-in">
-        <!-- Header minimalista -->
-        <div class="pt-10 pb-6 px-6 text-center">
-            <h1 class="text-2xl font-black tracking-tight text-gray-800">
-              Mesa {{ numeroMesa() || '...' }}
-            </h1>
-            <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-1">¿Qué necesitas?</p>
+      <div class="min-h-screen bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden">
+        <!-- Radial light accent background -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[260px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header Card Premium -->
+        <div class="pt-10 pb-6 px-6 relative z-10 flex flex-col items-center">
+            <div class="bg-white/80 backdrop-blur-md px-6 py-4 rounded-[2rem] border border-white shadow-sm flex flex-col items-center w-full max-w-sm">
+              <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em] mb-1">Tu Servicio Digital</span>
+              <h1 class="text-3xl font-serif font-black tracking-tight text-primary leading-none">
+                Mesa {{ numeroMesa() || '...' }}
+              </h1>
+              <div class="flex items-center gap-1.5 mt-2 bg-green-500/10 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                Sesión Activa
+              </div>
+            </div>
         </div>
 
         <!-- CONTENIDO CENTRAL -->
-        <div class="flex-1 px-6 flex flex-col items-center pb-24">
+        <div class="flex-1 px-6 flex flex-col items-center pb-28 relative z-10">
            @if (activeBottomTab() === 'inicio') {
-             <div class="w-full max-w-sm animate-fade-in flex flex-col gap-4 w-full">
+             <div class="w-full max-w-sm animate-fade-in flex flex-col gap-5 w-full">
                
-               <!-- Monto Consumido (Minimalista) -->
+               <!-- Monto Consumido (Premium Fintech Card) -->
                @if (montoConsumo() !== null && montoConsumo() !== undefined && montoConsumo()! > 0) {
-                 <div class="bg-white border border-gray-100 rounded-2xl p-5 w-full flex justify-between items-center shadow-sm">
+                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2rem] p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
+                   <!-- Decorative pattern -->
+                   <div class="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
+                   
                    <div>
-                     <span class="text-[10px] uppercase font-bold text-gray-400 tracking-widest">Total Consumido</span>
-                     <h2 class="text-2xl font-black text-gray-900 leading-none mt-1">\${{ formatCurrency(montoConsumo()) }}</h2>
+                     <span class="text-[9px] uppercase font-black text-slate-400 tracking-[0.25em]">Monto Consumido</span>
+                     <h2 class="text-3xl font-black leading-none mt-2 font-serif">\${{ formatCurrency(montoConsumo()) }}</h2>
                    </div>
-                   <button (click)="abrirDividirCuenta()" class="text-xs font-bold text-accent bg-accent/10 px-4 py-2 rounded-xl transition-all active:scale-95">
+                   <button (click)="abrirDividirCuenta()" class="text-xs font-black bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-3 rounded-2xl transition-all active:scale-95 backdrop-blur-md flex items-center gap-1">
+                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 10.742l5.028-2.514m0 0a3 3 0 10-4.043-4.042 3 3 0 004.043 4.042zM8.684 13.258l5.028 2.514m-5.028-2.514a3 3 0 11-4.043-4.043 3 3 0 014.043 4.043zm5.028 2.514a3 3 0 104.043-4.043 3 3 0 00-4.043 4.043z"></path></svg>
                      Dividir
                    </button>
                  </div>
                }
 
-               <!-- Tickets Activos / Estado (Minimalista) -->
+               <!-- Seguidor de Pedido Activo / Cocina Status (Premium Tracker) -->
                @if (activePedidoTaskId()) {
-                 <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm animate-fade-in flex flex-col gap-3">
-                   <div class="flex justify-between items-center">
-                     <div class="flex items-center gap-3">
-                       <span class="flex items-center justify-center shrink-0 w-8 h-8 rounded-full bg-gray-50">
-                         @if (activePedidoEstado() === 'Recibido') {
-                           <span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
-                         }
-                         @if (activePedidoEstado() === 'Aprobado') {
-                           <span class="w-2.5 h-2.5 bg-primary rounded-full"></span>
-                         }
-                         @if (activePedidoEstado() === 'EnPreparacion') {
-                           <span class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-pulse"></span>
-                         }
-                         @if (activePedidoEstado() === 'Listo') {
-                           <span class="w-2.5 h-2.5 bg-green-500 rounded-full"></span>
-                         }
-                       </span>
-                       <div>
-                         <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Estado del Pedido</p>
-                         <h3 class="font-black text-sm text-gray-800">
-                           @if (activePedidoEstado() === 'Recibido') { Pendiente }
-                           @if (activePedidoEstado() === 'Aprobado') { Aprobado }
-                           @if (activePedidoEstado() === 'EnPreparacion') { En Preparación }
-                           @if (activePedidoEstado() === 'Listo') { ¡Listo en Cocina! }
-                         </h3>
-                       </div>
+                 <div class="bg-white border border-gray-100 rounded-[2.25rem] p-6 shadow-md animate-fade-in flex flex-col gap-4">
+                   <div class="flex justify-between items-center pb-3 border-b border-gray-50">
+                     <div>
+                       <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Seguimiento</p>
+                       <h3 class="font-black text-sm text-gray-800 mt-0.5">Estado de tu Orden</h3>
                      </div>
+                     
                      @if (activePedidoEstado() === 'Recibido') {
                        <button 
                          (click)="cancelarPedido()"
                          [disabled]="loadingCancelarPedido()"
-                         class="text-xs text-red-500 font-bold active:scale-95 transition-all">
+                         class="text-xs text-red-500 font-bold active:scale-95 transition-all bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl border border-red-100">
                          @if (loadingCancelarPedido()) {
-                           <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
+                           <span class="animate-spin h-3 w-3 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
                          } @else {
                            Cancelar
                          }
                        </button>
                      }
                    </div>
+
+                   <!-- Progress Bar tracker -->
+                   <div class="grid grid-cols-4 items-center gap-1 py-1 relative">
+                     <!-- Line background -->
+                     <div class="absolute left-[12%] right-[12%] top-[40%] h-[3px] bg-gray-100 -z-10"></div>
+                     <div class="absolute left-[12%] top-[40%] h-[3px] bg-accent transition-all duration-700 -z-10"
+                          [style.width]="activePedidoEstado() === 'Recibido' ? '0%' : (activePedidoEstado() === 'Aprobado' ? '33%' : (activePedidoEstado() === 'EnPreparacion' ? '66%' : '100%'))"></div>
+                     
+                     <!-- Step 1: Recibido -->
+                     <div class="flex flex-col items-center text-center">
+                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
+                             [ngClass]="activePedidoEstado() === 'Recibido' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20 font-black' : 'bg-gray-100 text-gray-400'">
+                         📥
+                       </span>
+                       <span class="text-[9px] font-black text-gray-500 mt-1">Recibido</span>
+                     </div>
+
+                     <!-- Step 2: Aprobado -->
+                     <div class="flex flex-col items-center text-center">
+                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
+                             [ngClass]="activePedidoEstado() === 'Aprobado' ? 'bg-primary text-white shadow-lg shadow-primary/20 font-black' : (activePedidoEstado() === 'EnPreparacion' || activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-100 text-gray-400')">
+                         ✓
+                       </span>
+                       <span class="text-[9px] font-black text-gray-500 mt-1">Aprobado</span>
+                     </div>
+
+                     <!-- Step 3: EnPreparacion -->
+                     <div class="flex flex-col items-center text-center">
+                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
+                             [ngClass]="activePedidoEstado() === 'EnPreparacion' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 font-black animate-pulse' : (activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-100 text-gray-400')">
+                         🍳
+                       </span>
+                       <span class="text-[9px] font-black text-gray-500 mt-1">Cocina</span>
+                     </div>
+
+                     <!-- Step 4: Listo -->
+                     <div class="flex flex-col items-center text-center">
+                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
+                             [ngClass]="activePedidoEstado() === 'Listo' ? 'bg-green-500 text-white shadow-lg shadow-green-500/20 font-black animate-[bounce_1s_infinite]' : 'bg-gray-100 text-gray-400'">
+                         🍽️
+                       </span>
+                       <span class="text-[9px] font-black text-gray-500 mt-1">¡Listo!</span>
+                     </div>
+                   </div>
+
+                   <!-- Order Details -->
+                   <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-3 text-left">
+                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Detalle del Pedido</p>
+                     <p class="text-xs font-bold text-gray-600 mt-1 leading-relaxed">{{ activePedidoDetails() || 'Sin detalles' }}</p>
+                   </div>
                  </div>
                }
 
-               <!-- Menú de 3 Barras Simplificado -->
-               <div class="flex flex-col gap-3 mt-4 w-full">
-                 <!-- 1. Llamar Mozo -->
+               <!-- MÓDULO DE ACCIONES PREMIUM (Tarjetas de Servicio) -->
+               <div class="flex flex-col gap-4 mt-2 w-full">
+                 
+                 <!-- 1. CARTA HERO (VER MENÚ) -->
+                 <button (click)="activeBottomTab.set('menu')" 
+                         class="w-full bg-gradient-to-br from-primary via-primary to-primary/95 text-white rounded-[2.25rem] p-6 text-left shadow-xl shadow-primary/10 active:scale-[0.98] transition-all flex items-center justify-between border border-primary/20 relative overflow-hidden group">
+                   <!-- Glowing circles -->
+                   <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full blur-xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+                   
+                   <div class="flex items-center gap-5">
+                     <div class="h-16 w-16 bg-white/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner shrink-0 group-hover:rotate-6 transition-transform">
+                       📖
+                     </div>
+                     <div class="flex flex-col">
+                       <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em]">Menú Digital</span>
+                       <span class="font-serif font-black text-xl mt-0.5">Explorar la Carta</span>
+                       <span class="text-[10px] text-white/60 font-semibold mt-1">Ordená directamente a la cocina</span>
+                     </div>
+                   </div>
+                   <div class="h-11 w-11 rounded-full bg-white/10 flex items-center justify-center text-white/80 shrink-0 group-hover:translate-x-1 transition-transform">
+                     <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                   </div>
+                 </button>
+
+                 <!-- 2. LLAMAR AL MOZO -->
                  @if (yaLlamo()) {
-                   <div class="w-full bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                     <span class="font-black text-gray-800">Mozo Notificado</span>
-                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="text-gray-400 hover:text-red-500 transition-colors">
+                   <div class="w-full bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] p-6 flex items-center justify-between shadow-md shadow-emerald-500/5 animate-fade-in">
+                     <div class="flex items-center gap-5">
+                       <div class="h-16 w-16 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 animate-bounce">
+                         🛎️
+                       </div>
+                       <div class="flex flex-col text-left">
+                         <span class="text-[9px] font-black uppercase text-emerald-600 tracking-[0.2em]">En Camino</span>
+                         <span class="font-black text-gray-800 text-base mt-0.5">Mozo Notificado</span>
+                         <span class="text-[10px] text-gray-500 font-semibold mt-1">Aguarde un momento</span>
+                       </div>
+                     </div>
+                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="h-11 w-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-sm active:scale-90 disabled:opacity-50">
                         @if (loadingCancelarLlamar()) {
                           <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
                         } @else {
-                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg class="w-4.5 h-4.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                         }
                      </button>
                    </div>
                  } @else {
-                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" class="w-full bg-white border border-gray-200 rounded-2xl p-4 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between">
-                     <span class="font-black text-gray-800">Llamar al Mozo</span>
-                     @if (loadingLlamar()) { 
-                       <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
-                     } @else { 
-                       <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                     }
+                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" 
+                           class="w-full bg-white/80 backdrop-blur-md border border-gray-100 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between group">
+                     <div class="flex items-center gap-5">
+                       <div class="h-16 w-16 bg-accent/10 text-accent rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform">
+                         🔔
+                       </div>
+                       <div class="flex flex-col">
+                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Asistencia</span>
+                         <span class="font-black text-gray-800 text-lg mt-0.5">Llamar al Mozo</span>
+                         <span class="text-[10px] text-gray-400 font-semibold mt-1">Consulta o cubiertos extras</span>
+                       </div>
+                     </div>
+                     <div class="h-11 w-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                       @if (loadingLlamar()) { 
+                         <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
+                       } @else { 
+                         <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                       }
+                     </div>
                    </button>
                  }
 
-                 <!-- 2. Pedir de Menú -->
-                 <button (click)="activeBottomTab.set('menu')" class="w-full bg-primary text-white border border-primary rounded-2xl p-4 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between">
-                   <span class="font-black">Ver el Menú</span>
-                   <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                 </button>
-
-                 <!-- 3. Pedir Cuenta -->
+                 <!-- 3. PEDIR LA CUENTA -->
                  @if (yaPidioCuenta()) {
-                   <div class="w-full bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                     <span class="font-black text-gray-800">Cuenta Solicitada</span>
-                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="text-gray-400 hover:text-red-500 transition-colors">
+                   <div class="w-full bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-[2.25rem] p-6 flex items-center justify-between shadow-md shadow-amber-500/5 animate-fade-in">
+                     <div class="flex items-center gap-5">
+                       <div class="h-16 w-16 bg-amber-500/10 text-amber-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 animate-pulse">
+                         💳
+                       </div>
+                       <div class="flex flex-col text-left">
+                         <span class="text-[9px] font-black uppercase text-amber-600 tracking-[0.2em]">Caja Sincronizada</span>
+                         <span class="font-black text-gray-800 text-base mt-0.5">Cuenta Solicitada</span>
+                         <span class="text-[10px] text-gray-500 font-semibold mt-1">Preparando ticket de cobro</span>
+                       </div>
+                     </div>
+                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="h-11 w-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-sm active:scale-90 disabled:opacity-50">
                         @if (loadingCancelarCuenta()) {
                           <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
                         } @else {
-                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg class="w-4.5 h-4.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                         }
                      </button>
                    </div>
                  } @else {
-                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" class="w-full bg-white border border-gray-200 rounded-2xl p-4 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between">
-                     <span class="font-black text-gray-800">Pedir la Cuenta</span>
-                     @if (loadingCuenta()) { 
-                       <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
-                     } @else { 
-                       <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                     }
+                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" 
+                           class="w-full bg-white/80 backdrop-blur-md border border-gray-100 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between group">
+                     <div class="flex items-center gap-5">
+                       <div class="h-16 w-16 bg-indigo-500/10 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform">
+                         🧾
+                       </div>
+                       <div class="flex flex-col">
+                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Facturación</span>
+                         <span class="font-black text-gray-800 text-lg mt-0.5">Pedir la Cuenta</span>
+                         <span class="text-[10px] text-gray-400 font-semibold mt-1">Solicitá el cierre y el ticket</span>
+                       </div>
+                     </div>
+                     <div class="h-11 w-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                       @if (loadingCuenta()) { 
+                         <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
+                       } @else { 
+                         <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                       }
+                     </div>
                    </button>
                  }
                </div>
@@ -203,90 +323,115 @@ import { FormsModule } from '@angular/forms';
 
            @if (activeBottomTab() === 'menu') {
              <div class="w-full max-w-md animate-fade-in flex flex-col pb-8 mt-2">
-                <button (click)="activeBottomTab.set('inicio')" class="mb-4 flex items-center gap-1.5 text-gray-400 hover:text-primary transition-colors font-bold px-2 self-start active:scale-95">
+                <button (click)="activeBottomTab.set('inicio')" class="mb-5 flex items-center gap-1.5 text-gray-400 hover:text-primary transition-colors font-black px-2 self-start active:scale-95 text-xs uppercase tracking-wider">
                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                    Volver a la Mesa
                 </button>
-                <app-menu [restauranteId]="restauranteId()"></app-menu>
+                <div class="bg-white rounded-[2.5rem] p-6 shadow-md border border-gray-100">
+                  <app-menu [restauranteId]="restauranteId()"></app-menu>
+                </div>
              </div>
            }
+        </div>
 
         <!-- Floating Bottom Navigation Bar (Las 3 Barras) -->
-        <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 z-30 pb-safe">
-           <div class="flex justify-around items-center h-16 max-w-md mx-auto">
-              <button (click)="activeBottomTab.set('inicio')" class="flex flex-col items-center justify-center w-full h-full text-xs font-bold transition-colors" [ngClass]="activeBottomTab() === 'inicio' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+        <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-30 pb-safe">
+           <div class="flex justify-around items-center h-20 max-w-md mx-auto px-4">
+              <button (click)="activeBottomTab.set('inicio')" 
+                      class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                      [ngClass]="activeBottomTab() === 'inicio' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                @if (activeBottomTab() === 'inicio') {
+                  <span class="absolute top-0 w-8 h-1 bg-accent rounded-full"></span>
+                }
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                 Inicio
               </button>
-              <button (click)="activeBottomTab.set('menu')" class="flex flex-col items-center justify-center w-full h-full text-xs font-bold transition-colors" [ngClass]="activeBottomTab() === 'menu' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+              
+              <button (click)="activeBottomTab.set('menu')" 
+                      class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                      [ngClass]="activeBottomTab() === 'menu' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                @if (activeBottomTab() === 'menu') {
+                  <span class="absolute top-0 w-8 h-1 bg-accent rounded-full"></span>
+                }
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                 Menú
               </button>
-              <button (click)="abrirDividirCuenta()" class="flex flex-col items-center justify-center w-full h-full text-xs font-bold transition-colors text-gray-400 hover:text-gray-600 active:scale-95">
+              
+              <button (click)="abrirDividirCuenta()" 
+                      class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                      [ngClass]="showSplitModal() ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                @if (showSplitModal()) {
+                  <span class="absolute top-0 w-8 h-1 bg-accent rounded-full"></span>
+                }
                 <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                 Cuenta
               </button>
            </div>
         </div>
 
-        <!-- Floating Cart (Only show if not in Consultas where maybe they don't need it, but let's show it everywhere if items > 0) -->
+        <!-- Floating Cart Panel (Premium styling) -->
         @if (cart.totalItems() > 0 && !showCartModal()) {
           <div class="fixed bottom-24 left-0 right-0 px-4 flex justify-center z-40 animate-fade-in pointer-events-none">
             <button 
               (click)="showCartModal.set(true)"
-              class="w-full max-w-md bg-accent text-white rounded-2xl shadow-[0_10px_30px_rgba(128,26,45,0.15)] p-4 flex justify-between items-center active:scale-[0.98] transition-all border border-accent/20 pointer-events-auto">
+              class="w-full max-w-sm bg-accent text-white rounded-[2rem] shadow-[0_15px_40px_rgba(var(--color-accent-rgb,0,0,0),0.25)] p-5 flex justify-between items-center active:scale-[0.98] transition-all border border-accent/20 pointer-events-auto group">
               <div class="flex items-center gap-3">
-                 <div class="bg-white/20 rounded-full h-8 w-8 flex items-center justify-center font-black text-sm">
+                 <div class="bg-white text-accent rounded-xl h-9 w-9 flex items-center justify-center font-black text-sm shadow-sm group-hover:scale-105 transition-transform">
                    {{ cart.totalItems() }}
                  </div>
-                 <span class="font-bold">Ver Canasto</span>
+                 <div class="flex flex-col text-left">
+                   <span class="text-[9px] uppercase font-black tracking-wider text-white/70">Canasto Activo</span>
+                   <span class="font-bold text-sm">Ver mi Pedido</span>
+                 </div>
               </div>
-              <span class="font-black">\${{ cart.totalPrice() }}</span>
+              <span class="font-black text-lg font-serif">\${{ cart.totalPrice() }}</span>
             </button>
           </div>
         }
 
+        <!-- Cart Modal (Premium Rounded Dialog) -->
         @if (showCartModal()) {
-          <!-- Cart modal code -->
-          <div class="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center animate-fade-in p-4 backdrop-blur-sm">
-             <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative">
-                <button (click)="showCartModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800">
-                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up">
+                <button (click)="showCartModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
-                <h2 class="text-2xl font-black text-gray-800 mb-6">Tu Pedido</h2>
+                <h2 class="text-2xl font-serif font-black text-gray-800 mb-6">Tu Pedido</h2>
+                
                 <div class="max-h-64 overflow-y-auto space-y-4 mb-6 pr-2">
                    @for (item of cart.items(); track item.id) {
-                     <div class="flex justify-between items-center">
+                     <div class="flex justify-between items-center bg-gray-50/50 p-3 rounded-2xl border border-gray-100">
                         <div class="flex items-center gap-3">
-                           <div class="flex items-center bg-surface rounded-lg">
-                              <button (click)="cart.decreaseQuantity(item.id)" class="px-3 py-1 font-bold text-gray-500 hover:text-red-500">-</button>
-                              <span class="font-bold text-sm w-4 text-center">{{ item.quantity }}</span>
-                              <button (click)="cart.addToCart(item)" class="px-3 py-1 font-bold text-gray-500 hover:text-accent">+</button>
+                           <div class="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                              <button (click)="cart.decreaseQuantity(item.id)" class="px-3 py-1.5 font-black text-gray-500 hover:text-red-500 transition-colors">-</button>
+                              <span class="font-black text-xs w-4 text-center text-gray-800">{{ item.quantity }}</span>
+                              <button (click)="cart.addToCart(item)" class="px-3 py-1.5 font-black text-gray-500 hover:text-accent transition-colors">+</button>
                            </div>
-                           <div class="flex-1 max-w-[120px] sm:max-w-none break-words">
-                             <p class="font-bold text-gray-800 leading-tight">{{ item.nombre }}</p>
-                             <p class="text-xs text-gray-500">\${{ item.precio }} c/u</p>
+                           <div class="text-left">
+                             <p class="font-black text-xs text-gray-800 leading-tight">{{ item.nombre }}</p>
+                             <p class="text-[10px] text-gray-400 font-bold mt-0.5">\${{ item.precio }} c/u</p>
                            </div>
                         </div>
-                        <span class="font-black text-gray-800">\${{ item.precio * item.quantity }}</span>
+                        <span class="font-black text-sm text-gray-800 font-serif">\${{ item.precio * item.quantity }}</span>
                      </div>
                    } @empty {
-                     <p class="text-center text-gray-500 py-6">El canasto está vacío</p>
+                     <p class="text-center text-gray-400 py-8 font-medium">El canasto está vacío</p>
                    }
                 </div>
+                
                 @if (cart.totalItems() > 0) {
-                  <div class="border-t border-gray-100 pt-4 mb-6">
+                  <div class="border-t border-gray-100 pt-5 mb-6">
                     <div class="flex justify-between items-center">
-                       <span class="font-bold text-primary/60">Total a pagar</span>
-                       <span class="font-black text-2xl text-accent">\${{ cart.totalPrice() }}</span>
+                       <span class="font-bold text-sm text-gray-400 uppercase tracking-widest">Total a pagar</span>
+                       <span class="font-black text-2xl text-accent font-serif">\${{ cart.totalPrice() }}</span>
                     </div>
                   </div>
                   <button 
                     (click)="enviarPedido()"
                     [disabled]="loadingPedido()"
-                    class="w-full bg-accent text-white py-4 rounded-2xl font-bold text-lg hover:bg-accent/90 active:scale-[0.98] transition-all shadow-[0_8px_30px_rgba(128,26,45,0.15)] flex justify-center items-center">
+                    class="w-full bg-accent text-white py-4.5 rounded-2xl font-black text-sm hover:bg-accent/90 active:scale-[0.98] transition-all shadow-lg shadow-accent/25 flex justify-center items-center gap-2 uppercase tracking-wider">
                     @if (loadingPedido()) {
-                      <span class="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                      <span class="animate-spin h-5 w-5 border-3 border-white border-t-transparent rounded-full"></span>
                     } @else {
                       Enviar Pedido a Cocina
                     }
@@ -296,49 +441,47 @@ import { FormsModule } from '@angular/forms';
           </div>
         }
 
+        <!-- Split check modal and other dialogs -->
         @if (showSplitModal()) {
-          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center animate-fade-in p-4 backdrop-blur-sm">
-             <div class="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative max-h-[85vh] flex flex-col border border-gray-100 animate-scale-up">
                 <button (click)="showSplitModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
-                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 
-                <h2 class="text-2xl font-black text-gray-800 mb-2 flex items-center gap-2.5">
-                   <svg class="w-6 h-6 text-accent shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>
+                <h2 class="text-2xl font-serif font-black text-gray-800 mb-1 flex items-center gap-2">
                    Dividir Cuenta
                 </h2>
-                <p class="text-xs text-slate-500 mb-4">Administrá los comensales de la mesa y calcula el consumo correspondiente.</p>
+                <p class="text-xs text-gray-400 font-semibold mb-5">Calculá el consumo fraccionado entre comensales.</p>
                 
                 <!-- Scrollable Content Container -->
                 <div class="flex-1 overflow-y-auto space-y-5 pr-1 py-1">
                   
                   <!-- Formulario Agregar Comensal -->
-                  <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-3">Agregar Comensal</h3>
+                  <div class="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 text-left">
+                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Agregar Comensal</h3>
                     <div class="grid grid-cols-2 gap-2 mb-2">
                       <input type="text" [(ngModel)]="nuevoComensalNombre" placeholder="Nombre" 
-                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-accent focus:outline-none transition-all">
+                             class="bg-white px-3.5 py-2.5 text-xs rounded-xl border border-gray-200 focus:border-accent focus:outline-none transition-all font-bold">
                       <input type="text" [(ngModel)]="nuevoComensalApellido" placeholder="Apellido" 
-                             class="bg-white px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-accent focus:outline-none transition-all">
+                             class="bg-white px-3.5 py-2.5 text-xs rounded-xl border border-gray-200 focus:border-accent focus:outline-none transition-all font-bold">
                     </div>
                     <button (click)="agregarComensal()" 
                             [disabled]="!nuevoComensalNombre.trim() || !nuevoComensalApellido.trim()"
-                            class="w-full bg-accent hover:bg-accent/90 text-white font-bold text-sm py-2 rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100">
-                      + Agregar Comensal
+                            class="w-full bg-accent hover:bg-accent/90 text-white font-black text-xs py-3 rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:active:scale-100 uppercase tracking-wider">
+                      + Agregar
                     </button>
                   </div>
 
                   <!-- Lista de Comensales Agregados -->
                   @if (comensales().length > 0) {
-                    <div>
-                      <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-2 flex justify-between">
-                        <span>Comensales ({{ comensales().length }})</span>
-                      </h3>
-                      <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                    <div class="text-left">
+                      <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Comensales ({{ comensales().length }})</h3>
+                      <div class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-2 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
                         @for (c of comensales(); track c.id) {
-                          <span class="inline-flex items-center gap-1 bg-white border border-slate-200 px-2.5 py-1 rounded-full text-xs font-bold text-slate-700">
+                          <span class="inline-flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1.5 rounded-full text-xs font-bold text-gray-700 shadow-sm animate-fade-in">
                             {{ c.nombre }} {{ c.apellido }}
-                            <button (click)="removerComensal(c.id)" class="text-red-500 hover:text-red-700 ml-0.5 font-bold transition-colors">×</button>
+                            <button (click)="removerComensal(c.id)" class="text-red-500 hover:text-red-700 ml-1 font-black transition-colors text-sm">×</button>
                           </span>
                         }
                       </div>
@@ -347,19 +490,19 @@ import { FormsModule } from '@angular/forms';
 
                   @if (comensales().length > 0) {
                     <!-- Selector de Modo de División -->
-                    <div>
-                      <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Modo de División</h3>
-                      <div class="flex bg-slate-100 p-1 rounded-xl">
+                    <div class="text-left">
+                      <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Modo de División</h3>
+                      <div class="flex bg-gray-100 p-1 rounded-2xl">
                         <button 
                           (click)="changeSplitMode('equitativa')" 
-                          [ngClass]="{'bg-white shadow-sm font-bold text-accent': splitMode() === 'equitativa', 'text-slate-500 font-semibold': splitMode() !== 'equitativa'}"
-                          class="flex-1 py-2 text-xs rounded-lg transition-all">
-                          División Equitativa
+                          [ngClass]="{'bg-white shadow-sm font-black text-accent': splitMode() === 'equitativa', 'text-gray-500 font-bold': splitMode() !== 'equitativa'}"
+                          class="flex-1 py-2.5 text-xs rounded-xl transition-all">
+                          Equitativa
                         </button>
                         <button 
                           (click)="changeSplitMode('items')" 
-                          [ngClass]="{'bg-white shadow-sm font-bold text-accent': splitMode() === 'items', 'text-slate-500 font-semibold': splitMode() !== 'items'}"
-                          class="flex-1 py-2 text-xs rounded-lg transition-all">
+                          [ngClass]="{'bg-white shadow-sm font-black text-accent': splitMode() === 'items', 'text-gray-500 font-bold': splitMode() !== 'items'}"
+                          class="flex-1 py-2.5 text-xs rounded-xl transition-all">
                           Por Consumos
                         </button>
                       </div>
@@ -367,21 +510,21 @@ import { FormsModule } from '@angular/forms';
 
                     <!-- Asignación de Items (si es Por Consumos) -->
                     @if (splitMode() === 'items') {
-                      <div>
-                        <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-2">Asignar Consumos</h3>
-                        <p class="text-[10px] text-slate-400 mb-3 italic">Los consumos que dejes sin asignar se dividirán en partes iguales entre todos.</p>
+                      <div class="text-left">
+                        <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Asignar Consumos</h3>
+                        <p class="text-[10px] text-gray-400 font-medium mb-3 italic">Los consumos que dejes sin asignar se dividirán en partes iguales entre todos.</p>
                         
                         <div class="max-h-48 overflow-y-auto space-y-2 pr-1">
                           @for (unit of itemUnits(); track unit.unitId) {
-                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                            <div class="flex justify-between items-center bg-gray-50/50 p-3 rounded-2xl border border-gray-100">
                               <div class="text-left">
-                                <p class="text-xs font-bold text-slate-800 leading-tight">{{ unit.nombre }}</p>
-                                <p class="text-[10px] text-slate-500 font-semibold">\${{ formatCurrency(unit.precio) }}</p>
+                                <p class="text-xs font-black text-gray-800 leading-tight">{{ unit.nombre }}</p>
+                                <p class="text-[10px] text-gray-400 font-bold mt-0.5">\${{ formatCurrency(unit.precio) }}</p>
                               </div>
                               <select 
                                 [ngModel]="itemAssignments()[unit.unitId] || ''"
                                 (ngModelChange)="assignItem(unit.unitId, $event)"
-                                class="bg-white border border-slate-200 rounded-lg text-xs py-1 px-2 focus:border-accent focus:ring-1 focus:ring-accent/10 outline-none font-semibold text-slate-700 max-w-[150px]">
+                                class="bg-white border border-gray-200 rounded-xl text-xs py-1.5 px-2 focus:border-accent outline-none font-bold text-gray-700 max-w-[150px] shadow-sm">
                                 <option value="">Compartido / Todos</option>
                                 @for (c of comensales(); track c.id) {
                                   <option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</option>
@@ -389,22 +532,22 @@ import { FormsModule } from '@angular/forms';
                               </select>
                             </div>
                           } @empty {
-                            <p class="text-center text-xs text-slate-400 py-4 font-medium">No hay consumos entregados en esta mesa todavía.</p>
+                            <p class="text-center text-xs text-gray-400 py-4 font-medium">No hay consumos entregados en esta mesa todavía.</p>
                           }
                         </div>
                       </div>
                     }
 
                     <!-- Resumen de Totales a Pagar -->
-                    <div class="border-t border-slate-100 pt-4">
-                      <h3 class="text-xs font-black text-slate-600 uppercase tracking-wider mb-3">Resumen de Cuenta</h3>
+                    <div class="border-t border-gray-150 pt-5 text-left">
+                      <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Resumen de Cuenta</h3>
                       <div class="space-y-2">
                         @for (c of comensalesTotals(); track c.id) {
-                          <div class="bg-sand/40 border border-[#E2DACF] p-3 rounded-xl flex justify-between items-start">
+                          <div class="bg-gradient-to-r from-gray-50 to-white border border-gray-100 p-4.5 rounded-2xl flex justify-between items-center shadow-sm">
                             <div class="text-left max-w-[70%]">
-                              <p class="text-sm font-bold text-primary">{{ c.nombre }} {{ c.apellido }}</p>
+                              <p class="text-xs font-black text-gray-800">{{ c.nombre }} {{ c.apellido }}</p>
                               @if (splitMode() === 'items') {
-                                <p class="text-[10px] text-primary/60 font-medium leading-tight truncate" [title]="c.details">
+                                <p class="text-[9px] text-gray-400 font-bold mt-0.5 truncate" [title]="c.details">
                                   {{ c.details }}
                                 </p>
                               }
@@ -417,45 +560,47 @@ import { FormsModule } from '@angular/forms';
                       <!-- Botón de compartir WhatsApp -->
                       <button 
                         (click)="compartirWhatsApp()"
-                        class="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-3.5 rounded-2xl font-black text-sm transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-green-500/10 active:scale-[0.98]">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        class="w-full bg-[#25D366] hover:bg-[#20ba59] text-white py-4 rounded-2xl font-black text-xs transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-green-500/10 active:scale-[0.98] uppercase tracking-wider">
+                        <svg class="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
                           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.197 1.45 4.817 1.451 5.432 0 9.851-4.42 9.855-9.852.002-2.63-1.023-5.101-2.887-6.966a9.78 9.78 0 0 0-6.96-2.873c-5.433 0-9.853 4.42-9.858 9.853-.001 1.75.457 3.456 1.328 4.965l-1.017 3.714 3.822-1.002z"/>
                         </svg>
-                        Compartir por WhatsApp
+                        Compartir Cuenta por WhatsApp
                       </button>
                     </div>
 
                   } @else {
-                    <div class="py-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                      <svg class="w-10 h-10 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
-                      <p class="text-sm font-bold text-slate-700">Comenzá por agregar comensales</p>
-                      <p class="text-xs text-slate-400 mt-1 max-w-[200px] mx-auto">Agrega los nombres y apellidos de las personas en la mesa para poder dividir la cuenta.</p>
+                    <div class="py-8 text-center bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                      <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" /></svg>
+                      <p class="text-sm font-black text-gray-700">Comenzá por agregar comensales</p>
+                      <p class="text-[10px] text-gray-400 mt-1 max-w-[200px] mx-auto font-semibold leading-relaxed">Agrega las personas presentes en la mesa para ver el desglose o fraccionamiento.</p>
                     </div>
                   }
-
                 </div>
              </div>
           </div>
         }
 
+        <!-- Success Toast Notifications -->
         @if (showSuccessToast()) {
-          <div class="fixed top-6 left-0 right-0 flex justify-center z-50 animate-[slide-down_0.5s_ease-out] pointer-events-none">
-             <div class="bg-green-600 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(25,135,84,0.2)] font-black flex items-center gap-3.5 backdrop-blur-md">
-               <svg class="w-5 h-5 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg>
-               ¡Pedido orquestado con éxito!
+          <div class="fixed top-6 left-0 right-0 flex justify-center z-50 animate-[slide-down_0.5s_ease-out] pointer-events-none px-4">
+             <div class="bg-emerald-600 text-white px-6 py-4 rounded-2xl shadow-[0_15px_40px_rgba(16,185,129,0.3)] font-black text-xs uppercase tracking-wider flex items-center gap-3 backdrop-blur-md border border-emerald-500/20">
+               <svg class="w-5 h-5 text-white shrink-0 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
+               </svg>
+               ¡Pedido enviado con éxito!
              </div>
           </div>
-         }
-         </div>
+        }
       </div>
-
     }
   `,
   styles: [`
     @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes slide-down { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px) rotate(-2deg); } 75% { transform: translateX(6px) rotate(2deg); } }
+    @keyframes scale-up { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+    .animate-scale-up { animation: scale-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
   `]
 })
 export class PedidoComponent implements OnInit {
