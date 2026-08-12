@@ -16,11 +16,11 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, MenuComponent, FormsModule, SplitCheckWizardComponent],
   template: `
     @if (requirePin()) {
-      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden">
+      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden bg-grid">
         <!-- Radial light accent -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] max-w-sm w-full border border-white/80 relative z-10">
+        <div class="bg-white/95 backdrop-blur-md p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] max-w-sm w-full border border-white/80 relative z-10 animate-scale-up">
           <div class="h-20 w-20 bg-accent/10 text-accent rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-inner animate-pulse">
             <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path>
@@ -32,7 +32,7 @@ import { FormsModule } from '@angular/forms';
           <input type="tel" #pinInputRef (focus)="pinInputRef.scrollIntoView({behavior: 'smooth', block: 'center'})" 
                  [(ngModel)]="pinInput" name="pin"
                  placeholder="••••" maxlength="4" pattern="[0-9]*"
-                 class="w-full text-center text-4xl font-black tracking-[0.75em] pl-[0.75em] py-5 rounded-2xl border-2 border-gray-250 focus:border-accent focus:ring-8 focus:ring-accent/10 outline-none transition-all mb-4 bg-gray-50/50 shadow-inner">
+                 class="w-full text-center text-4xl font-black tracking-[0.75em] pl-[0.75em] py-5 rounded-2xl border-2 border-gray-255 focus:border-accent focus:ring-8 focus:ring-accent/10 outline-none transition-all mb-4 bg-gray-50/50 shadow-inner">
           
           @if(pinError()) {
             <div class="bg-red-50 text-red-700 text-xs font-bold py-2.5 px-4 rounded-xl mb-4 border border-red-100 flex items-center justify-center gap-2 animate-[shake_0.5s_ease-out]">
@@ -52,7 +52,7 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === undefined) {
-      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden">
+      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden bg-grid">
         <!-- Radial light accent -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -71,7 +71,7 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === false) {
-      <div class="min-h-screen bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden">
+      <div class="min-h-screen bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden bg-grid">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-red-500/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="h-28 w-28 bg-white text-red-500 rounded-[2rem] shadow-xl flex items-center justify-center mb-8 border border-red-100 animate-[shake_0.5s_ease-out] relative z-10">
@@ -84,69 +84,71 @@ import { FormsModule } from '@angular/forms';
           El código QR ha expirado o la mesa está inactiva. Por favor, solicita asistencia a tu Mozo.
         </p>
         <button (click)="verifyMesa()" class="bg-white text-gray-800 font-black py-4 px-8 rounded-2xl shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg transition-all flex items-center gap-2.5 active:scale-95 relative z-10 text-sm">
-          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <svg class="w-4 h-4 text-gray-600 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"></path>
           </svg>
           Reintentar Conexión
         </button>
       </div>
     } @else {
-      <div class="min-h-screen bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden">
+      <div class="min-h-screen bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden bg-grid">
         <!-- Radial light accent background -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[260px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- Header Card Premium -->
-        <div class="pt-10 pb-6 px-6 relative z-10 flex flex-col items-center">
-            <div class="bg-white/80 backdrop-blur-md px-6 py-4 rounded-[2rem] border border-white shadow-sm flex flex-col items-center w-full max-w-sm">
-              <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em] mb-1">Tu Servicio Digital</span>
-              <h1 class="text-3xl font-serif font-black tracking-tight text-primary leading-none">
-                Mesa {{ numeroMesa() || '...' }}
-              </h1>
-              <div class="flex items-center gap-1.5 mt-2 bg-green-500/10 text-green-700 px-3 py-1 rounded-full text-[10px] font-bold">
-                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                Sesión Activa
-              </div>
+        <!-- Sticky Header Bar (Native Style) -->
+        <header class="sticky top-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-b border-gray-150/50 z-30 py-4.5 px-6 shadow-[0_2px_15px_rgba(0,0,0,0.015)]">
+          <div class="max-w-md mx-auto flex justify-between items-center w-full">
+            <div class="flex flex-col text-left">
+              <span class="text-[9px] font-black uppercase text-accent tracking-[0.25em] leading-none">Mesa Virtual</span>
+              <span class="text-xl font-serif font-black text-primary mt-1.5 leading-none">Mesa {{ numeroMesa() || '...' }}</span>
             </div>
-        </div>
+            <div class="flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 text-green-700 font-bold text-[10px]">
+              <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+              Conectado
+            </div>
+          </div>
+        </header>
 
         <!-- CONTENIDO CENTRAL -->
-        <div class="flex-1 px-6 flex flex-col items-center pb-28 relative z-10">
+        <div class="flex-1 px-6 py-6 flex flex-col items-center pb-28 relative z-10 w-full">
            @if (activeBottomTab() === 'inicio') {
-             <div class="w-full max-w-sm animate-fade-in flex flex-col gap-5 w-full">
+             <div class="w-full max-w-md animate-fade-in flex flex-col gap-6">
                
                <!-- Monto Consumido (Premium Fintech Card) -->
                @if (montoConsumo() !== null && montoConsumo() !== undefined && montoConsumo()! > 0) {
-                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2rem] p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
+                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2.25rem] p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
                    <!-- Decorative pattern -->
                    <div class="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
                    
-                   <div>
-                     <span class="text-[9px] uppercase font-black text-slate-400 tracking-[0.25em]">Monto Consumido</span>
-                     <h2 class="text-3xl font-black leading-none mt-2 font-serif">\${{ formatCurrency(montoConsumo()) }}</h2>
+                   <div class="flex flex-col text-left">
+                     <span class="text-[9px] uppercase font-black text-slate-400 tracking-[0.25em] leading-none">Total Consumido</span>
+                     <h2 class="text-3xl font-black leading-none mt-2.5 font-serif text-white">\${{ formatCurrency(montoConsumo()) }}</h2>
                    </div>
-                   <button (click)="abrirDividirCuenta()" class="text-xs font-black bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-3 rounded-2xl transition-all active:scale-95 backdrop-blur-md flex items-center gap-1">
-                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8.684 10.742l5.028-2.514m0 0a3 3 0 10-4.043-4.042 3 3 0 004.043 4.042zM8.684 13.258l5.028 2.514m-5.028-2.514a3 3 0 11-4.043-4.043 3 3 0 014.043 4.043zm5.028 2.514a3 3 0 104.043-4.043 3 3 0 00-4.043 4.043z"></path></svg>
-                     Dividir
+                   <button (click)="abrirDividirCuenta()" class="text-xs font-black bg-white/10 hover:bg-white/20 border border-white/25 text-white px-5 py-3.5 rounded-2xl transition-all active:scale-95 backdrop-blur-md flex items-center gap-1.5 shadow-sm">
+                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                       <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                     </svg>
+                     Dividir Cuenta
                    </button>
                  </div>
                }
 
                <!-- Seguidor de Pedido Activo / Cocina Status (Premium Tracker) -->
                @if (activePedidoTaskId()) {
-                 <div class="bg-white border border-gray-100 rounded-[2.25rem] p-6 shadow-md animate-fade-in flex flex-col gap-4">
+                 <div class="bg-white border border-gray-100 rounded-[2.25rem] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.02)] animate-fade-in flex flex-col gap-5">
                    <div class="flex justify-between items-center pb-3 border-b border-gray-50">
-                     <div>
-                       <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Seguimiento</p>
-                       <h3 class="font-black text-sm text-gray-800 mt-0.5">Estado de tu Orden</h3>
+                     <div class="flex flex-col text-left">
+                       <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Seguimiento</span>
+                       <span class="font-black text-sm text-gray-800 mt-1.5">Estado de tu Orden</span>
                      </div>
                      
                      @if (activePedidoEstado() === 'Recibido') {
                        <button 
                          (click)="cancelarPedido()"
                          [disabled]="loadingCancelarPedido()"
-                         class="text-xs text-red-500 font-bold active:scale-95 transition-all bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl border border-red-100">
+                         class="text-xs text-red-500 font-bold active:scale-95 transition-all bg-red-50 hover:bg-red-100 px-3.5 py-1.5 rounded-xl border border-red-100/50">
                          @if (loadingCancelarPedido()) {
-                           <span class="animate-spin h-3 w-3 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
+                           <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
                          } @else {
                            Cancelar
                          }
@@ -154,121 +156,129 @@ import { FormsModule } from '@angular/forms';
                      }
                    </div>
 
-                   <!-- Progress Bar tracker -->
+                   <!-- Progress Bar tracker with SVG icons -->
                    <div class="grid grid-cols-4 items-center gap-1 py-1 relative">
                      <!-- Line background -->
-                     <div class="absolute left-[12%] right-[12%] top-[40%] h-[3px] bg-gray-100 -z-10"></div>
-                     <div class="absolute left-[12%] top-[40%] h-[3px] bg-accent transition-all duration-700 -z-10"
+                     <div class="absolute left-[12%] right-[12%] top-[35%] h-[3px] bg-gray-100 -z-10 rounded-full"></div>
+                     <div class="absolute left-[12%] top-[35%] h-[3px] bg-accent transition-all duration-700 -z-10 rounded-full"
                           [style.width]="activePedidoEstado() === 'Recibido' ? '0%' : (activePedidoEstado() === 'Aprobado' ? '33%' : (activePedidoEstado() === 'EnPreparacion' ? '66%' : '100%'))"></div>
                      
                      <!-- Step 1: Recibido -->
                      <div class="flex flex-col items-center text-center">
-                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
-                             [ngClass]="activePedidoEstado() === 'Recibido' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20 font-black' : 'bg-gray-100 text-gray-400'">
-                         📥
+                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                             [ngClass]="activePedidoEstado() === 'Recibido' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 font-black' : 'bg-gray-50 text-gray-400 border border-gray-100'">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                        </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-1">Recibido</span>
+                       <span class="text-[9px] font-black text-gray-500 mt-2">Recibido</span>
                      </div>
 
                      <!-- Step 2: Aprobado -->
                      <div class="flex flex-col items-center text-center">
-                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
-                             [ngClass]="activePedidoEstado() === 'Aprobado' ? 'bg-primary text-white shadow-lg shadow-primary/20 font-black' : (activePedidoEstado() === 'EnPreparacion' || activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-100 text-gray-400')">
-                         ✓
+                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                             [ngClass]="activePedidoEstado() === 'Aprobado' ? 'bg-primary text-white shadow-md shadow-primary/20 font-black' : (activePedidoEstado() === 'EnPreparacion' || activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-50 text-gray-400 border border-gray-100')">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                        </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-1">Aprobado</span>
+                       <span class="text-[9px] font-black text-gray-500 mt-2">Aprobado</span>
                      </div>
 
                      <!-- Step 3: EnPreparacion -->
                      <div class="flex flex-col items-center text-center">
-                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
-                             [ngClass]="activePedidoEstado() === 'EnPreparacion' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 font-black animate-pulse' : (activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-100 text-gray-400')">
-                         🍳
+                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                             [ngClass]="activePedidoEstado() === 'EnPreparacion' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20 font-black animate-pulse' : (activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-50 text-gray-400 border border-gray-100')">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1014.12 11.88M9.88 16.122A3 3 0 1014.12 11.88M9.88 16.122L14.12 11.88"></path></svg>
                        </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-1">Cocina</span>
+                       <span class="text-[9px] font-black text-gray-500 mt-2">Cocina</span>
                      </div>
 
                      <!-- Step 4: Listo -->
                      <div class="flex flex-col items-center text-center">
-                       <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs transition-all"
-                             [ngClass]="activePedidoEstado() === 'Listo' ? 'bg-green-500 text-white shadow-lg shadow-green-500/20 font-black animate-[bounce_1s_infinite]' : 'bg-gray-100 text-gray-400'">
-                         🍽️
+                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                             [ngClass]="activePedidoEstado() === 'Listo' ? 'bg-green-600 text-white shadow-md shadow-green-500/20 font-black animate-[bounce_1s_infinite]' : 'bg-gray-50 text-gray-400 border border-gray-100'">
+                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                        </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-1">¡Listo!</span>
+                       <span class="text-[9px] font-black text-gray-500 mt-2">¡Listo!</span>
                      </div>
                    </div>
 
                    <!-- Order Details -->
-                   <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-3 text-left">
-                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Detalle del Pedido</p>
-                     <p class="text-xs font-bold text-gray-600 mt-1 leading-relaxed">{{ activePedidoDetails() || 'Sin detalles' }}</p>
+                   <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-4 text-left">
+                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Detalle del Pedido</p>
+                     <p class="text-xs font-bold text-gray-600 mt-2 leading-relaxed">{{ activePedidoDetails() || 'Sin detalles' }}</p>
                    </div>
                  </div>
                }
 
                <!-- MÓDULO DE ACCIONES PREMIUM (Tarjetas de Servicio) -->
-               <div class="flex flex-col gap-4 mt-2 w-full">
+               <div class="flex flex-col gap-4.5 mt-2 w-full">
                  
                  <!-- 1. CARTA HERO (VER MENÚ) -->
                  <button (click)="activeBottomTab.set('menu')" 
-                         class="w-full bg-gradient-to-br from-primary via-primary to-primary/95 text-white rounded-[2.25rem] p-6 text-left shadow-xl shadow-primary/10 active:scale-[0.98] transition-all flex items-center justify-between border border-primary/20 relative overflow-hidden group">
-                   <!-- Glowing circles -->
-                   <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full blur-xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+                         class="w-full bg-slate-900 text-white rounded-[2.25rem] p-6 text-left shadow-lg shadow-slate-900/10 active:scale-[0.99] transition-all flex items-center justify-between border border-slate-800 relative overflow-hidden group">
+                   <!-- Subtle highlight -->
+                   <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
                    
                    <div class="flex items-center gap-5">
-                     <div class="h-16 w-16 bg-white/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner shrink-0 group-hover:rotate-6 transition-transform">
-                       📖
+                     <div class="h-14 w-14 bg-white/10 rounded-2xl flex items-center justify-center shadow-inner shrink-0 group-hover:rotate-6 transition-transform">
+                       <!-- Custom SVG Book icon -->
+                       <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                       </svg>
                      </div>
-                     <div class="flex flex-col">
-                       <span class="text-[10px] font-black uppercase text-accent tracking-[0.2em]">Menú Digital</span>
-                       <span class="font-serif font-black text-xl mt-0.5">Explorar la Carta</span>
-                       <span class="text-[10px] text-white/60 font-semibold mt-1">Ordená directamente a la cocina</span>
+                     <div class="flex flex-col text-left">
+                       <span class="text-[9px] font-black uppercase text-accent tracking-[0.25em] leading-none">Menú Digital</span>
+                       <span class="font-serif font-black text-xl mt-2 leading-none">Explorar la Carta</span>
+                       <span class="text-[10px] text-white/50 font-semibold mt-1.5">Elegí lo que querés comer y beber</span>
                      </div>
                    </div>
-                   <div class="h-11 w-11 rounded-full bg-white/10 flex items-center justify-center text-white/80 shrink-0 group-hover:translate-x-1 transition-transform">
-                     <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                   <div class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-white/80 shrink-0 group-hover:translate-x-1 transition-transform">
+                     <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                    </div>
                  </button>
 
                  <!-- 2. LLAMAR AL MOZO -->
                  @if (yaLlamo()) {
-                   <div class="w-full bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] p-6 flex items-center justify-between shadow-md shadow-emerald-500/5 animate-fade-in">
+                   <div class="w-full bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] p-6 flex items-center justify-between shadow-sm animate-fade-in">
                      <div class="flex items-center gap-5">
-                       <div class="h-16 w-16 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 animate-bounce">
-                         🛎️
+                       <div class="h-14 w-14 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
+                         <!-- Pulsing bell SVG -->
+                         <svg class="w-6 h-6 text-emerald-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                         </svg>
                        </div>
                        <div class="flex flex-col text-left">
-                         <span class="text-[9px] font-black uppercase text-emerald-600 tracking-[0.2em]">En Camino</span>
-                         <span class="font-black text-gray-800 text-base mt-0.5">Mozo Notificado</span>
-                         <span class="text-[10px] text-gray-500 font-semibold mt-1">Aguarde un momento</span>
+                         <span class="text-[9px] font-black uppercase text-emerald-600 tracking-[0.2em] leading-none">Asistencia</span>
+                         <span class="font-black text-gray-800 text-base mt-2 leading-none">Mozo Notificado</span>
+                         <span class="text-[10px] text-gray-400 font-semibold mt-1.5">Un camarero asistirá a tu mesa</span>
                        </div>
                      </div>
-                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="h-11 w-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-sm active:scale-90 disabled:opacity-50">
+                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="h-10 w-10 rounded-full bg-white border border-gray-150 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90 disabled:opacity-50">
                         @if (loadingCancelarLlamar()) {
-                          <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
+                          <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
                         } @else {
-                          <svg class="w-4.5 h-4.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                         }
                      </button>
                    </div>
                  } @else {
                    <button (click)="llamarMozo()" [disabled]="loadingLlamar()" 
-                           class="w-full bg-white/80 backdrop-blur-md border border-gray-100 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between group">
+                           class="w-full bg-white/90 backdrop-blur-md border border-gray-150 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.99] transition-all flex items-center justify-between group">
                      <div class="flex items-center gap-5">
-                       <div class="h-16 w-16 bg-accent/10 text-accent rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform">
-                         🔔
+                       <div class="h-14 w-14 bg-accent/10 text-accent rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                         <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                         </svg>
                        </div>
                        <div class="flex flex-col">
-                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Asistencia</span>
-                         <span class="font-black text-gray-800 text-lg mt-0.5">Llamar al Mozo</span>
-                         <span class="text-[10px] text-gray-400 font-semibold mt-1">Consulta o cubiertos extras</span>
+                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Llamado</span>
+                         <span class="font-black text-gray-800 text-lg mt-2 leading-none">Llamar al Mozo</span>
+                         <span class="text-[10px] text-gray-400 font-semibold mt-1.5">Solicitá cubiertos o asistencia</span>
                        </div>
                      </div>
-                     <div class="h-11 w-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                     <div class="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
                        @if (loadingLlamar()) { 
-                         <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
+                         <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
                        } @else { 
-                         <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                         <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                        }
                      </div>
                    </button>
@@ -276,43 +286,48 @@ import { FormsModule } from '@angular/forms';
 
                  <!-- 3. PEDIR LA CUENTA -->
                  @if (yaPidioCuenta()) {
-                   <div class="w-full bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-[2.25rem] p-6 flex items-center justify-between shadow-md shadow-amber-500/5 animate-fade-in">
+                   <div class="w-full bg-gradient-to-br from-amber-50 to-white border border-amber-150 rounded-[2.25rem] p-6 flex items-center justify-between shadow-sm animate-fade-in">
                      <div class="flex items-center gap-5">
-                       <div class="h-16 w-16 bg-amber-500/10 text-amber-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 animate-pulse">
-                         💳
+                       <div class="h-14 w-14 bg-amber-500/10 text-amber-600 rounded-2xl flex items-center justify-center shrink-0">
+                         <!-- Clock / Timer SVG -->
+                         <svg class="w-6 h-6 text-amber-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                         </svg>
                        </div>
                        <div class="flex flex-col text-left">
-                         <span class="text-[9px] font-black uppercase text-amber-600 tracking-[0.2em]">Caja Sincronizada</span>
-                         <span class="font-black text-gray-800 text-base mt-0.5">Cuenta Solicitada</span>
-                         <span class="text-[10px] text-gray-500 font-semibold mt-1">Preparando ticket de cobro</span>
+                         <span class="text-[9px] font-black uppercase text-amber-600 tracking-[0.2em] leading-none">Pago</span>
+                         <span class="font-black text-gray-800 text-base mt-2 leading-none">Cuenta Solicitada</span>
+                         <span class="text-[10px] text-gray-500 font-semibold mt-1.5">Ticket enviándose a la mesa</span>
                        </div>
                      </div>
-                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="h-11 w-11 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-sm active:scale-90 disabled:opacity-50">
+                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="h-10 w-10 rounded-full bg-white border border-gray-150 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90 disabled:opacity-50">
                         @if (loadingCancelarCuenta()) {
-                          <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
+                          <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
                         } @else {
-                          <svg class="w-4.5 h-4.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                          <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                         }
                      </button>
                    </div>
                  } @else {
                    <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" 
-                           class="w-full bg-white/80 backdrop-blur-md border border-gray-100 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.98] transition-all flex items-center justify-between group">
+                           class="w-full bg-white/90 backdrop-blur-md border border-gray-150 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.99] transition-all flex items-center justify-between group">
                      <div class="flex items-center gap-5">
-                       <div class="h-16 w-16 bg-indigo-500/10 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-105 transition-transform">
-                         🧾
+                       <div class="h-14 w-14 bg-indigo-50/10 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                         <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m-6 2h.01M12 16h.01M15 16h.01M13 8h7m-7 4h3m-9-4h3m-3 4h3m-3 4h3m-6 4h12a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                         </svg>
                        </div>
                        <div class="flex flex-col">
-                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Facturación</span>
-                         <span class="font-black text-gray-800 text-lg mt-0.5">Pedir la Cuenta</span>
-                         <span class="text-[10px] text-gray-400 font-semibold mt-1">Solicitá el cierre y el ticket</span>
+                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Cierre</span>
+                         <span class="font-black text-gray-800 text-lg mt-2 leading-none">Pedir la Cuenta</span>
+                         <span class="text-[10px] text-gray-400 font-semibold mt-1.5">Solicitá el ticket para abonar</span>
                        </div>
                      </div>
-                     <div class="h-11 w-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                     <div class="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
                        @if (loadingCuenta()) { 
-                         <span class="animate-spin h-4 w-4 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
+                         <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
                        } @else { 
-                         <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                         <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
                        }
                      </div>
                    </button>
@@ -322,14 +337,12 @@ import { FormsModule } from '@angular/forms';
            }
 
            @if (activeBottomTab() === 'menu') {
-             <div class="w-full max-w-md animate-fade-in flex flex-col pb-8 mt-2">
+             <div class="w-full max-w-md animate-fade-in flex flex-col pb-8">
                 <button (click)="activeBottomTab.set('inicio')" class="mb-5 flex items-center gap-1.5 text-gray-400 hover:text-primary transition-colors font-black px-2 self-start active:scale-95 text-xs uppercase tracking-wider">
-                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                   <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
                    Volver a la Mesa
                 </button>
-                <div class="bg-white rounded-[2.5rem] p-6 shadow-md border border-gray-100">
-                  <app-menu [restauranteId]="restauranteId()"></app-menu>
-                </div>
+                <app-menu [restauranteId]="restauranteId()"></app-menu>
              </div>
            }
         </div>
@@ -391,7 +404,7 @@ import { FormsModule } from '@angular/forms';
 
         <!-- Cart Modal (Premium Rounded Dialog) -->
         @if (showCartModal()) {
-          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
              <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up">
                 <button (click)="showCartModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -443,7 +456,7 @@ import { FormsModule } from '@angular/forms';
 
         <!-- Split check modal and other dialogs -->
         @if (showSplitModal()) {
-          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm">
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
              <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative max-h-[85vh] flex flex-col border border-gray-100 animate-scale-up">
                 <button (click)="showSplitModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -601,6 +614,11 @@ import { FormsModule } from '@angular/forms';
     @keyframes scale-up { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
     .animate-scale-up { animation: scale-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .bg-grid {
+      background-size: 24px 24px;
+      background-image: linear-gradient(to right, rgba(15, 81, 50, 0.015) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(15, 81, 50, 0.015) 1px, transparent 1px);
+    }
   `]
 })
 export class PedidoComponent implements OnInit {
