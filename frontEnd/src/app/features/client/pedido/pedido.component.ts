@@ -91,296 +91,272 @@ import { FormsModule } from '@angular/forms';
         </button>
       </div>
     } @else {
-      <div class="min-h-screen bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden bg-grid">
-        <!-- Radial light accent background -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[260px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
+      <div class="min-h-screen bg-[#f8f9fa] flex justify-center items-stretch w-full">
+        <div class="w-full max-w-md min-h-screen bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden bg-grid shadow-[0_0_80px_rgba(0,0,0,0.03)] border-x border-gray-100/50">
+          <!-- Radial light accent background -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[260px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- Sticky Header Bar (Native Style) -->
-        <header class="sticky top-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-b border-gray-150/50 z-30 py-4.5 px-6 shadow-[0_2px_15px_rgba(0,0,0,0.015)]">
-          <div class="max-w-md mx-auto flex justify-between items-center w-full">
-            <div class="flex flex-col text-left">
-              <span class="text-[9px] font-black uppercase text-accent tracking-[0.25em] leading-none">Mesa Virtual</span>
-              <span class="text-xl font-serif font-black text-primary mt-1.5 leading-none">Mesa {{ numeroMesa() || '...' }}</span>
+          <!-- Sticky Header Bar (Native Style) -->
+          <header class="sticky top-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100/60 z-30 py-4 px-6">
+            <div class="flex justify-between items-center w-full">
+              <div class="flex flex-col text-left">
+                <span class="text-[9px] font-black uppercase text-accent tracking-[0.2em] leading-none">Mesa Virtual</span>
+                <span class="text-xl font-serif font-black text-primary mt-1.5 leading-none">Mesa {{ numeroMesa() || '...' }}</span>
+              </div>
+              <div class="flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 text-green-700 font-bold text-[10px]">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                Conectado
+              </div>
             </div>
-            <div class="flex items-center gap-1.5 bg-green-50 px-3 py-1.5 rounded-full border border-green-100 text-green-700 font-bold text-[10px]">
-              <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-              Conectado
-            </div>
-          </div>
-        </header>
+          </header>
 
-        <!-- CONTENIDO CENTRAL -->
-        <div class="flex-1 px-6 py-6 flex flex-col items-center pb-28 relative z-10 w-full">
-           @if (activeBottomTab() === 'inicio') {
-             <div class="w-full max-w-md animate-fade-in flex flex-col gap-6">
-               
-               <!-- Monto Consumido (Premium Fintech Card) -->
-               @if (montoConsumo() !== null && montoConsumo() !== undefined && montoConsumo()! > 0) {
-                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2.25rem] p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
-                   <!-- Decorative pattern -->
-                   <div class="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
-                   
-                   <div class="flex flex-col text-left">
-                     <span class="text-[9px] uppercase font-black text-slate-400 tracking-[0.25em] leading-none">Total Consumido</span>
-                     <h2 class="text-3xl font-black leading-none mt-2.5 font-serif text-white">\${{ formatCurrency(montoConsumo()) }}</h2>
-                   </div>
-                   <button (click)="abrirDividirCuenta()" class="text-xs font-black bg-white/10 hover:bg-white/20 border border-white/25 text-white px-5 py-3.5 rounded-2xl transition-all active:scale-95 backdrop-blur-md flex items-center gap-1.5 shadow-sm">
-                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                       <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
-                     </svg>
-                     Dividir Cuenta
-                   </button>
-                 </div>
-               }
-
-               <!-- Seguidor de Pedido Activo / Cocina Status (Premium Tracker) -->
-               @if (activePedidoTaskId()) {
-                 <div class="bg-white border border-gray-100 rounded-[2.25rem] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.02)] animate-fade-in flex flex-col gap-5">
-                   <div class="flex justify-between items-center pb-3 border-b border-gray-50">
-                     <div class="flex flex-col text-left">
-                       <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Seguimiento</span>
-                       <span class="font-black text-sm text-gray-800 mt-1.5">Estado de tu Orden</span>
-                     </div>
+          <!-- CONTENIDO CENTRAL -->
+          <div class="flex-1 px-6 py-6 flex flex-col items-center pb-28 relative z-10 w-full overflow-y-auto">
+             @if (activeBottomTab() === 'inicio') {
+               <div class="w-full max-w-md animate-fade-in flex flex-col gap-6">
+                 
+                 <!-- Monto Consumido (Premium Fintech Card) -->
+                 @if (montoConsumo() !== null && montoConsumo() !== undefined && montoConsumo()! > 0) {
+                   <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2.25rem] p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
+                     <!-- Decorative pattern -->
+                     <div class="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
                      
-                     @if (activePedidoEstado() === 'Recibido') {
-                       <button 
-                         (click)="cancelarPedido()"
-                         [disabled]="loadingCancelarPedido()"
-                         class="text-xs text-red-500 font-bold active:scale-95 transition-all bg-red-50 hover:bg-red-100 px-3.5 py-1.5 rounded-xl border border-red-100/50">
-                         @if (loadingCancelarPedido()) {
-                           <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
-                         } @else {
-                           Cancelar
-                         }
+                     <div class="flex flex-col text-left">
+                       <span class="text-[9px] uppercase font-black text-slate-400 tracking-[0.25em] leading-none">Total Consumido</span>
+                       <h2 class="text-3xl font-black leading-none mt-2.5 font-serif text-white">\${{ formatCurrency(montoConsumo()) }}</h2>
+                     </div>
+                     <button (click)="abrirDividirCuenta()" class="text-xs font-black bg-white/10 hover:bg-white/20 border border-white/25 text-white px-5 py-3.5 rounded-2xl transition-all active:scale-95 backdrop-blur-md flex items-center gap-1.5 shadow-sm">
+                       <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"></path>
+                       </svg>
+                       Dividir Cuenta
+                     </button>
+                   </div>
+                 }
+
+                 <!-- Seguidor de Pedido Activo / Cocina Status (Premium Tracker) -->
+                 @if (activePedidoTaskId()) {
+                   <div class="bg-white border border-gray-100 rounded-[2.25rem] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.02)] animate-fade-in flex flex-col gap-5">
+                     <div class="flex justify-between items-center pb-3 border-b border-gray-50">
+                       <div class="flex flex-col text-left">
+                         <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Seguimiento</span>
+                         <span class="font-black text-sm text-gray-800 mt-1.5">Estado de tu Orden</span>
+                       </div>
+                       
+                       @if (activePedidoEstado() === 'Recibido') {
+                         <button 
+                           (click)="cancelarPedido()"
+                           [disabled]="loadingCancelarPedido()"
+                           class="text-xs text-red-500 font-bold active:scale-95 transition-all bg-red-50 hover:bg-red-100 px-3.5 py-1.5 rounded-xl border border-red-100/50">
+                           @if (loadingCancelarPedido()) {
+                             <span class="animate-spin h-3.5 w-3.5 border-2 border-red-500 border-t-transparent rounded-full inline-block"></span>
+                           } @else {
+                             Cancelar
+                           }
+                         </button>
+                       }
+                     </div>
+
+                     <!-- Progress Bar tracker with SVG icons -->
+                     <div class="grid grid-cols-4 items-center gap-1 py-1 relative">
+                       <!-- Line background -->
+                       <div class="absolute left-[12%] right-[12%] top-[35%] h-[3px] bg-gray-100 -z-10 rounded-full"></div>
+                       <div class="absolute left-[12%] top-[35%] h-[3px] bg-accent transition-all duration-700 -z-10 rounded-full"
+                            [style.width]="activePedidoEstado() === 'Recibido' ? '0%' : (activePedidoEstado() === 'Aprobado' ? '33%' : (activePedidoEstado() === 'EnPreparacion' ? '66%' : '100%'))"></div>
+                       
+                       <!-- Step 1: Recibido -->
+                       <div class="flex flex-col items-center text-center">
+                         <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                               [ngClass]="activePedidoEstado() === 'Recibido' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 font-black' : 'bg-gray-50 text-gray-400 border border-gray-100'">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                         </span>
+                         <span class="text-[9px] font-black text-gray-500 mt-2">Recibido</span>
+                       </div>
+
+                       <!-- Step 2: Aprobado -->
+                       <div class="flex flex-col items-center text-center">
+                         <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                               [ngClass]="activePedidoEstado() === 'Aprobado' ? 'bg-primary text-white shadow-md shadow-primary/20 font-black' : (activePedidoEstado() === 'EnPreparacion' || activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-50 text-gray-400 border border-gray-100')">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                         </span>
+                         <span class="text-[9px] font-black text-gray-500 mt-2">Aprobado</span>
+                       </div>
+
+                       <!-- Step 3: EnPreparacion -->
+                       <div class="flex flex-col items-center text-center">
+                         <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                               [ngClass]="activePedidoEstado() === 'EnPreparacion' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20 font-black animate-pulse' : (activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-50 text-gray-400 border border-gray-100')">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1014.12 11.88M9.88 16.122A3 3 0 1014.12 11.88M9.88 16.122L14.12 11.88"></path></svg>
+                         </span>
+                         <span class="text-[9px] font-black text-gray-500 mt-2">Cocina</span>
+                       </div>
+
+                       <!-- Step 4: Listo -->
+                       <div class="flex flex-col items-center text-center">
+                         <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
+                               [ngClass]="activePedidoEstado() === 'Listo' ? 'bg-green-600 text-white shadow-md shadow-green-500/20 font-black animate-[bounce_1s_infinite]' : 'bg-gray-50 text-gray-400 border border-gray-100'">
+                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                         </span>
+                         <span class="text-[9px] font-black text-gray-500 mt-2">¡Listo!</span>
+                       </div>
+                     </div>
+
+                     <!-- Order Details -->
+                     <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-4 text-left">
+                       <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Detalle del Pedido</p>
+                       <p class="text-xs font-bold text-gray-600 mt-2 leading-relaxed">{{ activePedidoDetails() || 'Sin detalles' }}</p>
+                     </div>
+                   </div>
+                 }
+
+                 <!-- MÓDULO DE ACCIONES PREMIUM (Grid de Botones Balanceado y Centrado) -->
+                 <div class="flex flex-col gap-4 w-full">
+                   
+                   <!-- 1. CARTA HERO (VER MENÚ) -->
+                   <button (click)="activeBottomTab.set('menu')" 
+                           class="w-full bg-slate-900 text-white rounded-[2.25rem] p-6 text-left shadow-lg active:scale-[0.98] transition-all flex items-center justify-between border border-slate-800 relative overflow-hidden group shrink-0">
+                     <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
+                     
+                     <div class="flex items-center gap-5">
+                       <div class="h-14 w-14 bg-white/10 rounded-2xl flex items-center justify-center shadow-inner shrink-0 group-hover:rotate-6 transition-transform">
+                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                         </svg>
+                       </div>
+                       <div class="flex flex-col text-left">
+                         <span class="text-[9px] font-black uppercase text-accent tracking-[0.25em] leading-none">Menú Digital</span>
+                         <span class="font-serif font-black text-xl mt-1.5 leading-none">Explorar la Carta</span>
+                         <span class="text-[10px] text-white/50 font-semibold mt-1.5">Elegí lo que querés comer y beber</span>
+                       </div>
+                     </div>
+                     <div class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-white/80 shrink-0 group-hover:translate-x-1 transition-transform">
+                       <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
+                     </div>
+                   </button>
+
+                   <!-- 2. SECUNDARIOS EN GRID (Llamar Mozo y Pedir Cuenta) -->
+                   <div class="grid grid-cols-2 gap-4 w-full">
+                     
+                     <!-- Llamar Mozo -->
+                     @if (yaLlamo()) {
+                       <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] p-5 flex flex-col items-center justify-between text-center shadow-sm relative aspect-square w-full">
+                         <div class="h-12 w-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600 animate-bounce mt-2 shrink-0">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                           </svg>
+                         </div>
+                         <div class="flex flex-col items-center mb-1">
+                           <span class="text-[8px] font-black uppercase text-emerald-600 tracking-[0.2em] leading-none">Asistencia</span>
+                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Mozo en camino</span>
+                         </div>
+                         <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="absolute top-3 right-3 h-7 w-7 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90">
+                            @if (loadingCancelarLlamar()) {
+                              <span class="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
+                            } @else {
+                              <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            }
+                         </button>
+                       </div>
+                     } @else {
+                       <button (click)="llamarMozo()" [disabled]="loadingLlamar()" 
+                               class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
+                         <div class="h-12 w-12 bg-accent/5 text-accent rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                           <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                           </svg>
+                         </div>
+                         <div class="flex flex-col items-center">
+                           <span class="text-[8px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Asistencia</span>
+                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Llamar Mozo</span>
+                         </div>
                        </button>
                      }
-                   </div>
 
-                   <!-- Progress Bar tracker with SVG icons -->
-                   <div class="grid grid-cols-4 items-center gap-1 py-1 relative">
-                     <!-- Line background -->
-                     <div class="absolute left-[12%] right-[12%] top-[35%] h-[3px] bg-gray-100 -z-10 rounded-full"></div>
-                     <div class="absolute left-[12%] top-[35%] h-[3px] bg-accent transition-all duration-700 -z-10 rounded-full"
-                          [style.width]="activePedidoEstado() === 'Recibido' ? '0%' : (activePedidoEstado() === 'Aprobado' ? '33%' : (activePedidoEstado() === 'EnPreparacion' ? '66%' : '100%'))"></div>
-                     
-                     <!-- Step 1: Recibido -->
-                     <div class="flex flex-col items-center text-center">
-                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
-                             [ngClass]="activePedidoEstado() === 'Recibido' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 font-black' : 'bg-gray-50 text-gray-400 border border-gray-100'">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                       </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-2">Recibido</span>
-                     </div>
+                     <!-- Pedir Cuenta -->
+                     @if (yaPidioCuenta()) {
+                       <div class="bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-[2.25rem] p-5 flex flex-col items-center justify-between text-center shadow-sm relative aspect-square w-full">
+                         <div class="h-12 w-12 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-600 animate-pulse mt-2 shrink-0">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                           </svg>
+                         </div>
+                         <div class="flex flex-col items-center mb-1">
+                           <span class="text-[8px] font-black uppercase text-amber-600 tracking-[0.2em] leading-none">Pago</span>
+                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Ticket en Caja</span>
+                         </div>
+                         <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="absolute top-3 right-3 h-7 w-7 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90">
+                            @if (loadingCancelarCuenta()) {
+                              <span class="animate-spin h-3 w-3 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
+                            } @else {
+                              <svg class="w-3 h-3 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            }
+                         </button>
+                       </div>
+                     } @else {
+                       <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" 
+                               class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
+                         <div class="h-12 w-12 bg-indigo-50/10 text-indigo-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m-6 2h.01M12 16h.01M15 16h.01M13 8h7m-7 4h3m-9-4h3m-3 4h3m-3 4h3m-6 4h12a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                           </svg>
+                         </div>
+                         <div class="flex flex-col items-center">
+                           <span class="text-[8px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Cierre</span>
+                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Pedir Cuenta</span>
+                         </div>
+                       </button>
+                     }
 
-                     <!-- Step 2: Aprobado -->
-                     <div class="flex flex-col items-center text-center">
-                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
-                             [ngClass]="activePedidoEstado() === 'Aprobado' ? 'bg-primary text-white shadow-md shadow-primary/20 font-black' : (activePedidoEstado() === 'EnPreparacion' || activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-50 text-gray-400 border border-gray-100')">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                       </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-2">Aprobado</span>
-                     </div>
-
-                     <!-- Step 3: EnPreparacion -->
-                     <div class="flex flex-col items-center text-center">
-                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
-                             [ngClass]="activePedidoEstado() === 'EnPreparacion' ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20 font-black animate-pulse' : (activePedidoEstado() === 'Listo' ? 'bg-accent text-white font-black' : 'bg-gray-50 text-gray-400 border border-gray-100')">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1014.12 11.88M9.88 16.122A3 3 0 1014.12 11.88M9.88 16.122L14.12 11.88"></path></svg>
-                       </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-2">Cocina</span>
-                     </div>
-
-                     <!-- Step 4: Listo -->
-                     <div class="flex flex-col items-center text-center">
-                       <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all shadow-sm"
-                             [ngClass]="activePedidoEstado() === 'Listo' ? 'bg-green-600 text-white shadow-md shadow-green-500/20 font-black animate-[bounce_1s_infinite]' : 'bg-gray-50 text-gray-400 border border-gray-100'">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                       </span>
-                       <span class="text-[9px] font-black text-gray-500 mt-2">¡Listo!</span>
-                     </div>
-                   </div>
-
-                   <!-- Order Details -->
-                   <div class="bg-gray-50/50 border border-gray-100 rounded-2xl p-4 text-left">
-                     <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Detalle del Pedido</p>
-                     <p class="text-xs font-bold text-gray-600 mt-2 leading-relaxed">{{ activePedidoDetails() || 'Sin detalles' }}</p>
                    </div>
                  </div>
-               }
-
-               <!-- MÓDULO DE ACCIONES PREMIUM (Tarjetas de Servicio) -->
-               <div class="flex flex-col gap-4.5 mt-2 w-full">
-                 
-                 <!-- 1. CARTA HERO (VER MENÚ) -->
-                 <button (click)="activeBottomTab.set('menu')" 
-                         class="w-full bg-slate-900 text-white rounded-[2.25rem] p-6 text-left shadow-lg shadow-slate-900/10 active:scale-[0.99] transition-all flex items-center justify-between border border-slate-800 relative overflow-hidden group">
-                   <!-- Subtle highlight -->
-                   <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
-                   
-                   <div class="flex items-center gap-5">
-                     <div class="h-14 w-14 bg-white/10 rounded-2xl flex items-center justify-center shadow-inner shrink-0 group-hover:rotate-6 transition-transform">
-                       <!-- Custom SVG Book icon -->
-                       <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                       </svg>
-                     </div>
-                     <div class="flex flex-col text-left">
-                       <span class="text-[9px] font-black uppercase text-accent tracking-[0.25em] leading-none">Menú Digital</span>
-                       <span class="font-serif font-black text-xl mt-2 leading-none">Explorar la Carta</span>
-                       <span class="text-[10px] text-white/50 font-semibold mt-1.5">Elegí lo que querés comer y beber</span>
-                     </div>
-                   </div>
-                   <div class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-white/80 shrink-0 group-hover:translate-x-1 transition-transform">
-                     <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
-                   </div>
-                 </button>
-
-                 <!-- 2. LLAMAR AL MOZO -->
-                 @if (yaLlamo()) {
-                   <div class="w-full bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] p-6 flex items-center justify-between shadow-sm animate-fade-in">
-                     <div class="flex items-center gap-5">
-                       <div class="h-14 w-14 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-                         <!-- Pulsing bell SVG -->
-                         <svg class="w-6 h-6 text-emerald-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                         </svg>
-                       </div>
-                       <div class="flex flex-col text-left">
-                         <span class="text-[9px] font-black uppercase text-emerald-600 tracking-[0.2em] leading-none">Asistencia</span>
-                         <span class="font-black text-gray-800 text-base mt-2 leading-none">Mozo Notificado</span>
-                         <span class="text-[10px] text-gray-400 font-semibold mt-1.5">Un camarero asistirá a tu mesa</span>
-                       </div>
-                     </div>
-                     <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="h-10 w-10 rounded-full bg-white border border-gray-150 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90 disabled:opacity-50">
-                        @if (loadingCancelarLlamar()) {
-                          <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
-                        } @else {
-                          <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        }
-                     </button>
-                   </div>
-                 } @else {
-                   <button (click)="llamarMozo()" [disabled]="loadingLlamar()" 
-                           class="w-full bg-white/90 backdrop-blur-md border border-gray-150 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.99] transition-all flex items-center justify-between group">
-                     <div class="flex items-center gap-5">
-                       <div class="h-14 w-14 bg-accent/10 text-accent rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                         <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                         </svg>
-                       </div>
-                       <div class="flex flex-col">
-                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Llamado</span>
-                         <span class="font-black text-gray-800 text-lg mt-2 leading-none">Llamar al Mozo</span>
-                         <span class="text-[10px] text-gray-400 font-semibold mt-1.5">Solicitá cubiertos o asistencia</span>
-                       </div>
-                     </div>
-                     <div class="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                       @if (loadingLlamar()) { 
-                         <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
-                       } @else { 
-                         <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
-                       }
-                     </div>
-                   </button>
-                 }
-
-                 <!-- 3. PEDIR LA CUENTA -->
-                 @if (yaPidioCuenta()) {
-                   <div class="w-full bg-gradient-to-br from-amber-50 to-white border border-amber-150 rounded-[2.25rem] p-6 flex items-center justify-between shadow-sm animate-fade-in">
-                     <div class="flex items-center gap-5">
-                       <div class="h-14 w-14 bg-amber-500/10 text-amber-600 rounded-2xl flex items-center justify-center shrink-0">
-                         <!-- Clock / Timer SVG -->
-                         <svg class="w-6 h-6 text-amber-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                         </svg>
-                       </div>
-                       <div class="flex flex-col text-left">
-                         <span class="text-[9px] font-black uppercase text-amber-600 tracking-[0.2em] leading-none">Pago</span>
-                         <span class="font-black text-gray-800 text-base mt-2 leading-none">Cuenta Solicitada</span>
-                         <span class="text-[10px] text-gray-500 font-semibold mt-1.5">Ticket enviándose a la mesa</span>
-                       </div>
-                     </div>
-                     <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="h-10 w-10 rounded-full bg-white border border-gray-150 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90 disabled:opacity-50">
-                        @if (loadingCancelarCuenta()) {
-                          <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span>
-                        } @else {
-                          <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        }
-                     </button>
-                   </div>
-                 } @else {
-                   <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" 
-                           class="w-full bg-white/90 backdrop-blur-md border border-gray-150 rounded-[2.25rem] p-6 text-left shadow-sm active:scale-[0.99] transition-all flex items-center justify-between group">
-                     <div class="flex items-center gap-5">
-                       <div class="h-14 w-14 bg-indigo-50/10 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                         <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m-6 2h.01M12 16h.01M15 16h.01M13 8h7m-7 4h3m-9-4h3m-3 4h3m-3 4h3m-6 4h12a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                         </svg>
-                       </div>
-                       <div class="flex flex-col">
-                         <span class="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Cierre</span>
-                         <span class="font-black text-gray-800 text-lg mt-2 leading-none">Pedir la Cuenta</span>
-                         <span class="text-[10px] text-gray-400 font-semibold mt-1.5">Solicitá el ticket para abonar</span>
-                       </div>
-                     </div>
-                     <div class="h-10 w-10 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                       @if (loadingCuenta()) { 
-                         <span class="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full block"></span> 
-                       } @else { 
-                         <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path></svg>
-                       }
-                     </div>
-                   </button>
-                 }
                </div>
-             </div>
-           }
+             }
 
-           @if (activeBottomTab() === 'menu') {
-             <div class="w-full max-w-md animate-fade-in flex flex-col pb-8">
-                <button (click)="activeBottomTab.set('inicio')" class="mb-5 flex items-center gap-1.5 text-gray-400 hover:text-primary transition-colors font-black px-2 self-start active:scale-95 text-xs uppercase tracking-wider">
-                   <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
-                   Volver a la Mesa
+             @if (activeBottomTab() === 'menu') {
+               <div class="w-full max-w-md animate-fade-in flex flex-col pb-8">
+                  <button (click)="activeBottomTab.set('inicio')" class="mb-5 flex items-center gap-1.5 text-gray-400 hover:text-primary transition-colors font-black px-2 self-start active:scale-95 text-xs uppercase tracking-wider">
+                     <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                     Volver a la Mesa
+                  </button>
+                  <app-menu [restauranteId]="restauranteId()"></app-menu>
+               </div>
+             }
+          </div>
+
+          <!-- Floating Bottom Navigation Bar (Las 3 Barras Centradas) -->
+          <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 backdrop-blur-xl border-t border-gray-100 z-30 pb-safe">
+             <div class="flex justify-around items-center h-20 w-full px-4">
+                <button (click)="activeBottomTab.set('inicio')" 
+                        class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                        [ngClass]="activeBottomTab() === 'inicio' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                  @if (activeBottomTab() === 'inicio') {
+                    <span class="absolute top-0 w-8 h-1 bg-accent rounded-full left-1/2 -translate-x-1/2"></span>
+                  }
+                  <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                  Inicio
                 </button>
-                <app-menu [restauranteId]="restauranteId()"></app-menu>
+                
+                <button (click)="activeBottomTab.set('menu')" 
+                        class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                        [ngClass]="activeBottomTab() === 'menu' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                  @if (activeBottomTab() === 'menu') {
+                    <span class="absolute top-0 w-8 h-1 bg-accent rounded-full left-1/2 -translate-x-1/2"></span>
+                  }
+                  <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                  Menú
+                </button>
+                
+                <button (click)="abrirDividirCuenta()" 
+                        class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                        [ngClass]="showSplitModal() ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                  @if (showSplitModal()) {
+                    <span class="absolute top-0 w-8 h-1 bg-accent rounded-full left-1/2 -translate-x-1/2"></span>
+                  }
+                  <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                  Cuenta
+                </button>
              </div>
-           }
-        </div>
-
-        <!-- Floating Bottom Navigation Bar (Las 3 Barras) -->
-        <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-30 pb-safe">
-           <div class="flex justify-around items-center h-20 max-w-md mx-auto px-4">
-              <button (click)="activeBottomTab.set('inicio')" 
-                      class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
-                      [ngClass]="activeBottomTab() === 'inicio' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
-                @if (activeBottomTab() === 'inicio') {
-                  <span class="absolute top-0 w-8 h-1 bg-accent rounded-full"></span>
-                }
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                Inicio
-              </button>
-              
-              <button (click)="activeBottomTab.set('menu')" 
-                      class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
-                      [ngClass]="activeBottomTab() === 'menu' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
-                @if (activeBottomTab() === 'menu') {
-                  <span class="absolute top-0 w-8 h-1 bg-accent rounded-full"></span>
-                }
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                Menú
-              </button>
-              
-              <button (click)="abrirDividirCuenta()" 
-                      class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
-                      [ngClass]="showSplitModal() ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
-                @if (showSplitModal()) {
-                  <span class="absolute top-0 w-8 h-1 bg-accent rounded-full"></span>
-                }
-                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                Cuenta
-              </button>
-           </div>
-        </div>
+          </div>
 
         <!-- Floating Cart Panel (Premium styling) -->
         @if (cart.totalItems() > 0 && !showCartModal()) {
@@ -605,7 +581,8 @@ import { FormsModule } from '@angular/forms';
           </div>
         }
       </div>
-    }
+    </div>
+  }
   `,
   styles: [`
     @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

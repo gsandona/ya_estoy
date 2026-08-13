@@ -31,6 +31,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         {
             numero = mesa.Numero;
             restauranteId = mesa.RestauranteId;
+            grupos.Add($"Restaurante_{mesa.RestauranteId}");
             if (mesa.MozoId.HasValue)
             {
                 assignedMozoId = mesa.MozoId.Value.ToString();
@@ -172,8 +173,13 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         await Clients.All.TareaCompletada(taskId);
     }
 
-    public async Task JoinGroup(string role, string? userId)
+    public async Task JoinGroup(string role, string? userId, string? restauranteId)
     {
+        if (!string.IsNullOrEmpty(restauranteId))
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"Restaurante_{restauranteId}");
+        }
+
         if (role == "Admin" || role == "SuperAdmin")
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, "Admin");

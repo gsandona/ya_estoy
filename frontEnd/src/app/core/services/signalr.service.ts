@@ -187,7 +187,7 @@ export class SignalrService {
     if (savedUser) {
       try {
         const user = JSON.parse(savedUser);
-        this.joinGroup(user.role, user.id);
+        this.joinGroup(user.role, user.id, user.restauranteId);
       } catch (e) {}
     }
   }
@@ -298,12 +298,12 @@ export class SignalrService {
     });
   }
 
-  public async joinGroup(role: string, userId?: string) {
+  public async joinGroup(role: string, userId?: string, restauranteId?: string) {
     if (userId) {
       this.loadSettings();
     }
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('JoinGroup', role, userId || '');
+      await this.hubConnection.invoke('JoinGroup', role, userId || '', restauranteId || '');
     }
   }
 

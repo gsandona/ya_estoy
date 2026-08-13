@@ -71,7 +71,7 @@ export class AuthService {
       }
 
       // Wait for signalR connection or just call it, signalr.service buffers/handles it
-      setTimeout(() => this.signalrService.joinGroup(user.role, user.id), 1000);
+      setTimeout(() => this.signalrService.joinGroup(user.role, user.id, user.restauranteId), 1000);
     }
   }
 
@@ -88,7 +88,7 @@ export class AuthService {
           this.tenantContext.setTenantId(user.restauranteId);
         }
 
-        this.signalrService.joinGroup(user.role, user.id);
+        this.signalrService.joinGroup(user.role, user.id, user.restauranteId);
       })
     );
   }
