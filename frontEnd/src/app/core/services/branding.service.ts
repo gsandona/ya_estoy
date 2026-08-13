@@ -1,10 +1,13 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BrandingService {
+  logo = signal<string>('logo.png');
+  appName = signal<string>('MozoGo');
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   applyBranding(colors: { primary?: string, secondary?: string, background?: string }) {
@@ -19,6 +22,8 @@ export class BrandingService {
   }
 
   resetBranding() {
+    this.logo.set('logo.png');
+    this.appName.set('MozoGo');
     if (isPlatformBrowser(this.platformId)) {
       const root = document.documentElement;
       root.style.removeProperty('--color-primary');

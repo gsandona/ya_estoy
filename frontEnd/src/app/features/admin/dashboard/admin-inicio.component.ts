@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 import { LanguageService } from '../../../core/services/language.service';
+import { BrandingService } from '../../../core/services/branding.service';
 
 interface WidgetConfig {
   widgetKey: string;
@@ -36,7 +37,7 @@ interface WidgetConfig {
           <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
             <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
             <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex">
-              <img src="logo.png" class="w-full h-full object-cover" />
+              <img [src]="branding.logo()" class="w-full h-full object-cover" />
             </div>
           </div>
           <h3 class="text-lg font-black text-gray-800">{{ lang.translations().dashboard.loadingStats }}</h3>
@@ -334,6 +335,7 @@ interface WidgetConfig {
 export class AdminInicioComponent implements OnInit {
   private http = inject(HttpClient);
   lang = inject(LanguageService);
+  branding = inject(BrandingService);
 
   loading = signal(true);
   error = signal<string | null>(null);

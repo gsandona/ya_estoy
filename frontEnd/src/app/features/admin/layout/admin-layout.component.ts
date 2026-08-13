@@ -24,10 +24,10 @@ import { BrandingService } from '../../../core/services/branding.service';
           <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2">
             <span class="animate-spin absolute h-16 w-16 border-4 border-gray-300 border-t-gray-600 rounded-full"></span>
             <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-200 flex">
-              <img src="logo.png" class="w-full h-full object-cover" />
+              <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
             </div>
           </div>
-          <h2 class="text-xl font-black text-gray-800 tracking-tight mb-2">{{ globalAppName() || 'MozoGo' }}</h2>
+          <h2 class="text-xl font-black text-gray-800 tracking-tight mb-2">{{ brandingService.appName() }}</h2>
           <p class="text-gray-400 text-xs font-semibold uppercase tracking-widest animate-pulse">Cargando Sistema...</p>
         </div>
       </div>
@@ -39,10 +39,10 @@ import { BrandingService } from '../../../core/services/branding.service';
         <div class="p-4 border-b border-white/10 mt-4 flex items-center justify-between">
           <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
-              <img src="logo.png" class="w-full h-full object-cover" />
+              <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
             </div>
             @if (!sidebarCollapsed()) {
-              <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
+              <span class="truncate">{{ brandingService.appName() }}</span>
             }
           </h2>
           <button (click)="sidebarCollapsed.set(!sidebarCollapsed())" class="hidden md:flex p-1.5 hover:bg-white/10 rounded-xl transition-colors text-white shrink-0">
@@ -159,9 +159,9 @@ import { BrandingService } from '../../../core/services/branding.service';
             </button>
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 max-w-[200px] truncate">
               <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100 flex">
-                <img src="logo.png" class="w-full h-full object-cover" />
+                <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
               </div>
-              <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
+              <span class="truncate">{{ brandingService.appName() }}</span>
             </h2>
           </div>
           
@@ -304,7 +304,7 @@ import { BrandingService } from '../../../core/services/branding.service';
                 <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
                   <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
                   <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex">
-                    <img src="logo.png" class="w-full h-full object-cover" />
+                    <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
                   </div>
                 </div>
                 <h3 class="text-lg font-black text-gray-800">Cargando datos...</h3>
@@ -325,9 +325,9 @@ import { BrandingService } from '../../../core/services/branding.service';
               <div>
                 <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
                   <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
-                    <img src="logo.png" class="w-full h-full object-cover" />
+                    <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
                   </div>
-                  <span class="truncate">{{ globalAppName() || 'MozoGo' }}</span>
+                  <span class="truncate">{{ brandingService.appName() }}</span>
                 </h2>
                 <p class="text-slate-400 text-xs mt-1 font-medium">{{ auth.currentUser()?.role }}</p>
               </div>
@@ -426,7 +426,7 @@ export class AdminLayoutComponent {
   public signalrService = inject(SignalrService);
   private pushNotification = inject(PushNotificationService);
   private restauranteService = inject(RestauranteService);
-  private brandingService = inject(BrandingService);
+  public brandingService = inject(BrandingService);
   
   mobileMenuOpen = signal(false);
   sidebarCollapsed = signal(false);
@@ -439,8 +439,16 @@ export class AdminLayoutComponent {
     this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
       const appName = data.find(s => s.key === 'GlobalAppName')?.value;
       const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
-      if (appName) this.globalAppName.set(appName);
-      if (appLogo) this.globalLogoBase64.set(appLogo);
+      if (appName) {
+        this.globalAppName.set(appName);
+        this.brandingService.appName.set(appName);
+      }
+      if (appLogo) {
+        this.globalLogoBase64.set(appLogo);
+        if (!this.auth.currentUser()?.restauranteId) {
+          this.brandingService.logo.set(appLogo);
+        }
+      }
     });
 
     const user = this.auth.currentUser();
@@ -453,6 +461,12 @@ export class AdminLayoutComponent {
               secondary: res.colorSecundario,
               background: res.colorFondo
             });
+            if (res.logoUrl) {
+              this.brandingService.logo.set(res.logoUrl);
+            }
+            if (res.nombre) {
+              this.brandingService.appName.set(res.nombre);
+            }
           }
           setTimeout(() => this.isBrandingLoaded.set(true), 150); // Pequeño delay para aplicar estilos CSS
         },

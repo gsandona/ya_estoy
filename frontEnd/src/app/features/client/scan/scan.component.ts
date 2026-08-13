@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ActiveSessionService, TableSession } from '../../../core/services/active-session.service';
 import { environment } from '../../../../environments/environment';
+import { BrandingService } from '../../../core/services/branding.service';
 
 @Component({
   selector: 'app-scan',
@@ -18,7 +19,7 @@ import { environment } from '../../../../environments/environment';
         <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2 z-10">
           <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
           <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex">
-            <img src="logo.png" class="w-full h-full object-cover" />
+            <img [src]="branding.logo()" class="w-full h-full object-cover" />
           </div>
         </div>
         <h2 class="text-xl font-bold text-gray-800 tracking-tight z-10">Conectando con tu Mesa...</h2>
@@ -57,6 +58,7 @@ export class ScanComponent implements OnInit {
   private router = inject(Router);
   private http = inject(HttpClient);
   private sessionService = inject(ActiveSessionService);
+  branding = inject(BrandingService);
 
   status = signal<'loading' | 'error'>('loading');
 

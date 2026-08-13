@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
+import { BrandingService } from '../../../core/services/branding.service';
 
 @Component({
   selector: 'app-login',
@@ -18,9 +19,9 @@ import { environment } from '../../../../environments/environment';
         <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
           <!-- pulsing logo -->
           <div class="h-28 w-28 rounded-3xl overflow-hidden shadow-xl mb-6 animate-pulse border border-white/10 flex">
-            <img src="logo.png" class="w-full h-full object-cover" />
+            <img [src]="branding.logo()" class="w-full h-full object-cover" />
           </div>
-          <h1 class="text-white text-4xl font-black tracking-tight mb-2">MozoGo</h1>
+          <h1 class="text-white text-4xl font-black tracking-tight mb-2">{{ branding.appName() }}</h1>
           <p class="text-slate-200/80 text-xs font-semibold uppercase tracking-widest mt-2">Cargando Sistema...</p>
           <div class="w-32 bg-white/10 h-1.5 rounded-full mt-6 overflow-hidden border border-white/5">
             <div class="bg-accent h-full w-1/2 rounded-full animate-[loading-bar_1.5s_infinite_ease-in-out]"></div>
@@ -49,11 +50,11 @@ import { environment } from '../../../../environments/environment';
             <div class="h-16 w-16 mb-4 relative flex items-center justify-center p-2">
               <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
               <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-gray-100 flex bg-white p-1.5">
-                <img src="logo.png" class="w-full h-full object-contain" />
+                <img [src]="branding.logo()" class="w-full h-full object-contain" />
               </div>
             </div>
             <h3 class="text-lg font-black text-gray-800">Conectando...</h3>
-            <p class="text-gray-500 text-sm mt-2 font-medium">Validando tus credenciales en MozoGo</p>
+            <p class="text-gray-500 text-sm mt-2 font-medium">Validando tus credenciales en {{ branding.appName() }}</p>
           </div>
         </div>
       }
@@ -63,11 +64,11 @@ import { environment } from '../../../../environments/environment';
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-6">
           <div class="h-20 w-20 rounded-2xl overflow-hidden shadow-md border border-gray-150 flex bg-white p-2.5">
-            <img src="logo.png" class="w-full h-full object-contain" />
+            <img [src]="branding.logo()" class="w-full h-full object-contain" />
           </div>
         </div>
         <h2 class="text-center text-3xl font-black text-gray-900 tracking-tight mb-1 flex flex-col">
-          <span>MozoGo</span>
+          <span>{{ branding.appName() }}</span>
         </h2>
         <p class="mt-2 text-center text-xs text-gray-400 font-semibold uppercase tracking-wider">
           Acceso privado · Usa tu <span class="text-accent">nombre de usuario</span>
@@ -153,6 +154,7 @@ export class LoginComponent {
   authService = inject(AuthService);
   router = inject(Router);
   http = inject(HttpClient);
+  branding = inject(BrandingService);
   
   username = '';
   password = '';
@@ -160,9 +162,6 @@ export class LoginComponent {
   isLoading = signal(false);
   errorMessage = signal('');
   isSplashing = signal(true);
-  
-  globalAppName = signal<string>('');
-  globalLogoBase64 = signal<string>('');
 
   constructor() {
     setTimeout(() => this.isSplashing.set(false), 1800);
@@ -171,8 +170,8 @@ export class LoginComponent {
       next: data => {
         const appName = data.find(s => s.key === 'GlobalAppName')?.value;
         const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
-        if (appName) this.globalAppName.set(appName);
-        if (appLogo) this.globalLogoBase64.set(appLogo);
+        if (appName) this.branding.appName.set(appName);
+        if (appLogo) this.branding.logo.set(appLogo);
       },
       error: () => {}
     });

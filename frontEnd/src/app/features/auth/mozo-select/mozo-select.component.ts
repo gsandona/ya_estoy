@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { BrandingService } from '../../../core/services/branding.service';
 
 interface MozoProfile {
   id: string;
@@ -27,10 +28,10 @@ interface MozoProfile {
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-4">
           <div class="h-16 w-16 rounded-2xl overflow-hidden shadow-md border border-gray-150 flex bg-white p-2.5">
-            <img src="logo.png" class="w-full h-full object-contain" />
+            <img [src]="branding.logo()" class="w-full h-full object-contain" />
           </div>
         </div>
-        <h2 class="text-3xl font-serif font-black text-primary">MozoGo</h2>
+        <h2 class="text-3xl font-serif font-black text-primary">{{ branding.appName() }}</h2>
         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-1">Portal de Selección de Mozos</p>
       </div>
 
@@ -145,6 +146,7 @@ export class MozoSelectComponent implements OnInit {
   private http = inject(HttpClient);
   private router = inject(Router);
   private authService = inject(AuthService);
+  branding = inject(BrandingService);
 
   mozos = signal<MozoProfile[]>([]);
   loadingMozos = signal(false);

@@ -60,10 +60,10 @@ import { FormsModule } from '@angular/forms';
           <div class="h-24 w-24 flex items-center justify-center mb-8 relative p-2">
             <span class="animate-spin absolute h-20 w-20 border-4 border-accent border-t-transparent rounded-full"></span>
             <div class="w-14 h-14 rounded-2xl overflow-hidden shadow-lg border border-white flex bg-white p-2">
-              <img src="logo.png" class="w-full h-full object-contain" />
+              <img [src]="brandingService.logo()" class="w-full h-full object-contain" />
             </div>
           </div>
-          <h2 class="text-3xl font-serif font-black text-primary tracking-tight mb-2">MozoGo</h2>
+          <h2 class="text-3xl font-serif font-black text-primary tracking-tight mb-2">{{ brandingService.appName() }}</h2>
           <div class="flex items-center gap-2 px-4 py-1.5 bg-accent/10 rounded-full">
             <span class="w-2 h-2 bg-accent rounded-full animate-ping"></span>
             <p class="text-accent text-xs font-black uppercase tracking-widest">Validando Código QR</p>
@@ -600,7 +600,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class PedidoComponent implements OnInit {
   showSplitCheck = false;
-  private brandingService = inject(BrandingService);
+  public brandingService = inject(BrandingService);
   restauranteFondo = signal<string | null>(null);
   
   activeBottomTab = signal<'inicio' | 'menu' | 'consultas'>('inicio');
@@ -868,6 +868,12 @@ export class PedidoComponent implements OnInit {
       });
       if (res.restauranteFondo) {
         this.restauranteFondo.set(res.restauranteFondo);
+      }
+      if (res.restauranteLogo) {
+        this.brandingService.logo.set(res.restauranteLogo);
+      }
+      if (res.restauranteNombre) {
+        this.brandingService.appName.set(res.restauranteNombre);
       }
     }
   }
