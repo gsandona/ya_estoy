@@ -27,6 +27,7 @@ export class SignalrService {
   public readonly taskCompleted = signal<string | null>(null);
   public readonly comandaChanged = signal<string | null>(null);
   public readonly mesaMontoConsumo = signal<{ mesaId: string, monto: number | null } | null>(null);
+  public readonly currentRestauranteId = signal<string | null>(null);
 
   // Notification settings signal
   public readonly notificationSettings = signal<NotificationSettings>({
@@ -190,6 +191,10 @@ export class SignalrService {
         this.joinGroup(user.role, user.id, user.restauranteId);
       } catch (e) {}
     }
+    const currentRest = this.currentRestauranteId();
+    if (currentRest) {
+      this.joinGroup('Comensal', '', currentRest);
+    }
   }
 
   private startConnection() {
@@ -302,8 +307,15 @@ export class SignalrService {
     if (userId) {
       this.loadSettings();
     }
+    if (restauranteId) {
+      this.currentRestauranteId.set(restauranteId);
+    }
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      await this.hubConnection.invoke('JoinGroup', role, userId || '', restauranteId || '');
+      try {
+        await this.hubConnection.invoke('JoinGroup', role, userId || '', restauranteId || '');
+      } catch (err) {
+        console.error('Error invoking JoinGroup:', err);
+      }
     }
   }
 

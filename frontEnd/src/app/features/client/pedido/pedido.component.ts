@@ -403,11 +403,147 @@ import { FormsModule } from '@angular/forms';
                   <app-menu [restauranteId]="restauranteId()"></app-menu>
                </div>
              }
+             
+              @if (activeBottomTab() === 'juegos') {
+                <div class="w-full max-w-md animate-fade-in flex flex-col pb-24 px-4 text-primary">
+                  <button (click)="activeBottomTab.set('inicio')" class="mb-5 flex items-center gap-1.5 text-gray-400 hover:text-primary transition-colors font-black px-2 self-start active:scale-95 text-xs uppercase tracking-wider">
+                     <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path></svg>
+                     Volver a la Mesa
+                  </button>
+
+                  <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm mb-6 text-center">
+                    <span class="text-4xl block mb-2 select-none">🎮</span>
+                    <h2 class="font-serif font-black text-xl text-gray-800">Zona de Entretenimiento</h2>
+                    <p class="text-xs text-gray-400 font-semibold mt-1">¡Jugá mientras esperas tu comida!</p>
+                  </div>
+
+                  <!-- Game Selectors -->
+                  <div class="flex gap-2 mb-6 select-none">
+                    <button (click)="selectedGame.set('dados')" 
+                            class="flex-1 py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
+                            [ngClass]="selectedGame() === 'dados' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-slate-50 border-gray-200 text-gray-600 hover:bg-slate-100'">
+                      🎲 Dados
+                    </button>
+                    <button (click)="selectedGame.set('trivia')" 
+                            class="flex-1 py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
+                            [ngClass]="selectedGame() === 'trivia' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-slate-50 border-gray-200 text-gray-600 hover:bg-slate-100'">
+                      🧠 Trivia
+                    </button>
+                  </div>
+
+                  <!-- GAME 1: Guerra de Dados -->
+                  @if (selectedGame() === 'dados') {
+                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm animate-scale-up text-center">
+                      <h3 class="font-black text-sm text-gray-800 uppercase tracking-widest mb-4">🎲 Guerra de Dados</h3>
+                      
+                      <div class="grid grid-cols-3 gap-2 bg-slate-50 border border-slate-100 rounded-2xl p-3 mb-6 select-none">
+                        <div>
+                          <span class="text-[10px] font-bold text-gray-400 block">TÚ</span>
+                          <span class="text-xl font-black text-indigo-650 block">{{ dicePlayerWins() }}</span>
+                        </div>
+                        <div class="flex items-center justify-center text-xs font-black text-gray-300">VS</div>
+                        <div>
+                          <span class="text-[10px] font-bold text-gray-400 block">BOT</span>
+                          <span class="text-xl font-black text-gray-800 block">{{ diceBotWins() }}</span>
+                        </div>
+                      </div>
+
+                      <div class="flex justify-around items-center py-6 mb-6">
+                        <div class="flex flex-col items-center gap-2">
+                          <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Tu dado</span>
+                          <div class="text-6xl font-bold transition-all duration-300" [class.animate-bounce]="rollingDice()">
+                            {{ getDiceEmoji(playerDiceValue()) }}
+                          </div>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                          <span class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Bot dado</span>
+                          <div class="text-6xl font-bold transition-all duration-300" [class.animate-bounce]="rollingDice()">
+                            {{ getDiceEmoji(botDiceValue()) }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="text-sm font-bold text-gray-800 h-6 mb-6">
+                        @if (rollingDice()) {
+                          <span class="text-slate-400 animate-pulse">¡Lanzando dados...! 🎲</span>
+                        } @else if (diceWinnerMessage()) {
+                          <span [ngClass]="{
+                            'text-emerald-600': diceWinnerMessage().includes('Ganaste'),
+                            'text-red-500': diceWinnerMessage().includes('Perdiste'),
+                            'text-slate-500': diceWinnerMessage().includes('Empate')
+                          }">
+                            {{ diceWinnerMessage() }}
+                          </span>
+                        } @else {
+                          <span class="text-gray-400">¿Listo para desafiar al bot?</span>
+                        }
+                      </div>
+
+                      <div class="flex gap-2">
+                        <button (click)="rollDice()" [disabled]="rollingDice()" 
+                                class="flex-1 bg-accent text-white py-3.5 rounded-2xl text-xs font-black shadow-md hover:opacity-90 active:scale-95 transition-all disabled:opacity-50">
+                          🎲 Tirar Dado
+                        </button>
+                        <button (click)="resetDiceGame()" class="bg-gray-100 hover:bg-gray-250 text-gray-600 border border-gray-250 px-4 rounded-2xl text-xs font-bold transition-all active:scale-95">
+                          Reiniciar
+                        </button>
+                      </div>
+                    </div>
+                  }
+
+                  <!-- GAME 2: Trivia Express -->
+                  @if (selectedGame() === 'trivia') {
+                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm animate-scale-up text-left">
+                      <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-black text-sm text-gray-800 uppercase tracking-widest">🧠 Trivia Express</h3>
+                        <span class="text-[10px] font-black bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full uppercase tracking-wider select-none">
+                          Score: {{ triviaCorrectCount() }}
+                        </span>
+                      </div>
+
+                      <div class="bg-slate-50 border border-slate-100 p-5 rounded-2xl mb-5">
+                        <span class="text-[9px] font-black text-indigo-650 uppercase tracking-wider block mb-1 select-none font-bold">Pregunta al azar</span>
+                        <p class="font-bold text-sm text-gray-800 leading-relaxed">{{ currentQuestion().question }}</p>
+                      </div>
+
+                      <div class="space-y-2.5">
+                        @for (opt of currentQuestion().options; let idx = $index; track opt) {
+                          <button (click)="answerQuestion(idx)" 
+                                  [disabled]="answeredTrivia()"
+                                  class="w-full text-left p-4 rounded-xl border text-xs font-bold transition-all flex justify-between items-center active:scale-[0.99]"
+                                  [ngClass]="getTriviaOptionClass(idx)">
+                            <span>{{ opt }}</span>
+                            @if (answeredTrivia()) {
+                              <span>
+                                @if (idx === currentQuestion().correctAnswer) {
+                                  🟢
+                                } @else if (selectedAnswerIndex() === idx) {
+                                  🔴
+                                }
+                              </span>
+                            }
+                          </button>
+                        }
+                      </div>
+
+                      @if (answeredTrivia()) {
+                        <div class="mt-5 text-center animate-fade-in">
+                          <button (click)="nextTriviaQuestion()" 
+                                  class="bg-primary text-white px-6 py-3 rounded-2xl text-xs font-black shadow-md hover:bg-slate-800 active:scale-95 transition-all select-none">
+                            Siguiente Pregunta ➔
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                </div>
+              }
           </div>
 
           <!-- Floating Bottom Navigation Bar (Las 3 Barras Centradas) -->
           <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/80 backdrop-blur-xl border-t border-gray-100 z-30 pb-safe">
-             <div class="flex justify-around items-center h-20 w-full px-4">
+             <div class="flex justify-around items-center h-20 w-full px-4 select-none">
                 <button (click)="activeBottomTab.set('inicio')" 
                         class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
                         [ngClass]="activeBottomTab() === 'inicio' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
@@ -426,6 +562,16 @@ import { FormsModule } from '@angular/forms';
                   }
                   <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                   Menú
+                </button>
+
+                <button (click)="activeBottomTab.set('juegos')" 
+                        class="flex flex-col items-center justify-center w-full h-full text-[10px] font-black uppercase tracking-wider transition-colors relative" 
+                        [ngClass]="activeBottomTab() === 'juegos' ? 'text-accent' : 'text-gray-400 hover:text-gray-600'">
+                  @if (activeBottomTab() === 'juegos') {
+                    <span class="absolute top-0 w-8 h-1 bg-accent rounded-full left-1/2 -translate-x-1/2"></span>
+                  }
+                  <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  Juegos
                 </button>
                 
                 <button (click)="abrirDividirCuenta()" 
@@ -685,7 +831,7 @@ export class PedidoComponent implements OnInit {
   public brandingService = inject(BrandingService);
   restauranteFondo = signal<string | null>(null);
   
-  activeBottomTab = signal<'inicio' | 'menu' | 'consultas'>('inicio');
+  activeBottomTab = signal<'inicio' | 'menu' | 'juegos'>('inicio');
 
   @Input() restaurante!: string;
   @Input() numero!: string;
@@ -703,6 +849,37 @@ export class PedidoComponent implements OnInit {
   validatingPin = signal(false);
   numeroMesa = signal<string>('');
   restauranteId = signal<string>('');
+
+  selectedGame = signal<'dados' | 'trivia'>('dados');
+
+  // Dice game states
+  rollingDice = signal(false);
+  playerDiceValue = signal<number>(1);
+  botDiceValue = signal<number>(1);
+  dicePlayerWins = signal<number>(0);
+  diceBotWins = signal<number>(0);
+  diceWinnerMessage = signal<string>('');
+
+  // Trivia game states
+  triviaCorrectCount = signal<number>(0);
+  answeredTrivia = signal(false);
+  selectedAnswerIndex = signal<number | null>(null);
+  
+  triviaQuestions = [
+    { question: '¿Cuál es el ingrediente principal del pesto tradicional?', options: ['Perejil', 'Albahaca', 'Cilantro'], correctAnswer: 1 },
+    { question: '¿De qué país es originaria la pizza Margherita?', options: ['Francia', 'Grecia', 'Italia'], correctAnswer: 2 },
+    { question: '¿Qué fruta contiene una enzima que ablanda la carne?', options: ['Piña', 'Manzana', 'Naranja'], correctAnswer: 0 },
+    { question: '¿Cuál es el tipo de pasta con forma de pajarita?', options: ['Farfalle', 'Penne', 'Fusilli'], correctAnswer: 0 },
+    { question: '¿Qué destilado se produce a partir del agave azul?', options: ['Ron', 'Mezcal', 'Tequila'], correctAnswer: 2 },
+    { question: '¿Qué país produce la mayor cantidad de café en el mundo?', options: ['Colombia', 'Brasil', 'Etiopía'], correctAnswer: 1 },
+    { question: '¿Qué animal produce la leche para el Mozzarella tradicional?', options: ['Cabra', 'Oveja', 'Búfala'], correctAnswer: 2 },
+    { question: '¿Qué especia le da al curry su color amarillo?', options: ['Comino', 'Cúrcuma', 'Pimentón'], correctAnswer: 1 },
+    { question: '¿Cómo se llama el pan tostado untado con ajo y aceite?', options: ['Bruschetta', 'Croissant', 'Focaccia'], correctAnswer: 0 },
+    { question: '¿Cuál es el hongo subterráneo más caro de la cocina?', options: ['Champiñón', 'Trufa negra', 'Portobello'], correctAnswer: 1 }
+  ];
+
+  currentQuestionIndex = signal<number>(0);
+  currentQuestion = computed(() => this.triviaQuestions[this.currentQuestionIndex()]);
 
   // Split bill states
   showSplitModal = signal(false);
@@ -841,6 +1018,7 @@ export class PedidoComponent implements OnInit {
         this.id = res.mesaId; // Guardamos el GUID para las llamadas de SignalR
         if (res.restauranteId) {
           this.restauranteId.set(res.restauranteId);
+          this.signalrService.joinGroup('Comensal', '', res.restauranteId);
         }
 
         // Sincronizar con el backend: si el mozo ya lo completó, desbloqueamos
@@ -1316,5 +1494,86 @@ export class PedidoComponent implements OnInit {
   formatCurrency(value: number | null): string {
     if (value === null) return '0';
     return value.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  // Games logic
+  getDiceEmoji(val: number): string {
+    const diceEmojis = ['🎲', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    return diceEmojis[val] || '🎲';
+  }
+
+  rollDice() {
+    this.rollingDice.set(true);
+    this.diceWinnerMessage.set('');
+    
+    let counter = 0;
+    const interval = setInterval(() => {
+      this.playerDiceValue.set(Math.floor(Math.random() * 6) + 1);
+      this.botDiceValue.set(Math.floor(Math.random() * 6) + 1);
+      counter++;
+      if (counter > 6) {
+        clearInterval(interval);
+        
+        const playerVal = Math.floor(Math.random() * 6) + 1;
+        const botVal = Math.floor(Math.random() * 6) + 1;
+        
+        this.playerDiceValue.set(playerVal);
+        this.botDiceValue.set(botVal);
+        this.rollingDice.set(false);
+
+        if (playerVal > botVal) {
+          this.dicePlayerWins.update(w => w + 1);
+          this.diceWinnerMessage.set('🎉 ¡Ganaste la ronda!');
+        } else if (botVal > playerVal) {
+          this.diceBotWins.update(w => w + 1);
+          this.diceWinnerMessage.set('😢 Perdiste la ronda.');
+        } else {
+          this.diceWinnerMessage.set('🤝 ¡Empate!');
+        }
+      }
+    }, 100);
+  }
+
+  resetDiceGame() {
+    this.dicePlayerWins.set(0);
+    this.diceBotWins.set(0);
+    this.playerDiceValue.set(1);
+    this.botDiceValue.set(1);
+    this.diceWinnerMessage.set('');
+  }
+
+  answerQuestion(index: number) {
+    if (this.answeredTrivia()) return;
+    this.selectedAnswerIndex.set(index);
+    this.answeredTrivia.set(true);
+
+    if (index === this.currentQuestion().correctAnswer) {
+      this.triviaCorrectCount.update(c => c + 1);
+    }
+  }
+
+  getTriviaOptionClass(index: number): string {
+    if (!this.answeredTrivia()) {
+      return 'bg-white border-gray-205 text-gray-700 hover:bg-slate-50 hover:border-gray-300';
+    }
+
+    const correct = this.currentQuestion().correctAnswer;
+    if (index === correct) {
+      return 'bg-emerald-50 border-emerald-300 text-emerald-800';
+    }
+    if (this.selectedAnswerIndex() === index) {
+      return 'bg-red-50 border-red-300 text-red-800';
+    }
+    return 'bg-white border-gray-150 text-gray-400 opacity-60';
+  }
+
+  nextTriviaQuestion() {
+    this.answeredTrivia.set(false);
+    this.selectedAnswerIndex.set(null);
+    let nextIdx = this.currentQuestionIndex() + 1;
+    if (nextIdx >= this.triviaQuestions.length) {
+      nextIdx = 0;
+    }
+    this.currentQuestionIndex.set(nextIdx);
   }
 }
