@@ -88,4 +88,12 @@ public class UsuarioRepository : IUsuarioRepository
 
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<string>> GetFeaturesForRoleAsync(int roleId)
+    {
+        return await _context.RoleFeatures
+            .Where(rf => rf.RoleId == roleId && rf.Activo)
+            .Select(rf => rf.FeatureKey)
+            .ToListAsync();
+    }
 }

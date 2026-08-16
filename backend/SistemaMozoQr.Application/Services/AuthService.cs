@@ -66,6 +66,8 @@ public class AuthService : IAuthService
             }
         }
 
+        var features = await _usuarioRepository.GetFeaturesForRoleAsync(user.RolId);
+
         return new AuthResponseDto
         {
             Id = user.Id,
@@ -73,7 +75,8 @@ public class AuthService : IAuthService
             Role = user.Rol.ToString(),
             Token = tokenHandler.WriteToken(token),
             RestauranteId = user.RestauranteId != Guid.Empty ? user.RestauranteId : null,
-            RestauranteNombre = restauranteNombre
+            RestauranteNombre = restauranteNombre,
+            Features = features
         };
     }
 }

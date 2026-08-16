@@ -21,7 +21,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
 
     private async Task<(IRestauranteHubClient Clients, string? AssignedMozoId, Guid RestauranteId, int Numero)> GetClientsForMesa(Guid mesaId)
     {
-        var mesa = await _mesaRepository.GetByIdAsync(mesaId);
+        var mesa = await _mesaRepository.GetByIdIgnoreQueryFiltersAsync(mesaId);
         
         var grupos = new List<string> { "Admin" };
         string? assignedMozoId = null;
@@ -55,13 +55,13 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
 
     private async Task<bool> IsMesaActive(Guid mesaId)
     {
-        var mesa = await _mesaRepository.GetByIdAsync(mesaId);
+        var mesa = await _mesaRepository.GetByIdIgnoreQueryFiltersAsync(mesaId);
         return mesa != null && mesa.Estado == SistemaMozoQr.Domain.Enums.EstadoMesa.Ocupada && !string.IsNullOrEmpty(mesa.CodigoAcceso);
     }
 
     private async Task<bool> IsDuplicateAlert(Guid mesaId, string type)
     {
-        var mesa = await _mesaRepository.GetByIdAsync(mesaId);
+        var mesa = await _mesaRepository.GetByIdIgnoreQueryFiltersAsync(mesaId);
         if (mesa == null) return false;
         var pendingTasks = await _taskRepository.GetPendingTasksIgnoreQueryFiltersAsync();
         return pendingTasks.Any(t => t.TableId == mesa.Numero && t.Type == type && t.RestauranteId == mesa.RestauranteId);

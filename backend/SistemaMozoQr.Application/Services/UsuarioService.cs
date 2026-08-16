@@ -12,10 +12,17 @@ namespace SistemaMozoQr.Application.Services;
 public class UsuarioService : IUsuarioService
 {
     private readonly IUsuarioRepository _usuarioRepository;
+    private readonly IRestauranteRepository _restauranteRepository;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UsuarioService(IUsuarioRepository usuarioRepository)
+    public UsuarioService(
+        IUsuarioRepository usuarioRepository, 
+        IRestauranteRepository restauranteRepository, 
+        ICurrentUserService currentUserService)
     {
         _usuarioRepository = usuarioRepository;
+        _restauranteRepository = restauranteRepository;
+        _currentUserService = currentUserService;
     }
 
     private void ValidarFortalezaPassword(string? password)
@@ -25,21 +32,11 @@ public class UsuarioService : IUsuarioService
         // Mínimo 8 caracteres
         if (password.Length < 8)
             throw new Exception("La contraseña debe tener al menos 8 caracteres de longitud.");
-
-        // Al menos 3 números
-        int numCount = password.Count(char.IsDigit);
-        if (numCount < 3)
-            throw new Exception("La contraseña debe tener al menos 3 números.");
             
         // Al menos 1 mayúscula
         bool hasUpper = password.Any(char.IsUpper);
         if (!hasUpper)
             throw new Exception("La contraseña debe tener al menos una letra mayúscula.");
-            
-        // Al menos 1 minúscula
-        bool hasLower = password.Any(char.IsLower);
-        if (!hasLower)
-            throw new Exception("La contraseña debe tener al menos una letra minúscula.");
             
         // Al menos 1 símbolo
         bool hasSymbol = password.Any(c => !char.IsLetterOrDigit(c));
@@ -55,23 +52,42 @@ public class UsuarioService : IUsuarioService
 
         ValidarFortalezaPassword(dto.Password);
 
+        var restauranteId = dto.RestauranteId;
+        if (!restauranteId.HasValue)
+        {
+            restauranteId = _currentUserService.GetRestauranteId();
+            if (!restauranteId.HasValue)
+            {
+                var rests = await _restauranteRepository.GetAllAsync();
+                var firstRest = rests.FirstOrDefault();
+                if (firstRest == null)
+                    throw new Exception("No hay restaurantes en el sistema para asociar al usuario.");
+                restauranteId = firstRest.Id;
+            }
+        }
+
         var user = new Usuario
         {
             Id = dto.Id ?? Guid.NewGuid(),
             NombreCompleto = dto.NombreCompleto ?? "Usuario",
             Username = dto.Username,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(string.IsNullOrEmpty(dto.Password) ? "MozoGo1234!" : dto.Password),
-            Rol = dto.Role
+            Rol = dto.Role,
+            RestauranteId = restauranteId.Value
         };
 
         await _usuarioRepository.AddAsync(user);
+
+        var restsList = await _restauranteRepository.GetAllAsync();
 
         return new UsuarioDto
         {
             Id = user.Id,
             NombreCompleto = user.NombreCompleto,
             Username = user.Username,
-            Role = user.Rol.ToString()
+            Role = user.Rol.ToString(),
+            RestauranteId = user.RestauranteId,
+            RestauranteNombre = restsList.FirstOrDefault(r => r.Id == user.RestauranteId)?.Nombre ?? "Sin Restaurante"
         };
     }
 
@@ -97,15 +113,23 @@ public class UsuarioService : IUsuarioService
         user.NombreCompleto = dto.NombreCompleto ?? user.NombreCompleto;
         user.Username = dto.Username;
         user.Rol = dto.Role;
+        if (dto.RestauranteId.HasValue)
+        {
+            user.RestauranteId = dto.RestauranteId.Value;
+        }
 
         await _usuarioRepository.UpdateAsync(user);
+
+        var restsList = await _restauranteRepository.GetAllAsync();
 
         return new UsuarioDto
         {
             Id = user.Id,
             NombreCompleto = user.NombreCompleto,
             Username = user.Username,
-            Role = user.Rol.ToString()
+            Role = user.Rol.ToString(),
+            RestauranteId = user.RestauranteId,
+            RestauranteNombre = restsList.FirstOrDefault(r => r.Id == user.RestauranteId)?.Nombre ?? "Sin Restaurante"
         };
     }
 
@@ -121,12 +145,28 @@ public class UsuarioService : IUsuarioService
     public async Task<IEnumerable<UsuarioDto>> GetAllAsync()
     {
         var usuarios = await _usuarioRepository.GetAllAsync();
+        var restaurantes = await _restauranteRepository.GetAllAsync();
+        
         return usuarios.Select(u => new UsuarioDto
         {
             Id = u.Id,
             NombreCompleto = u.NombreCompleto,
             Username = u.Username,
-            Role = u.Rol.ToString()
+            Role = u.Rol.ToString(),
+            RestauranteId = u.RestauranteId,
+            RestauranteNombre = restaurantes.FirstOrDefault(r => r.Id == u.RestauranteId)?.Nombre ?? "Sin Restaurante"
         });
+    }
+
+    public async Task CambiarPasswordAsync(Guid id, string nuevaPassword)
+    {
+        var user = await _usuarioRepository.GetByIdAsync(id);
+        if (user == null)
+            throw new Exception("Usuario no encontrado.");
+
+        ValidarFortalezaPassword(nuevaPassword);
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(nuevaPassword);
+        await _usuarioRepository.UpdateAsync(user);
     }
 }

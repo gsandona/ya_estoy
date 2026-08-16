@@ -26,39 +26,37 @@ import { LanguageService } from '../../../../core/services/language.service';
       }
       
 
-        <!-- Panel de Solicitudes Activas -->
-        <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div class="flex items-center gap-2 select-none">
-              <div>
-                <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                  Solicitudes Activas
-                </h1>
-                <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
-              </div>
+        <!-- Cabecera de Solicitudes Activas -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div class="flex items-center gap-2 select-none">
+            <div>
+              <h1 class="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
+                Solicitudes Activas
+              </h1>
+              <p class="text-sm text-gray-500 font-medium mt-1">Monitorea y atiende los pedidos en tiempo real</p>
             </div>
-            
-            <!-- Filtros (Solo Admin) -->
-            @if(auth.currentUser()?.role === 'Admin') {
-            <div class="flex flex-wrap items-center gap-3 bg-surface/50 px-4 py-2 rounded-2xl border border-gray-200 backdrop-blur-sm">
-              <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
+          </div>
+          
+          <!-- Filtros (Solo Admin) -->
+          @if(auth.currentUser()?.role === 'Admin') {
+            <div class="flex flex-wrap items-center gap-3 bg-white px-4 py-2 rounded-2xl border border-gray-250 shadow-sm">
+              <select [ngModel]="filterType()" (ngModelChange)="filterType.set($event)" class="bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
                 <option value="All">Todos los Tipos</option>
                 <option value="Llamado">Llamado</option>
                 <option value="Pedido">Pedido</option>
                 <option value="Cuenta">Cuenta</option>
               </select>
-              <select [ngModel]="filterMesa()" (ngModelChange)="filterMesa.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
+              <select [ngModel]="filterMesa()" (ngModelChange)="filterMesa.set($event)" class="bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
                 <option value="All">Todas las Mesas</option>
                 @for(m of dataService.mesas(); track m.id) { <option [value]="m.numero">Mesa {{m.numero}}</option> }
               </select>
-              <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-white border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
+              <select [ngModel]="filterMozo()" (ngModelChange)="filterMozo.set($event)" class="bg-gray-50 border-none rounded-xl text-sm font-bold text-gray-600 px-3 py-2 outline-none focus:ring-2 focus:ring-primary/20 shadow-sm cursor-pointer">
                 <option value="All">Todos los Mozos</option>
                 @for(mz of dataService.mozos(); track mz.id) { <option [value]="mz.id">{{mz.username}}</option> }
               </select>
             </div>
           }
         </div>
-      </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (task of myPendingTasks(); track task.id) {

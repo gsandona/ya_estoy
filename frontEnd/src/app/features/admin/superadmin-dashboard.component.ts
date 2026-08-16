@@ -5,6 +5,8 @@ import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { AbmRestaurantesComponent } from './config/abm-restaurantes.component';
 import { SuperadminCategoriesComponent } from './config/superadmin-categories.component';
+import { SuperadminUsuariosComponent } from './config/superadmin-usuarios.component';
+import { SuperadminFeaturesComponent } from './config/superadmin-features.component';
 
 interface Restaurante {
   id: string;
@@ -42,7 +44,7 @@ interface ErrorLog {
 @Component({
   selector: 'app-super-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, AbmRestaurantesComponent, SuperadminCategoriesComponent],
+  imports: [CommonModule, FormsModule, AbmRestaurantesComponent, SuperadminCategoriesComponent, SuperadminUsuariosComponent, SuperadminFeaturesComponent],
   template: `
     <div class="p-6">
       <h1 class="text-3xl font-black mb-8">Centro de Control SaaS</h1>
@@ -50,6 +52,8 @@ interface ErrorLog {
       <!-- Tabs -->
       <div class="flex flex-wrap gap-3 mb-8">
         <button (click)="activeTab.set('restaurantes')" [class.bg-primary]="activeTab() === 'restaurantes'" [class.text-white]="activeTab() === 'restaurantes'" [class.bg-white]="activeTab() !== 'restaurantes'" [class.text-gray-600]="activeTab() !== 'restaurantes'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Restaurantes</button>
+        <button (click)="activeTab.set('usuarios')" [class.bg-primary]="activeTab() === 'usuarios'" [class.text-white]="activeTab() === 'usuarios'" [class.bg-white]="activeTab() !== 'usuarios'" [class.text-gray-600]="activeTab() !== 'usuarios'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Usuarios</button>
+        <button (click)="activeTab.set('permisos')" [class.bg-primary]="activeTab() === 'permisos'" [class.text-white]="activeTab() === 'permisos'" [class.bg-white]="activeTab() !== 'permisos'" [class.text-gray-600]="activeTab() !== 'permisos'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Permisos</button>
         <button (click)="activeTab.set('dashboard-config')" [class.bg-primary]="activeTab() === 'dashboard-config'" [class.text-white]="activeTab() === 'dashboard-config'" [class.bg-white]="activeTab() !== 'dashboard-config'" [class.text-gray-600]="activeTab() !== 'dashboard-config'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Configurar Dashboards</button>
         <button (click)="activeTab.set('menu-categories')" [class.bg-primary]="activeTab() === 'menu-categories'" [class.text-white]="activeTab() === 'menu-categories'" [class.bg-white]="activeTab() !== 'menu-categories'" [class.text-gray-600]="activeTab() !== 'menu-categories'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Categorías de Menú</button>
         <button (click)="activeTab.set('auditoria')" [class.bg-primary]="activeTab() === 'auditoria'" [class.text-white]="activeTab() === 'auditoria'" [class.bg-white]="activeTab() !== 'auditoria'" [class.text-gray-600]="activeTab() !== 'auditoria'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Auditoría</button>
@@ -322,13 +326,23 @@ interface ErrorLog {
           <app-superadmin-categories></app-superadmin-categories>
         </div>
       }
+      @if (activeTab() === 'usuarios') {
+        <div class="animate-fade-in">
+          <app-superadmin-usuarios></app-superadmin-usuarios>
+        </div>
+      }
+      @if (activeTab() === 'permisos') {
+        <div class="animate-fade-in">
+          <app-superadmin-features></app-superadmin-features>
+        </div>
+      }
     </div>
   `
 })
 export class SuperAdminDashboardComponent {
   private http = inject(HttpClient);
   
-  activeTab = signal<'restaurantes' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding' | 'menu-categories'>('restaurantes');
+  activeTab = signal<'restaurantes' | 'usuarios' | 'permisos' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding' | 'menu-categories'>('restaurantes');
   restaurantes = signal<Restaurante[]>([]);
   logsAuditoria = signal<Log[]>([]);
   logsErrores = signal<ErrorLog[]>([]);

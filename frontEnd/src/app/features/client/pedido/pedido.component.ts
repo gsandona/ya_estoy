@@ -297,7 +297,7 @@ import { FormsModule } from '@angular/forms';
                                class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
                          <div class="h-12 w-12 bg-indigo-50/10 text-indigo-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m-6 2h.01M12 16h.01M15 16h.01M13 8h7m-7 4h3m-9-4h3m-3 4h3m-3 4h3m-6 4h12a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m-6 2h.01M12 16h.01M15 16h.01M13 8h7m-7 4h3m-9-4h3m-3 4h3m-3 4h3m-3 4h3m-6 4h12a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                            </svg>
                          </div>
                          <div class="flex flex-col items-center">
@@ -308,6 +308,88 @@ import { FormsModule } from '@angular/forms';
                      }
 
                    </div>
+
+                    <!-- 3. SECCIÓN DE VALORACIÓN / OPINIÓN -->
+                    @if (!ratingSubmitted()) {
+                      <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm mt-4 text-left w-full animate-fade-in">
+                        <h3 class="font-serif font-black text-lg text-gray-800 mb-1 flex items-center gap-1.5">
+                          ⭐ Danos tu opinión
+                        </h3>
+                        <p class="text-xs text-gray-500 font-medium mb-4">Ayudanos a mejorar tu experiencia</p>
+
+                        <div class="space-y-3.5">
+                          <!-- Rating Row: General -->
+                          <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-700">General</span>
+                            <div class="flex gap-1">
+                              @for (star of [1, 2, 3, 4, 5]; track star) {
+                                <button (click)="ratingGeneral.set(star)" type="button" class="text-lg transition-transform active:scale-125 focus:outline-none">
+                                  {{ ratingGeneral() >= star ? '⭐' : '☆' }}
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Rating Row: Comida -->
+                          <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-700">Platos y Bebidas</span>
+                            <div class="flex gap-1">
+                              @for (star of [1, 2, 3, 4, 5]; track star) {
+                                <button (click)="ratingComida.set(star)" type="button" class="text-lg transition-transform active:scale-125 focus:outline-none">
+                                  {{ ratingComida() >= star ? '⭐' : '☆' }}
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Rating Row: Mozo -->
+                          <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-700">Atención del Mozo</span>
+                            <div class="flex gap-1">
+                              @for (star of [1, 2, 3, 4, 5]; track star) {
+                                <button (click)="ratingMozo.set(star)" type="button" class="text-lg transition-transform active:scale-125 focus:outline-none">
+                                  {{ ratingMozo() >= star ? '⭐' : '☆' }}
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Rating Row: Servicio -->
+                          <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-gray-700">Servicio y Ambiente</span>
+                            <div class="flex gap-1">
+                              @for (star of [1, 2, 3, 4, 5]; track star) {
+                                <button (click)="ratingServicio.set(star)" type="button" class="text-lg transition-transform active:scale-125 focus:outline-none">
+                                  {{ ratingServicio() >= star ? '⭐' : '☆' }}
+                                </button>
+                              }
+                            </div>
+                          </div>
+
+                          <!-- Comentario -->
+                          <div class="pt-2">
+                            <textarea [ngModel]="ratingComment()" (ngModelChange)="ratingComment.set($event)" 
+                                      placeholder="Dejanos un comentario (opcional)..." 
+                                      rows="2" 
+                                      class="w-full text-xs bg-gray-50 border border-gray-200 rounded-2xl p-3 outline-none focus:ring-2 focus:ring-accent/20 resize-none font-medium text-gray-700"></textarea>
+                          </div>
+
+                          <button (click)="enviarValoracion()" [disabled]="submittingRating()"
+                                  class="w-full mt-2 bg-primary text-white py-3 rounded-2xl text-xs font-bold shadow-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-1.5">
+                            @if (submittingRating()) {
+                              <span class="animate-spin h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full block"></span>
+                            }
+                            Enviar Calificación
+                          </button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="bg-emerald-50/20 border border-emerald-100 rounded-[2.25rem] p-6 shadow-sm mt-4 text-center w-full animate-fade-in">
+                        <div class="h-10 w-10 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-lg select-none">💖</div>
+                        <h3 class="font-serif font-black text-base text-gray-800 mb-1">¡Muchas gracias!</h3>
+                        <p class="text-xs text-gray-500 font-medium">Tu valoración ha sido registrada con éxito y nos ayuda muchísimo a seguir mejorando.</p>
+                      </div>
+                    }
                  </div>
                </div>
              }
@@ -649,6 +731,14 @@ export class PedidoComponent implements OnInit {
   activePedidoEstado = signal<string>('Recibido');
   montoConsumo = signal<number | null>(null);
 
+  ratingGeneral = signal<number>(5);
+  ratingComida = signal<number>(5);
+  ratingMozo = signal<number>(5);
+  ratingServicio = signal<number>(5);
+  ratingComment = signal<string>('');
+  ratingSubmitted = signal<boolean>(false);
+  submittingRating = signal<boolean>(false);
+
 
   showCartModal = signal(false);
   showSuccessToast = signal(false);
@@ -906,6 +996,39 @@ export class PedidoComponent implements OnInit {
     } finally {
       setTimeout(() => this.loadingCuenta.set(false), 800);
     }
+  }
+
+  enviarValoracion() {
+    if (!this.id) return;
+    const pin = localStorage.getItem(`mesa_pin_${this.restaurante}_${this.numero}`) || '';
+    if (!pin) {
+      alert('Código PIN no encontrado, no se puede enviar la valoración.');
+      return;
+    }
+    
+    this.submittingRating.set(true);
+    
+    const payload = {
+      mesaId: this.id,
+      codigoAcceso: pin,
+      puntajeGeneral: this.ratingGeneral(),
+      puntajeComida: this.ratingComida(),
+      puntajeMozo: this.ratingMozo(),
+      puntajeServicio: this.ratingServicio(),
+      comentario: this.ratingComment()
+    };
+
+    this.http.post(`${environment.apiUrl}/api/valoraciones`, payload).subscribe({
+      next: () => {
+        this.submittingRating.set(false);
+        this.ratingSubmitted.set(true);
+      },
+      error: (err) => {
+        console.error(err);
+        this.submittingRating.set(false);
+        alert(err.error?.message || 'Error al enviar la valoración.');
+      }
+    });
   }
 
   async enviarPedido() {

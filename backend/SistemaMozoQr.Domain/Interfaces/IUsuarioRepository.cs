@@ -11,4 +11,5 @@ public interface IUsuarioRepository
     Task UpdateAsync(Usuario usuario);
     Task DeleteAsync(Usuario usuario);
     Task BulkSyncAsync(IEnumerable<Usuario> items);
+    Task<List<string>> GetFeaturesForRoleAsync(int roleId);
 }

@@ -25,7 +25,31 @@ export const roleGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // Redirigir si no tiene permisos
   router.navigate(['/admin/dashboard']);
+  return false;
+};
+
+export const featureGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  
+  const expectedFeature = route.data['feature'] as string;
+  const user = authService.currentUser();
+
+  if (user && authService.hasFeature(expectedFeature)) {
+    return true;
+  }
+
+  if (user) {
+    if (authService.hasFeature('MesasTareas')) {
+      router.navigate(['/admin/dashboard']);
+    } else if (authService.hasFeature('Cocina')) {
+      router.navigate(['/admin/cocina']);
+    } else {
+      router.navigate(['/admin/inicio']);
+    }
+  } else {
+    router.navigate(['/login']);
+  }
   return false;
 };

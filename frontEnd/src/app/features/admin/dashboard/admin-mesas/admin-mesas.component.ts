@@ -27,7 +27,7 @@ import { LanguageService } from '../../../../core/services/language.service';
       
 
         <!-- Panel de Mesas (Control y Administración) -->
-        <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+        <div class="mb-6">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div class="flex items-center gap-2 cursor-pointer select-none" (click)="collapseMesas.set(!collapseMesas())">
               <div>
@@ -388,9 +388,12 @@ import { LanguageService } from '../../../../core/services/language.service';
             </div>
           </div>
 
-          <div class="flex gap-3 justify-end pt-2">
+          <div class="flex flex-wrap gap-2.5 justify-end pt-2">
             <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs">
               Cancelar
+            </button>
+            <button (click)="ejecutarCierreSinFacturar()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">
+              Cerrar sin Facturar
             </button>
             <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">
               Confirmar Pago y Facturar
@@ -793,9 +796,15 @@ export class AdminMesasComponent {
     }
   }
 
-  private procederConCerrarMesaAPI(mesaId: string) {
+  async ejecutarCierreSinFacturar() {
+    const mesa = this.billingMesa();
+    if (!mesa) return;
+    this.procederConCerrarMesaAPI(mesa.id, true);
+  }
+
+  private procederConCerrarMesaAPI(mesaId: string, sinFacturar: boolean = false) {
     const token = localStorage.getItem('auth_token');
-    this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null, {
+    this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar?sinFacturar=${sinFacturar}`, null, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: () => {

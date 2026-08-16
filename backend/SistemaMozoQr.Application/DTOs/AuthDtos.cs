@@ -21,6 +21,7 @@ public class AuthResponseDto
     public string Token { get; set; } = string.Empty;
     public Guid? RestauranteId { get; set; }
     public string? RestauranteNombre { get; set; }
+    public List<string> Features { get; set; } = new();
 }
 
 public class CrearUsuarioDto
@@ -37,6 +38,8 @@ public class CrearUsuarioDto
     
     [Required]
     public Rol Role { get; set; }
+    
+    public Guid? RestauranteId { get; set; }
 }
 
 public class UsuarioDto
@@ -45,6 +48,8 @@ public class UsuarioDto
     public string? NombreCompleto { get; set; }
     public string Username { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
+    public Guid? RestauranteId { get; set; }
+    public string? RestauranteNombre { get; set; }
 }
 
 public class EditarUsuarioDto
@@ -61,6 +66,8 @@ public class EditarUsuarioDto
     
     [Required]
     public Rol Role { get; set; }
+    
+    public Guid? RestauranteId { get; set; }
 }
 
 public class BulkUsuarioDto

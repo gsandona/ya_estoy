@@ -25,47 +25,93 @@ public class NotificacionService : INotificacionService
 
     public async Task NotificarLlamadoMozoAsync(Guid mesaId, int numeroMesa, Guid? mozoId)
     {
-        await ObtenerDestinatarios(mozoId).NotificarLlamadoMozo(mesaId, numeroMesa);
+        var mesa = await _context.Mesas.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == mesaId);
+        var restauranteId = mesa?.RestauranteId;
+        await ObtenerDestinatarios(mozoId, restauranteId).NotificarLlamadoMozo(mesaId, numeroMesa);
         await EnviarPushADestinatariosAsync(mozoId, "🛎️ Llamado de Mesa", $"La Mesa {numeroMesa} solicita tu asistencia.");
     }
 
     public async Task NotificarPidiendoCuentaAsync(Guid mesaId, int numeroMesa, Guid? mozoId)
     {
-        await ObtenerDestinatarios(mozoId).NotificarPidiendoCuenta(mesaId, numeroMesa);
+        var mesa = await _context.Mesas.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == mesaId);
+        var restauranteId = mesa?.RestauranteId;
+        await ObtenerDestinatarios(mozoId, restauranteId).NotificarPidiendoCuenta(mesaId, numeroMesa);
         await EnviarPushADestinatariosAsync(mozoId, "💵 Pedido de Cuenta", $"La Mesa {numeroMesa} solicita la cuenta.");
     }
 
     public async Task NotificarNuevoPedidoAsync(Guid pedidoId, Guid taskId, int numeroMesa, string details, Guid? mozoId)
     {
-        await ObtenerDestinatarios(mozoId).NotificarNuevoPedido(pedidoId, taskId, numeroMesa, details);
+        var pedido = await _context.Pedidos.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == pedidoId);
+        var restauranteId = pedido?.RestauranteId;
+        await ObtenerDestinatarios(mozoId, restauranteId).NotificarNuevoPedido(pedidoId, taskId, numeroMesa, details);
         await EnviarPushADestinatariosAsync(mozoId, "📝 Nuevo Pedido", $"La Mesa {numeroMesa} realizó un nuevo pedido.");
     }
 
     public async Task NotificarPedidoAprobadoAsync(Guid pedidoId, int numeroMesa, string details, Guid? mozoId)
     {
-        await _hubContext.Clients.All.NotificarPedidoAprobado(pedidoId, numeroMesa, details);
+        var pedido = await _context.Pedidos.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == pedidoId);
+        var restauranteId = pedido?.RestauranteId;
+        if (restauranteId.HasValue)
+        {
+            await _hubContext.Clients.Group($"Restaurante_{restauranteId.Value}").NotificarPedidoAprobado(pedidoId, numeroMesa, details);
+        }
+        else
+        {
+            await _hubContext.Clients.All.NotificarPedidoAprobado(pedidoId, numeroMesa, details);
+        }
         await EnviarPushADestinatariosAsync(mozoId, "✅ Pedido Aprobado", $"El pedido de la Mesa {numeroMesa} fue aprobado.");
     }
 
     public async Task NotificarPedidoListoAsync(Guid pedidoId, Guid taskId, int numeroMesa, Guid? mozoId)
     {
-        await _hubContext.Clients.All.NotificarPedidoListo(pedidoId, taskId, numeroMesa);
+        var pedido = await _context.Pedidos.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == pedidoId);
+        var restauranteId = pedido?.RestauranteId;
+        if (restauranteId.HasValue)
+        {
+            await _hubContext.Clients.Group($"Restaurante_{restauranteId.Value}").NotificarPedidoListo(pedidoId, taskId, numeroMesa);
+        }
+        else
+        {
+            await _hubContext.Clients.All.NotificarPedidoListo(pedidoId, taskId, numeroMesa);
+        }
         await EnviarPushADestinatariosAsync(mozoId, "🍽️ Pedido Listo", $"El pedido de la Mesa {numeroMesa} está listo para ser servido.");
     }
 
     public async Task NotificarTareaCompletadaAsync(Guid taskId)
     {
-        await _hubContext.Clients.All.TareaCompletada(taskId.ToString());
+        var task = await _context.Tasks.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == taskId);
+        var restauranteId = task?.RestauranteId;
+        if (restauranteId.HasValue)
+        {
+            await _hubContext.Clients.Group($"Restaurante_{restauranteId.Value}").TareaCompletada(taskId.ToString());
+        }
+        else
+        {
+            await _hubContext.Clients.All.TareaCompletada(taskId.ToString());
+        }
     }
 
     public async Task NotificarMontoConsumoActualizadoAsync(Guid mesaId, decimal? monto)
     {
-        await _hubContext.Clients.All.NotificarMontoConsumoActualizado(mesaId.ToString(), monto);
+        var mesa = await _context.Mesas.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == mesaId);
+        var restauranteId = mesa?.RestauranteId;
+        if (restauranteId.HasValue)
+        {
+            await _hubContext.Clients.Group($"Restaurante_{restauranteId.Value}").NotificarMontoConsumoActualizado(mesaId.ToString(), monto);
+        }
+        else
+        {
+            await _hubContext.Clients.All.NotificarMontoConsumoActualizado(mesaId.ToString(), monto);
+        }
     }
 
-    private IRestauranteHubClient ObtenerDestinatarios(Guid? mozoId)
+    private IRestauranteHubClient ObtenerDestinatarios(Guid? mozoId, Guid? restauranteId)
     {
         var grupos = new List<string> { "Admin" };
+        if (restauranteId.HasValue)
+        {
+            grupos.Add($"Restaurante_{restauranteId.Value}");
+        }
         if (mozoId.HasValue)
         {
             grupos.Add($"Mozo_{mozoId.Value}");

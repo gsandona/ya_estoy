@@ -16,7 +16,7 @@ public class RestauranteDbContext : DbContext
 
     public Guid? CurrentTenantId => _currentUserService?.GetRestauranteId();
     public bool IsSuperAdmin => _currentUserService?.IsSuperAdmin() ?? false;
-    public bool BypassTenantFilter => IsSuperAdmin && CurrentTenantId == null;
+    public bool BypassTenantFilter => IsSuperAdmin;
 
     public DbSet<Restaurante> Restaurantes { get; set; }
 
@@ -34,6 +34,8 @@ public class RestauranteDbContext : DbContext
     public DbSet<UserPushSubscription> PushSubscriptions { get; set; }
     public DbSet<Venta> Ventas { get; set; }
     public DbSet<MenuCategory> MenuCategories { get; set; }
+    public DbSet<Valoracion> Valoraciones { get; set; }
+    public DbSet<RoleFeature> RoleFeatures { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +53,7 @@ public class RestauranteDbContext : DbContext
         modelBuilder.Entity<DashboardWidgetConfig>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<UserPushSubscription>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
         modelBuilder.Entity<Venta>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
+        modelBuilder.Entity<Valoracion>().HasQueryFilter(e => BypassTenantFilter || e.RestauranteId == CurrentTenantId);
 
         // Self-referencing relationship for Sucursales
         modelBuilder.Entity<Restaurante>()
@@ -152,6 +155,32 @@ public class RestauranteDbContext : DbContext
         modelBuilder.Entity<MesaTask>(entity =>
         {
             entity.HasIndex(t => new { t.RestauranteId, t.Status });
+        });
+
+        modelBuilder.Entity<Valoracion>(entity =>
+        {
+            entity.HasIndex(v => v.RestauranteId);
+            entity.HasOne(v => v.Restaurante)
+                  .WithMany()
+                  .HasForeignKey(v => v.RestauranteId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(v => v.Mesa)
+                  .WithMany()
+                  .HasForeignKey(v => v.MesaId)
+                  .OnDelete(DeleteBehavior.SetNull);
+            entity.HasOne(v => v.Mozo)
+                  .WithMany()
+                  .HasForeignKey(v => v.MozoId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        modelBuilder.Entity<RoleFeature>(entity =>
+        {
+            entity.HasIndex(rf => new { rf.RoleId, rf.FeatureKey }).IsUnique();
+            entity.HasOne(rf => rf.Role)
+                  .WithMany()
+                  .HasForeignKey(rf => rf.RoleId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         // --- SEED DATA MULTI-TENANT ---

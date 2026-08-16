@@ -13,6 +13,7 @@ export interface User {
   token: string;
   restauranteId?: string;
   restauranteNombre?: string;
+  features?: string[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -31,6 +32,28 @@ export class AuthService {
   public isCocina = computed(() => this._currentUser()?.role === 'Cocina');
   public isCaja = computed(() => this._currentUser()?.role === 'Caja');
   public isMozoPortal = computed(() => this._currentUser()?.role === 'MozoPortal');
+
+  public hasFeature(key: string): boolean {
+    const user = this._currentUser();
+    if (!user) return false;
+    if (user.role === 'SuperAdmin') return true;
+    if (!user.features) {
+      if (user.role === 'Admin') {
+        return ['Metricas', 'MesasTareas', 'Cocina', 'Ventas', 'MetricasMenu', 'ConfigPersonal'].includes(key);
+      }
+      if (user.role === 'Mozo') {
+        return ['MesasTareas'].includes(key);
+      }
+      if (user.role === 'Cocina') {
+        return ['Cocina'].includes(key);
+      }
+      if (user.role === 'Caja') {
+        return ['Cocina', 'Ventas', 'ConfigPersonal'].includes(key);
+      }
+      return false;
+    }
+    return user.features.includes(key);
+  }
 
   private parseJwt(token: string): any {
     try {

@@ -59,18 +59,7 @@ import { BrandingService } from '../../../core/services/branding.service';
           </div>
         }
         <nav class="flex-1 p-4 space-y-2">
-          @if (auth.isAdmin() || auth.isSuperAdmin()) {
-            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.metrics : ''">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </span>
-              @if (!sidebarCollapsed()) {
-                <span class="truncate">{{ lang.translations().sidebar.metrics }}</span>
-              }
-            </a>
-          }
-          
-          @if (auth.currentUser()?.role !== 'Cocina') {
+          @if (auth.hasFeature('MesasTareas')) {
             <a routerLink="/admin/dashboard" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.tables : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
@@ -81,7 +70,18 @@ import { BrandingService } from '../../../core/services/branding.service';
             </a>
           }
 
-          @if (auth.currentUser()?.role === 'Cocina' || auth.isAdmin() || auth.isSuperAdmin() || auth.isCaja()) {
+          @if (auth.hasFeature('Metricas')) {
+            <a routerLink="/admin/inicio" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.metrics : ''">
+              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              @if (!sidebarCollapsed()) {
+                <span class="truncate">{{ lang.translations().sidebar.metrics }}</span>
+              }
+            </a>
+          }
+
+          @if (auth.hasFeature('Cocina')) {
             <a routerLink="/admin/cocina" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.kitchen : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
@@ -92,7 +92,7 @@ import { BrandingService } from '../../../core/services/branding.service';
             </a>
           }
 
-          @if (auth.isAdmin() || auth.isSuperAdmin() || auth.isCaja()) {
+          @if (auth.hasFeature('Ventas')) {
             <a routerLink="/admin/ventas" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.sales : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
@@ -103,7 +103,7 @@ import { BrandingService } from '../../../core/services/branding.service';
             </a>
           }
 
-          @if (auth.isAdmin() || auth.isSuperAdmin()) {
+          @if (auth.hasFeature('MetricasMenu')) {
             <a routerLink="/admin/metricas-menu" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Platos Vendidos' : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5z" /></svg>
@@ -114,7 +114,7 @@ import { BrandingService } from '../../../core/services/branding.service';
             </a>
           }
 
-          @if (auth.isAdmin() || auth.isCaja()) {
+          @if (auth.hasFeature('ConfigPersonal')) {
             <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.personal : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -125,7 +125,7 @@ import { BrandingService } from '../../../core/services/branding.service';
             </a>
           }
           
-          @if (auth.isSuperAdmin()) {
+          @if (auth.hasFeature('Sistema')) {
             <a routerLink="/admin/sistema" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.system : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -337,15 +337,7 @@ import { BrandingService } from '../../../core/services/branding.service';
             </div>
             
             <nav class="flex-1 p-6 space-y-4">
-              @if (auth.isAdmin() || auth.isSuperAdmin()) {
-                <a routerLink="/admin/inicio" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </span>
-                  Métricas y Datos
-                </a>
-              }
-              @if (auth.currentUser()?.role !== 'Cocina') {
+              @if (auth.hasFeature('MesasTareas')) {
                 <a routerLink="/admin/dashboard" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/></svg>
@@ -354,7 +346,16 @@ import { BrandingService } from '../../../core/services/branding.service';
                 </a>
               }
 
-              @if (auth.currentUser()?.role === 'Cocina' || auth.isAdmin() || auth.isSuperAdmin()) {
+              @if (auth.hasFeature('Metricas')) {
+                <a routerLink="/admin/inicio" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
+                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 18h16M4 6l6 6 4-2 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                  Métricas y Datos
+                </a>
+              }
+
+              @if (auth.hasFeature('Cocina')) {
                 <a routerLink="/admin/cocina" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
@@ -363,7 +364,7 @@ import { BrandingService } from '../../../core/services/branding.service';
                 </a>
               }
 
-              @if (auth.isAdmin() || auth.isSuperAdmin()) {
+              @if (auth.hasFeature('Ventas')) {
                 <a routerLink="/admin/ventas" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
@@ -372,7 +373,7 @@ import { BrandingService } from '../../../core/services/branding.service';
                 </a>
               }
 
-              @if (auth.isAdmin() || auth.isCaja()) {
+              @if (auth.hasFeature('ConfigPersonal')) {
                 <a routerLink="/admin/configuracion" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75M9 21h6m-3-10a4 4 0 11-8 0 4 4 0 018 0zM3 21v-2a4 4 0 014-4h4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -381,7 +382,7 @@ import { BrandingService } from '../../../core/services/branding.service';
                 </a>
               }
               
-              @if (auth.isSuperAdmin()) {
+              @if (auth.hasFeature('Sistema')) {
                 <a routerLink="/admin/sistema" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
                   <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>

@@ -4,11 +4,12 @@ import { AbmUsuariosComponent } from './abm-usuarios.component';
 import { AbmMesasComponent } from './abm-mesas.component';
 import { AbmMenuComponent } from './abm-menu.component';
 import { AbmRestaurantesComponent } from './abm-restaurantes.component';
+import { ValoracionesListComponent } from './valoraciones-list.component';
 
 @Component({
   selector: 'app-config',
   standalone: true,
-  imports: [CommonModule, AbmUsuariosComponent, AbmMesasComponent, AbmMenuComponent, AbmRestaurantesComponent],
+  imports: [CommonModule, AbmUsuariosComponent, AbmMesasComponent, AbmMenuComponent, AbmRestaurantesComponent, ValoracionesListComponent],
   template: `
     <div class="space-y-8 animate-fade-in">
       <div class="bg-white p-8 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 flex justify-between items-center">
@@ -50,6 +51,13 @@ import { AbmRestaurantesComponent } from './abm-restaurantes.component';
             <p class="text-sm text-gray-500 mb-4">Configura los datos y la identidad de los establecimientos.</p>
             <button type="button" class="w-full bg-surface text-primary py-2.5 rounded-xl text-sm font-bold border border-gray-200 hover:bg-gray-100">Gestionar Sedes</button>
           </div>
+
+          <div (click)="setTab('valoraciones')" class="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-lg transition cursor-pointer hover:-translate-y-1">
+            <div class="h-14 w-14 bg-yellow-50 text-yellow-600 rounded-2xl flex items-center justify-center text-2xl mb-4">⭐</div>
+            <h2 class="text-xl font-bold text-gray-800 mb-2">Valoraciones</h2>
+            <p class="text-sm text-gray-500 mb-4">Revisa las opiniones y calificaciones de los comensales.</p>
+            <button type="button" class="w-full bg-surface text-primary py-2.5 rounded-xl text-sm font-bold border border-gray-200 hover:bg-gray-100">Ver Opiniones</button>
+          </div>
         </div>
       }
 
@@ -65,6 +73,9 @@ import { AbmRestaurantesComponent } from './abm-restaurantes.component';
       @if (activeTab === 'restaurantes') {
         <app-abm-restaurantes class="block"></app-abm-restaurantes>
       }
+      @if (activeTab === 'valoraciones') {
+        <app-valoraciones-list class="block"></app-valoraciones-list>
+      }
     </div>
   `,
   styles: [`
@@ -78,9 +89,9 @@ import { AbmRestaurantesComponent } from './abm-restaurantes.component';
   `]
 })
 export class ConfigComponent {
-  activeTab: 'home' | 'usuarios' | 'mesas' | 'menu' | 'restaurantes' = 'home';
+  activeTab: 'home' | 'usuarios' | 'mesas' | 'menu' | 'restaurantes' | 'valoraciones' = 'home';
 
-  setTab(tab: 'home' | 'usuarios' | 'mesas' | 'menu' | 'restaurantes') {
+  setTab(tab: 'home' | 'usuarios' | 'mesas' | 'menu' | 'restaurantes' | 'valoraciones') {
     this.activeTab = tab;
   }
 }

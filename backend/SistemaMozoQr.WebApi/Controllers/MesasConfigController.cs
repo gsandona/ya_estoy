@@ -149,13 +149,13 @@ public class MesasConfigController : ControllerBase
 
     [HttpPost("{id:guid}/cerrar")]
     [Authorize(Roles = "Admin,SuperAdmin,Mozo,Caja")]
-    public async Task<IActionResult> Cerrar(Guid id)
+    public async Task<IActionResult> Cerrar(Guid id, [FromQuery] bool sinFacturar = false)
     {
         var mesa = await _dbContext.Mesas.IgnoreQueryFilters().Include(m => m.Mozo).FirstOrDefaultAsync(m => m.Id == id);
         if (mesa == null) return NotFound();
 
-        // 1. Registrar la Venta en el histórico antes de limpiar la sesión
-        if (!string.IsNullOrEmpty(mesa.CodigoAcceso))
+        // 1. Registrar la Venta en el histórico antes de limpiar la sesión (solo si no es sinFacturar)
+        if (!sinFacturar && !string.IsNullOrEmpty(mesa.CodigoAcceso))
         {
             var ordersList = await _pedidoRepository.GetByMesaIdAsync(mesa.Id);
             var activeOrders = ordersList.Where(o => o.Estado != SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado && o.CodigoAcceso == mesa.CodigoAcceso).ToList();
@@ -207,15 +207,23 @@ public class MesasConfigController : ControllerBase
             await _hubContext.Clients.All.TareaCompletada(task.Id.ToString());
         }
 
-        // 4. Mark all active/pending orders for this table as delivered
+        // 4. Mark all active/pending orders for this table as delivered or canceled
         var orders = await _pedidoRepository.GetByMesaIdAsync(mesa.Id);
         foreach (var order in orders)
         {
             if (order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Recibido ||
                 order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.EnPreparacion ||
-                order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Listo)
+                order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Listo ||
+                order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Aprobado)
             {
-                order.Estado = SistemaMozoQr.Domain.Enums.EstadoPedido.Entregado;
+                order.Estado = sinFacturar 
+                    ? SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado 
+                    : SistemaMozoQr.Domain.Enums.EstadoPedido.Entregado;
+                await _pedidoRepository.UpdateAsync(order);
+            }
+            else if (sinFacturar && order.Estado == SistemaMozoQr.Domain.Enums.EstadoPedido.Entregado)
+            {
+                order.Estado = SistemaMozoQr.Domain.Enums.EstadoPedido.Cancelado;
                 await _pedidoRepository.UpdateAsync(order);
             }
         }

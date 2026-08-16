@@ -30,6 +30,37 @@ public static class ModelBuilderExtensions
             new Role { Id = 6, Nombre = "MozoPortal", Descripcion = "Portal de selección para Mozos" }
         );
 
+        // Seed RoleFeatures
+        modelBuilder.Entity<RoleFeature>().HasData(
+            // SuperAdmin (all 7 features)
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000001"), RoleId = 3, FeatureKey = "Metricas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000002"), RoleId = 3, FeatureKey = "MesasTareas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000003"), RoleId = 3, FeatureKey = "Cocina", Activo = true },
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000004"), RoleId = 3, FeatureKey = "Ventas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000005"), RoleId = 3, FeatureKey = "MetricasMenu", Activo = true },
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000006"), RoleId = 3, FeatureKey = "ConfigPersonal", Activo = true },
+            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000007"), RoleId = 3, FeatureKey = "Sistema", Activo = true },
+
+            // Admin (6 features, no 'Sistema')
+            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000001"), RoleId = 2, FeatureKey = "Metricas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000002"), RoleId = 2, FeatureKey = "MesasTareas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000003"), RoleId = 2, FeatureKey = "Cocina", Activo = true },
+            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000004"), RoleId = 2, FeatureKey = "Ventas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000005"), RoleId = 2, FeatureKey = "MetricasMenu", Activo = true },
+            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000006"), RoleId = 2, FeatureKey = "ConfigPersonal", Activo = true },
+
+            // Mozo (only 'MesasTareas')
+            new RoleFeature { Id = Guid.Parse("d0000000-0000-0000-0000-000000000001"), RoleId = 1, FeatureKey = "MesasTareas", Activo = true },
+
+            // Cocina (only 'Cocina')
+            new RoleFeature { Id = Guid.Parse("c0000000-0000-0000-0000-000000000001"), RoleId = 4, FeatureKey = "Cocina", Activo = true },
+
+            // Caja (Cocina, Ventas, ConfigPersonal)
+            new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000001"), RoleId = 5, FeatureKey = "Cocina", Activo = true },
+            new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000002"), RoleId = 5, FeatureKey = "Ventas", Activo = true },
+            new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000003"), RoleId = 5, FeatureKey = "ConfigPersonal", Activo = true }
+        );
+
         // Seed Restaurantes
         modelBuilder.Entity<Restaurante>().HasData(
             new Restaurante { Id = rest1Id, Nombre = "El Gran Sabor", IconoPrincipal = "🍽️", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },

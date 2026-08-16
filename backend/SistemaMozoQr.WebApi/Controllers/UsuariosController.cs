@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaMozoQr.Application.DTOs;
 using SistemaMozoQr.Application.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMozoQr.WebApi.Controllers;
 
@@ -92,4 +93,24 @@ public class UsuariosController : ControllerBase
 
         return Ok(dtos);
     }
+
+    [HttpPost("{id:guid}/change-password")]
+    public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordRequestDto dto)
+    {
+        try
+        {
+            await _usuarioService.CambiarPasswordAsync(id, dto.Password);
+            return Ok(new { message = "Contraseña cambiada correctamente" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+}
+
+public class ChangePasswordRequestDto
+{
+    [Required]
+    public string Password { get; set; } = string.Empty;
 }

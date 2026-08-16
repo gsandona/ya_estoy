@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, roleGuard } from './core/guards/auth.guard';
+import { authGuard, roleGuard, featureGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -22,43 +22,45 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+        loadComponent: () => import('./features/admin/dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+        canActivate: [featureGuard],
+        data: { feature: 'MesasTareas' }
       },
       {
         path: 'configuracion',
         loadComponent: () => import('./features/admin/config/config.component').then(m => m.ConfigComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['Admin', 'SuperAdmin', 'Caja'] }
+        canActivate: [featureGuard],
+        data: { feature: 'ConfigPersonal' }
       },
       {
         path: 'sistema',
         loadComponent: () => import('./features/admin/superadmin-dashboard.component').then(m => m.SuperAdminDashboardComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['SuperAdmin'] }
+        canActivate: [featureGuard],
+        data: { feature: 'Sistema' }
       },
       {
         path: 'inicio',
         loadComponent: () => import('./features/admin/dashboard/admin-inicio.component').then(m => m.AdminInicioComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['Admin', 'SuperAdmin'] }
+        canActivate: [featureGuard],
+        data: { feature: 'Metricas' }
       },
       {
         path: 'cocina',
         loadComponent: () => import('./features/admin/dashboard/admin-cocina.component').then(m => m.AdminCocinaComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['Cocina', 'Admin', 'SuperAdmin', 'Caja'] }
+        canActivate: [featureGuard],
+        data: { feature: 'Cocina' }
       },
       {
         path: 'ventas',
         loadComponent: () => import('./features/admin/dashboard/admin-ventas.component').then(m => m.AdminVentasComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['Admin', 'SuperAdmin', 'Caja'] }
+        canActivate: [featureGuard],
+        data: { feature: 'Ventas' }
       },
       {
         path: 'metricas-menu',
         loadComponent: () => import('./features/admin/dashboard/admin-menu-metrics.component').then(m => m.AdminMenuMetricsComponent),
-        canActivate: [roleGuard],
-        data: { roles: ['Admin', 'SuperAdmin'] }
+        canActivate: [featureGuard],
+        data: { feature: 'MetricasMenu' }
       },
       {
         path: '',
