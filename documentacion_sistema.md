@@ -25,6 +25,7 @@ El backend está estructurado bajo los principios de **Clean Architecture** (Arq
 ```
 
 - **Multi-Tenant (Aislamiento de Datos):** Implementado mediante **Global Query Filters** en EF Core. Todos los inquilinos (restaurantes) comparten la misma base de datos física, pero sus datos se filtran automáticamente a nivel de repositorio usando la cabecera `X-Tenant-ID` (para administradores) o la propiedad `TenantId` incrustada en los JWT (para mozos).
+- **Almacenamiento Local de Imágenes:** Los logotipos e imágenes de fondo cargados desde el panel se guardan de forma física en el sistema de archivos del backend (`wwwroot/uploads`), almacenando rutas relativas en la BD.
 - **Notificaciones en Tiempo Real:** Utiliza **SignalR** para conectar el cliente (mesa) con el dashboard de administración, permitiendo a los mozos recibir notificaciones instantáneas de llamados, pedidos y pedidos de cuentas.
 
 ### 1.2. Frontend (Angular + Capacitor)

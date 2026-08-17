@@ -12,6 +12,7 @@ Esta documentación describe la arquitectura de software, infraestructura, tecno
 5. [Configuración de Entornos y Despliegue](#5-configuración-de-entornos-y-despliegue)
 6. [Referencia Completa de API (Guía Postman)](#6-referencia-completa-de-api-guía-postman)
 7. [Comunicación en Tiempo Real (SignalR)](#7-comunicación-en-tiempo-real-signalr)
+8. [Carga Local de Imágenes (Logotipos y Fondos)](#8-carga-local-de-imágenes-logotipos-y-fondos)
 
 ---
 
@@ -244,3 +245,32 @@ El Hub de comunicación en tiempo real está expuesto en `/hubs/mozo`.
 * `"MesaActualizada"`: Avisa a las terminales de administración que el estado de una mesa cambió (ej. de Disponible a Ocupada o Solicitó Cuenta).
 * `"NuevaTarea"`: Notifica a los mozos que hay una tarea pendiente (Llamado de mesa, Pedido Listo).
 * `"PedidoActualizado"`: Avisa a los comensales que el estado de su orden cambió (ej. de Recibido a En Preparación o Listo).
+
+---
+
+## 8. Carga Local de Imágenes (Logotipos y Fondos)
+
+El sistema soporta la personalización de logotipos de sucursales (`LogoUrl`) e imágenes de fondo de menús (`ImagenFondoUrl`). Para evitar la dependencia de URLs de almacenamiento externas o de base de datos saturadas por strings Base64 gigantes, las imágenes se gestionan de forma local en el servidor:
+
+### 8.1 Flujo de Trabajo (Upload Workflow)
+1. **Frontend (Angular):**
+   - El administrador utiliza selectores de archivos locales (`input[type="file"]`) para elegir imágenes (PNG, JPG, WEBP o SVG).
+   - El archivo se procesa en el navegador usando un `FileReader.readAsDataURL` que genera un string en formato Base64.
+   - La previsualización de la imagen se muestra de forma reactiva cargando este string Base64.
+   - Al enviar el formulario de restaurante, los valores Base64 de `logoUrl` e `imagenFondoUrl` se envían al backend en el JSON del request.
+
+2. **Backend (ASP.NET Core Web API):**
+   - El controlador `RestaurantesController` intercepta los campos `LogoUrl` e `ImagenFondoUrl`.
+   - Si la cadena empieza con `data:image/`, el servidor:
+     - Detecta la extensión correspondiente basándose en el MIME type (e.g. `.png`, `.jpg`, `.webp`, `.svg`).
+     - Decodifica la sección de datos Base64 a bytes binarios.
+     - Guarda el archivo binario en el disco local bajo el directorio `wwwroot/uploads/` asignándole un nombre de archivo único (`Guid`).
+     - Actualiza el campo de la base de datos con la ruta de acceso relativa pública (ej. `/uploads/3f68a8cf-8d9e-4e1b-b461-9c8088be30df.png`).
+   - Si la cadena no contiene prefijo Base64, se asume que es una ruta estática ya procesada y se almacena directamente.
+
+### 8.2 Configuración del Servidor y Despliegue (Production)
+- **Servidor Kestrel:** En `Program.cs` se registra `app.UseStaticFiles()` lo que permite exponer la carpeta `wwwroot/` públicamente en el puerto de la API.
+- **Render / Docker Containers (Persistencia):**
+  > [!IMPORTANT]
+  > Dado que las imágenes se almacenan de forma local en el sistema de archivos del servidor backend, si el entorno de ejecución es efímero (como los Web Services estándar de Render), los archivos subidos se perderán al redesplegar la aplicación.
+  > **Solución:** Debes montar un volumen o disco persistente (**Persistent Disk**) en la ruta del contenedor `/app/wwwroot/uploads` (o la ruta correspondiente de tu compilación de Docker) en el panel de control de tu proveedor de la nube.

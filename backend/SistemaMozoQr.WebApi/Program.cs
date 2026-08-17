@@ -69,6 +69,16 @@ var app = builder.Build();
 
 app.UseCors("AllowAll");
 
+// Asegurar creación de carpeta wwwroot/uploads para subida de imágenes
+var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+var uploadsPath = Path.Combine(wwwrootPath, "uploads");
+if (!Directory.Exists(uploadsPath))
+{
+    Directory.CreateDirectory(uploadsPath);
+}
+
+app.UseStaticFiles();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

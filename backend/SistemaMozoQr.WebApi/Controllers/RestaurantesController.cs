@@ -1,4 +1,7 @@
+using System;
+using System.IO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaMozoQr.Domain.Entities;
@@ -12,10 +15,12 @@ namespace SistemaMozoQr.WebApi.Controllers;
 public class RestaurantesController : ControllerBase
 {
     private readonly RestauranteDbContext _context;
+    private readonly IWebHostEnvironment _env;
 
-    public RestaurantesController(RestauranteDbContext context)
+    public RestaurantesController(RestauranteDbContext context, IWebHostEnvironment env)
     {
         _context = context;
+        _env = env;
     }
 
     [HttpGet]
@@ -59,6 +64,9 @@ public class RestaurantesController : ControllerBase
             restaurante.ParentRestauranteId = _context.CurrentTenantId;
         }
 
+        restaurante.LogoUrl = SaveBase64Image(restaurante.LogoUrl);
+        restaurante.ImagenFondoUrl = SaveBase64Image(restaurante.ImagenFondoUrl);
+
         _context.Restaurantes.Add(restaurante);
         await _context.SaveChangesAsync();
         return Ok(restaurante);
@@ -75,9 +83,9 @@ public class RestaurantesController : ControllerBase
 
         existing.Nombre = restaurante.Nombre;
         existing.Activo = restaurante.Activo;
-        existing.LogoUrl = restaurante.LogoUrl;
+        existing.LogoUrl = SaveBase64Image(restaurante.LogoUrl);
         existing.IconoPrincipal = restaurante.IconoPrincipal;
-        existing.ImagenFondoUrl = restaurante.ImagenFondoUrl;
+        existing.ImagenFondoUrl = SaveBase64Image(restaurante.ImagenFondoUrl);
         existing.ColorPrimario = restaurante.ColorPrimario;
         existing.ColorSecundario = restaurante.ColorSecundario;
         existing.ColorFondo = restaurante.ColorFondo;
@@ -142,5 +150,64 @@ public class RestaurantesController : ControllerBase
 
         await _context.SaveChangesAsync();
         return Ok(new { message = "Datos de prueba generados exitosamente." });
+    }
+
+    private string? SaveBase64Image(string? base64Data)
+    {
+        if (string.IsNullOrEmpty(base64Data)) return null;
+
+        // Si no es un base64 de datos (no empieza con data:image/), lo devolvemos tal cual (ya es un path/URL guardado)
+        if (!base64Data.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return base64Data;
+        }
+
+        try
+        {
+            // Separar el header del contenido
+            var parts = base64Data.Split(',');
+            if (parts.Length < 2) return base64Data;
+
+            var header = parts[0]; // data:image/png;base64
+            var base64Content = parts[1];
+
+            // Obtener la extensión adecuada
+            var extension = ".png"; // default
+            if (header.Contains("image/jpeg", StringComparison.OrdinalIgnoreCase) || header.Contains("image/jpg", StringComparison.OrdinalIgnoreCase)) extension = ".jpg";
+            else if (header.Contains("image/gif", StringComparison.OrdinalIgnoreCase)) extension = ".gif";
+            else if (header.Contains("image/webp", StringComparison.OrdinalIgnoreCase)) extension = ".webp";
+            else if (header.Contains("image/svg+xml", StringComparison.OrdinalIgnoreCase)) extension = ".svg";
+
+            // Decodificar los bytes
+            var imageBytes = Convert.FromBase64String(base64Content);
+
+            // Obtener path absoluto a wwwroot
+            var webRootPath = _env.WebRootPath;
+            if (string.IsNullOrEmpty(webRootPath))
+            {
+                webRootPath = Path.Combine(_env.ContentRootPath, "wwwroot");
+            }
+
+            var uploadsFolder = Path.Combine(webRootPath, "uploads");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Generar nombre de archivo único
+            var fileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Guardar el archivo físicamente en disco
+            System.IO.File.WriteAllBytes(filePath, imageBytes);
+
+            // Devolver la URL relativa pública
+            return $"/uploads/{fileName}";
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error guardando imagen base64: {ex.Message}");
+            return base64Data; // fallback
+        }
     }
 }

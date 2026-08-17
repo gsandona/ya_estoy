@@ -37,13 +37,16 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
             <label class="block text-sm font-semibold text-gray-700 mb-1">Logo de la Sucursal</label>
             <div class="flex gap-4 items-center">
               <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center">
-                 <img *ngIf="restauranteForm.get('logoUrl')?.value" [src]="restauranteForm.get('logoUrl')?.value" class="w-full h-full object-contain p-1" />
-                 <span *ngIf="!restauranteForm.get('logoUrl')?.value" class="text-xl opacity-20">📷</span>
+                  <img *ngIf="restauranteForm.get('logoUrl')?.value" [src]="restauranteForm.get('logoUrl')?.value" class="w-full h-full object-contain p-1" />
+                  <span *ngIf="!restauranteForm.get('logoUrl')?.value" class="text-xl opacity-20">📷</span>
               </div>
-              <div class="flex-1">
+              <div class="flex-1 flex items-center gap-2">
                 <input type="file" #restFile (change)="onLogoSelected($event)" accept="image/png, image/jpeg, image/svg+xml" class="hidden">
                 <button type="button" (click)="restFile.click()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors">
                   Subir Imagen
+                </button>
+                <button type="button" *ngIf="restauranteForm.get('logoUrl')?.value" (click)="removeLogo()" class="text-xs text-red-500 font-bold hover:underline">
+                  Eliminar
                 </button>
               </div>
             </div>
@@ -82,8 +85,22 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
                 </div>
               </div>
               <div class="form-group">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">URL Imagen Fondo Menú</label>
-                <input type="text" formControlName="imagenFondoUrl" class="w-full px-4 py-2 rounded-xl border outline-none" placeholder="https://ejemplo.com/fondo.jpg">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Imagen de Fondo del Menú</label>
+                <div class="flex gap-4 items-center">
+                  <div class="w-24 h-12 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center relative">
+                     <img *ngIf="restauranteForm.get('imagenFondoUrl')?.value" [src]="restauranteForm.get('imagenFondoUrl')?.value" class="w-full h-full object-cover" />
+                     <span *ngIf="!restauranteForm.get('imagenFondoUrl')?.value" class="text-xl opacity-20">🖼️</span>
+                  </div>
+                  <div class="flex-1 flex items-center gap-2">
+                    <input type="file" #fondoFile (change)="onFondoSelected($event)" accept="image/png, image/jpeg, image/webp" class="hidden">
+                    <button type="button" (click)="fondoFile.click()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors">
+                      Subir Fondo
+                    </button>
+                    <button type="button" *ngIf="restauranteForm.get('imagenFondoUrl')?.value" (click)="removeFondo()" class="text-xs text-red-500 font-bold hover:underline">
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -173,6 +190,25 @@ export class AbmRestaurantesComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  removeLogo() {
+    this.restauranteForm.patchValue({ logoUrl: '' });
+  }
+
+  onFondoSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.restauranteForm.patchValue({ imagenFondoUrl: e.target.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeFondo() {
+    this.restauranteForm.patchValue({ imagenFondoUrl: '' });
   }
 
   loadData(): void {
