@@ -258,18 +258,18 @@ import { FormsModule } from '@angular/forms';
                          </button>
                        </div>
                      } @else {
-                       <button (click)="llamarMozo()" [disabled]="loadingLlamar()" 
+                       <button (click)="abrirModalLlamar()" [disabled]="loadingLlamar()" 
                                class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
-                         <div class="h-12 w-12 bg-accent/5 text-accent rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                           <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                           </svg>
-                         </div>
-                         <div class="flex flex-col items-center">
-                           <span class="text-[8px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Asistencia</span>
-                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Llamar Mozo</span>
-                         </div>
-                       </button>
+                          <div class="h-12 w-12 bg-accent/5 text-accent rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                          </div>
+                          <div class="flex flex-col items-center">
+                            <span class="text-[8px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Asistencia</span>
+                            <span class="font-black text-gray-800 text-xs mt-1 leading-none">Llamar Mozo</span>
+                          </div>
+                        </button>
                      }
 
                      <!-- Pedir Cuenta -->
@@ -293,7 +293,7 @@ import { FormsModule } from '@angular/forms';
                          </button>
                        </div>
                      } @else {
-                       <button (click)="pedirCuenta()" [disabled]="loadingCuenta()" 
+                       <button (click)="abrirModalCuenta()" [disabled]="loadingCuenta()" 
                                class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
                          <div class="h-12 w-12 bg-indigo-50/10 text-indigo-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -808,6 +808,98 @@ import { FormsModule } from '@angular/forms';
              </div>
           </div>
         }
+
+        <!-- Llamar Mozo Modal (Premium custom description) -->
+        @if (showLlamarModal()) {
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up text-left">
+                <button (click)="showLlamarModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <span class="text-3xl block mb-2 select-none">🛎️</span>
+                <h2 class="text-xl font-serif font-black text-gray-800 mb-1">Llamar al Mozo</h2>
+                <p class="text-xs text-gray-400 font-semibold mb-5">Si necesitas algo específico, indícalo abajo (opcional).</p>
+                
+                <div class="mb-6">
+                  <textarea 
+                    [(ngModel)]="llamarMotivoInput"
+                    rows="3"
+                    class="w-full px-4 py-3 rounded-2xl border border-gray-150 focus:ring-2 focus:ring-accent/20 focus:border-accent outline-none text-xs font-bold transition-all text-gray-700 resize-none"
+                    placeholder="Ej: Traer servilletas, cubiertos, hielo, etc."></textarea>
+                </div>
+                
+                <button 
+                  (click)="confirmarLlamarMozo()"
+                  [disabled]="loadingLlamar()"
+                  class="w-full bg-accent text-white py-4 rounded-2xl font-black text-xs hover:bg-accent/90 active:scale-[0.98] transition-all shadow-lg shadow-accent/25 flex justify-center items-center gap-2 uppercase tracking-wider">
+                  @if (loadingLlamar()) {
+                    <span class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full block animate-delay-150"></span>
+                  } @else {
+                    Confirmar Llamado
+                  }
+                </button>
+             </div>
+          </div>
+        }
+
+        <!-- Pedir Cuenta Modal (Payment options and change) -->
+        @if (showPedirCuentaModal()) {
+          <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up text-left">
+                <button (click)="showPedirCuentaModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
+                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <span class="text-3xl block mb-2 select-none">💵</span>
+                <h2 class="text-xl font-serif font-black text-gray-800 mb-1">Pedir la Cuenta</h2>
+                <p class="text-xs text-gray-400 font-semibold mb-5">Selecciona el método de pago para agilizar el servicio.</p>
+                
+                <div class="space-y-3 mb-6">
+                  <!-- Payment Method Selection -->
+                  <div class="flex gap-2">
+                    <button 
+                      (click)="metodoPago.set('efectivo')"
+                      class="flex-1 py-3 px-4 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                      [ngClass]="metodoPago() === 'efectivo' ? 'bg-primary text-white border-primary' : 'bg-slate-50 border-gray-150 text-gray-650'">
+                      <span>💵</span> Efectivo
+                    </button>
+                    <button 
+                      (click)="metodoPago.set('tarjeta')"
+                      class="flex-1 py-3 px-4 rounded-2xl border text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                      [ngClass]="metodoPago() === 'tarjeta' ? 'bg-primary text-white border-primary' : 'bg-slate-50 border-gray-150 text-gray-650'">
+                      <span>💳</span> POS / Tarjeta
+                    </button>
+                  </div>
+                  
+                  <!-- Cash Details -->
+                  @if (metodoPago() === 'efectivo') {
+                    <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 animate-scale-up">
+                      <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">¿Con cuánto vas a pagar? (Opcional)</label>
+                      <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-xs text-gray-400">$</span>
+                        <input 
+                          type="number"
+                          [(ngModel)]="pagaConMonto"
+                          class="w-full pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-accent/20 outline-none text-xs font-bold text-gray-700 bg-white"
+                          placeholder="Ej: 5000">
+                      </div>
+                      <p class="text-[9px] text-gray-400 font-semibold mt-1">Nos ayuda a traer el cambio exacto.</p>
+                    </div>
+                  }
+                </div>
+                
+                <button 
+                  (click)="confirmarPedirCuenta()"
+                  [disabled]="loadingCuenta()"
+                  class="w-full bg-accent text-white py-4 rounded-2xl font-black text-xs hover:bg-accent/90 active:scale-[0.98] transition-all shadow-lg shadow-accent/25 flex justify-center items-center gap-2 uppercase tracking-wider">
+                  @if (loadingCuenta()) {
+                    <span class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-delay-150"></span>
+                  } @else {
+                    Confirmar Pedido de Cuenta
+                  }
+                </button>
+             </div>
+          </div>
+        }
       </div>
     </div>
   }
@@ -919,6 +1011,13 @@ export class PedidoComponent implements OnInit {
 
   showCartModal = signal(false);
   showSuccessToast = signal(false);
+
+  showLlamarModal = signal(false);
+  llamarMotivoInput = '';
+  
+  showPedirCuentaModal = signal(false);
+  metodoPago = signal<'efectivo' | 'tarjeta'>('efectivo');
+  pagaConMonto = '';
 
   constructor() {
     effect(() => {
@@ -1146,10 +1245,40 @@ export class PedidoComponent implements OnInit {
     }
   }
 
-  async llamarMozo() {
+  abrirModalLlamar() {
+    this.llamarMotivoInput = '';
+    this.showLlamarModal.set(true);
+  }
+
+  confirmarLlamarMozo() {
+    this.showLlamarModal.set(false);
+    let details = 'Solicita asistencia';
+    if (this.llamarMotivoInput.trim()) {
+      details = `Solicita asistencia: "${this.llamarMotivoInput.trim()}"`;
+    }
+    this.ejecutarLlamarMozo(details);
+  }
+
+  abrirModalCuenta() {
+    this.pagaConMonto = '';
+    this.metodoPago.set('efectivo');
+    this.showPedirCuentaModal.set(true);
+  }
+
+  confirmarPedirCuenta() {
+    this.showPedirCuentaModal.set(false);
+    let details = 'Pago con Tarjeta / POS';
+    if (this.metodoPago() === 'efectivo') {
+      const monto = this.pagaConMonto.trim();
+      details = monto ? `Pago en Efectivo (Paga con $${monto})` : 'Pago en Efectivo';
+    }
+    this.ejecutarPedirCuenta(details);
+  }
+
+  async ejecutarLlamarMozo(details?: string) {
     this.loadingLlamar.set(true);
     try {
-      const taskId = await this.signalrService.sendLlamarMozo(this.id);
+      const taskId = await this.signalrService.sendLlamarMozo(this.id, details);
       if (taskId && taskId !== '00000000-0000-0000-0000-000000000000') {
         this.yaLlamo.set(true);
         this.activeLlamoTaskId.set(taskId);
@@ -1161,10 +1290,10 @@ export class PedidoComponent implements OnInit {
     }
   }
 
-  async pedirCuenta() {
+  async ejecutarPedirCuenta(details?: string) {
     this.loadingCuenta.set(true);
     try {
-      const taskId = await this.signalrService.sendPedirCuenta(this.id);
+      const taskId = await this.signalrService.sendPedirCuenta(this.id, details);
       if (taskId && taskId !== '00000000-0000-0000-0000-000000000000') {
         this.yaPidioCuenta.set(true);
         this.activeCuentaTaskId.set(taskId);

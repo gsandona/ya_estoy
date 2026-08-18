@@ -347,56 +347,26 @@ import { LanguageService } from '../../../../core/services/language.service';
     <!-- Confirm Close Modal -->
     @if (showConfirmCloseModal()) {
       <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-md border border-gray-150 shadow-2xl space-y-5 animate-scale-up">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm border border-gray-150 shadow-2xl space-y-5 animate-scale-up text-left">
           <div class="pb-2 border-b border-gray-100">
-            <h3 class="text-lg font-black text-gray-800">Confirmar Cierre de Cuenta</h3>
+            <h3 class="text-lg font-black text-gray-800">Cerrar Mesa {{ billingMesa()?.numero }}</h3>
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">
-              Mesa {{ billingMesa()?.numero }} • Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
+              Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
             </p>
           </div>
 
-          <div class="space-y-3 max-h-[250px] overflow-y-auto pr-1">
-            <!-- Render already saved billing items -->
-            @for (item of billingItems(); track item.id) {
-              <div class="flex justify-between items-center text-xs font-bold text-gray-700">
-                <span>{{ item.cantidad }}x {{ item.nombre }}</span>
-                <span>\${{ item.total | number:'1.2-2' }}</span>
-              </div>
-            }
-            
-            <!-- Render pending extra items -->
-            @for (item of extraItems(); track item.menuItemId) {
-              <div class="flex justify-between items-center text-xs font-bold text-accent">
-                <span>{{ item.cantidad }}x {{ item.nombre }} (Extra)</span>
-                <span>\${{ item.total | number:'1.2-2' }}</span>
-              </div>
-            }
-
-            <!-- Render pending manual charges -->
-            @for (charge of manualCharges(); track charge.descripcion) {
-              <div class="flex justify-between items-center text-xs font-bold text-accent">
-                <span>1x {{ charge.descripcion }} (Manual)</span>
-                <span>\${{ charge.monto | number:'1.2-2' }}</span>
-              </div>
-            }
+          <div>
+            <p class="text-xs text-gray-550 font-semibold leading-relaxed">
+              ¿Está seguro que desea cerrar la mesa? Se guardará el registro de consumos de esta sesión para las estadísticas y métricas de ventas, y la mesa quedará disponible para nuevos clientes.
+            </p>
           </div>
 
-          <div class="pt-4 border-t border-dashed border-gray-200">
-            <div class="flex justify-between items-center font-black text-gray-800 text-sm">
-              <span>TOTAL FACTURA</span>
-              <span class="text-emerald-700 text-base">\${{ getPreviewTotal() | number:'1.2-2' }}</span>
-            </div>
-          </div>
-
-          <div class="flex flex-wrap gap-2.5 justify-end pt-2">
-            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs">
+          <div class="flex gap-2.5 justify-end pt-2">
+            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-105 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs transition-all active:scale-95">
               Cancelar
             </button>
-            <button (click)="ejecutarCierreSinFacturar()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">
-              Cerrar sin Facturar
-            </button>
-            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">
-              Confirmar Pago y Facturar
+            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs shadow-md transition-all active:scale-95">
+              Confirmar Cierre
             </button>
           </div>
         </div>

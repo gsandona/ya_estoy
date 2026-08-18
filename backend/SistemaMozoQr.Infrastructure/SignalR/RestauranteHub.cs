@@ -67,37 +67,41 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         return pendingTasks.Any(t => t.TableId == mesa.Numero && t.Type == type && t.RestauranteId == mesa.RestauranteId);
     }
 
-    public async Task<Guid> LlamarMozo(Guid mesaId)
+    public async Task<Guid> LlamarMozo(Guid mesaId, string? details)
     {
         if (IsSpamming(mesaId, "Llamado") || !await IsMesaActive(mesaId) || await IsDuplicateAlert(mesaId, "Llamado")) return Guid.Empty;
         var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
         var taskId = Guid.NewGuid();
+        var detailsText = string.IsNullOrEmpty(details) ? "Solicita asistencia" : details;
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask 
         { 
             Id = taskId, 
             TableId = tableNumero, 
             Type = "Llamado", 
+            Details = detailsText,
             AssignedMozoId = assignedMozoId,
             RestauranteId = restauranteId
         });
-        await clients.NotificarLlamadoMozo(taskId, tableNumero);
+        await clients.NotificarLlamadoMozo(taskId, tableNumero, detailsText);
         return taskId;
     }
 
-    public async Task<Guid> PedirCuenta(Guid mesaId)
+    public async Task<Guid> PedirCuenta(Guid mesaId, string? details)
     {
         if (IsSpamming(mesaId, "Cuenta") || !await IsMesaActive(mesaId) || await IsDuplicateAlert(mesaId, "Cuenta")) return Guid.Empty;
         var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
         var taskId = Guid.NewGuid();
+        var detailsText = string.IsNullOrEmpty(details) ? "Solicita la cuenta" : details;
         await _taskRepository.AddAsync(new SistemaMozoQr.Domain.Entities.MesaTask 
         { 
             Id = taskId, 
             TableId = tableNumero, 
             Type = "Cuenta", 
+            Details = detailsText,
             AssignedMozoId = assignedMozoId,
             RestauranteId = restauranteId
         });
-        await clients.NotificarPidiendoCuenta(taskId, tableNumero);
+        await clients.NotificarPidiendoCuenta(taskId, tableNumero, detailsText);
         return taskId;
     }
 

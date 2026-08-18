@@ -27,7 +27,7 @@ public class NotificacionService : INotificacionService
     {
         var mesa = await _context.Mesas.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == mesaId);
         var restauranteId = mesa?.RestauranteId;
-        await ObtenerDestinatarios(mozoId, restauranteId).NotificarLlamadoMozo(mesaId, numeroMesa);
+        await ObtenerDestinatarios(mozoId, restauranteId).NotificarLlamadoMozo(mesaId, numeroMesa, "Solicita mozo a la mesa");
         await EnviarPushADestinatariosAsync(mozoId, "🛎️ Llamado de Mesa", $"La Mesa {numeroMesa} solicita tu asistencia.");
     }
 
@@ -35,7 +35,7 @@ public class NotificacionService : INotificacionService
     {
         var mesa = await _context.Mesas.IgnoreQueryFilters().FirstOrDefaultAsync(m => m.Id == mesaId);
         var restauranteId = mesa?.RestauranteId;
-        await ObtenerDestinatarios(mozoId, restauranteId).NotificarPidiendoCuenta(mesaId, numeroMesa);
+        await ObtenerDestinatarios(mozoId, restauranteId).NotificarPidiendoCuenta(mesaId, numeroMesa, "Solicita la cuenta");
         await EnviarPushADestinatariosAsync(mozoId, "💵 Pedido de Cuenta", $"La Mesa {numeroMesa} solicita la cuenta.");
     }
 

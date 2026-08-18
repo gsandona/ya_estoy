@@ -213,14 +213,15 @@ export class SignalrService {
   private addListeners() {
     if (!this.hubConnection) return;
 
-    this.hubConnection.on('NotificarLlamadoMozo', (taskId: string, numeroMesa: number) => {
+    this.hubConnection.on('NotificarLlamadoMozo', (taskId: string, numeroMesa: number, details?: string) => {
       this.playAudioAlert('tasks');
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
         type: 'Llamado',
         timestamp: new Date(),
-        status: 'Pending'
+        status: 'Pending',
+        details: details || 'Solicita asistencia'
       });
     });
 
@@ -237,14 +238,15 @@ export class SignalrService {
       });
     });
 
-    this.hubConnection.on('NotificarPidiendoCuenta', (taskId: string, numeroMesa: number) => {
+    this.hubConnection.on('NotificarPidiendoCuenta', (taskId: string, numeroMesa: number, details?: string) => {
       this.playAudioAlert('tasks');
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
         type: 'Cuenta',
         timestamp: new Date(),
-        status: 'Pending'
+        status: 'Pending',
+        details: details || 'Solicita la cuenta'
       });
     });
 
@@ -399,9 +401,9 @@ export class SignalrService {
     }
   }
 
-  public async sendLlamarMozo(mesaId: string): Promise<string> {
+  public async sendLlamarMozo(mesaId: string, details?: string): Promise<string> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      return await this.hubConnection.invoke<string>('LlamarMozo', mesaId);
+      return await this.hubConnection.invoke<string>('LlamarMozo', mesaId, details || '');
     } else {
       console.warn('SignalR not connected, mock send locally.');
       const taskId = crypto.randomUUID();
@@ -410,15 +412,16 @@ export class SignalrService {
         tableId: 0,
         type: 'Llamado',
         timestamp: new Date(),
-        status: 'Pending'
+        status: 'Pending',
+        details: details || 'Solicita asistencia'
       });
       return taskId;
     }
   }
 
-  public async sendPedirCuenta(mesaId: string): Promise<string> {
+  public async sendPedirCuenta(mesaId: string, details?: string): Promise<string> {
     if (this.hubConnection && this.hubConnection.state === signalR.HubConnectionState.Connected) {
-      return await this.hubConnection.invoke<string>('PedirCuenta', mesaId);
+      return await this.hubConnection.invoke<string>('PedirCuenta', mesaId, details || '');
     } else {
       console.warn('SignalR not connected, mock send locally.');
       const taskId = crypto.randomUUID();
@@ -427,7 +430,8 @@ export class SignalrService {
         tableId: 0,
         type: 'Cuenta',
         timestamp: new Date(),
-        status: 'Pending'
+        status: 'Pending',
+        details: details || 'Solicita la cuenta'
       });
       return taskId;
     }
