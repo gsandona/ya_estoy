@@ -6,8 +6,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
+System.Environment.SetEnvironmentVariable("DOTNET_USE_POLLING_FILE_WATCHER", "true");
 
 var builder = WebApplication.CreateBuilder(args);
+
+foreach (var source in builder.Configuration.Sources)
+{
+    if (source is FileConfigurationSource fileSource)
+    {
+        fileSource.ReloadOnChange = false;
+    }
+}
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(options =>
