@@ -67,7 +67,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         return pendingTasks.Any(t => t.TableId == mesa.Numero && t.Type == type && t.RestauranteId == mesa.RestauranteId);
     }
 
-    public async Task<Guid> LlamarMozo(Guid mesaId, string? details)
+    public async Task<Guid> LlamarMozo(Guid mesaId, string? details = null)
     {
         if (IsSpamming(mesaId, "Llamado") || !await IsMesaActive(mesaId) || await IsDuplicateAlert(mesaId, "Llamado")) return Guid.Empty;
         var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
@@ -86,7 +86,7 @@ public class RestauranteHub : Hub<IRestauranteHubClient>
         return taskId;
     }
 
-    public async Task<Guid> PedirCuenta(Guid mesaId, string? details)
+    public async Task<Guid> PedirCuenta(Guid mesaId, string? details = null)
     {
         if (IsSpamming(mesaId, "Cuenta") || !await IsMesaActive(mesaId) || await IsDuplicateAlert(mesaId, "Cuenta")) return Guid.Empty;
         var (clients, assignedMozoId, restauranteId, tableNumero) = await GetClientsForMesa(mesaId);
