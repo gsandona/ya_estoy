@@ -31,7 +31,7 @@ import { BrandingService } from '../../../core/services/branding.service';
     }
 
     <!-- Pantalla de Login Principal -->
-    <div class="min-h-screen bg-surface flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="min-h-dvh bg-surface flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <!-- Toast Error -->
       @if (errorMessage()) {
         <div class="fixed top-8 left-0 right-0 z-50 flex justify-center w-full px-4 animate-[slide-down_0.5s_ease-out,shake_0.4s_ease-in-out_0.5s]">

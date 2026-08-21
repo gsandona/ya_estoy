@@ -11,7 +11,7 @@ import { BrandingService } from '../../../core/services/branding.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-surface flex flex-col items-center justify-center p-6 animate-fade-in relative overflow-hidden">
+    <div class="min-h-dvh bg-surface flex flex-col items-center justify-center p-6 animate-fade-in relative overflow-hidden">
       <!-- Fondo estéticamente superior -->
       <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-accent/5"></div>
       

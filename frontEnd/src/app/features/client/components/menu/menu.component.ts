@@ -10,8 +10,8 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="bg-white rounded-[2rem] shadow-xl w-full max-w-md p-6 border border-gray-200/85">
-      <h2 class="text-2xl font-black text-gray-800 mb-5 tracking-tight text-center sm:text-left">Nuestro Menú</h2>
+    <div class="w-full flex flex-col">
+      <h2 class="text-2xl font-black text-gray-800 mb-5 tracking-tight text-left">Nuestro Menú</h2>
       
       <!-- Buscador Superior Reactivo -->
       <div class="relative mb-5">
@@ -84,7 +84,7 @@ import { FormsModule } from '@angular/forms';
           <p class="text-gray-500 font-bold">No se encontraron productos.</p>
         </div>
       }
-      <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1 pb-4">
+      <div class="space-y-4 pb-4">
         @for (item of filteredItems(); track item.id) {
           @if (item.activo !== false) {
             <div class="bg-white p-4 rounded-2xl border border-gray-150 shadow-sm flex justify-between items-start gap-4 transition-all hover:border-accent/30 hover:shadow-md animate-fade-in-quick">

@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, MenuComponent, FormsModule, SplitCheckWizardComponent],
   template: `
     @if (requirePin()) {
-      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden bg-grid">
+      <div class="min-h-dvh bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden bg-grid">
         <!-- Radial light accent -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -52,7 +52,7 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === undefined) {
-      <div class="min-h-screen bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden bg-grid">
+      <div class="min-h-dvh bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden bg-grid">
         <!-- Radial light accent -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -71,7 +71,7 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === false) {
-      <div class="min-h-screen bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden bg-grid">
+      <div class="min-h-dvh bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden bg-grid">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-red-500/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="h-28 w-28 bg-white text-red-500 rounded-[2rem] shadow-xl flex items-center justify-center mb-8 border border-red-100 animate-[shake_0.5s_ease-out] relative z-10">
@@ -91,13 +91,13 @@ import { FormsModule } from '@angular/forms';
         </button>
       </div>
     } @else {
-      <div class="min-h-screen bg-[#f8f9fa] flex justify-center items-stretch w-full">
-        <div class="w-full max-w-md min-h-screen bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden bg-grid shadow-[0_0_80px_rgba(0,0,0,0.03)] border-x border-gray-100/50">
+      <div class="min-h-dvh bg-[#f8f9fa] flex justify-center items-stretch w-full">
+        <div class="w-full max-w-md min-h-dvh bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden bg-grid shadow-[0_0_80px_rgba(0,0,0,0.03)] border-x border-gray-100/50">
           <!-- Radial light accent background -->
           <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[260px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
           <!-- Sticky Header Bar (Native Style) -->
-          <header class="sticky top-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100/60 z-30 py-4 px-6">
+          <header class="sticky top-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-100/60 z-30 py-4 px-4 sm:px-6">
             <div class="flex justify-between items-center w-full">
               <div class="flex flex-col text-left">
                 <span class="text-[9px] font-black uppercase text-accent tracking-[0.2em] leading-none">Mesa Virtual</span>
@@ -111,13 +111,13 @@ import { FormsModule } from '@angular/forms';
           </header>
 
           <!-- CONTENIDO CENTRAL -->
-          <div class="flex-1 px-6 py-6 flex flex-col items-center pb-28 relative z-10 w-full overflow-y-auto">
+          <div class="flex-1 px-4 sm:px-6 py-5 sm:py-6 flex flex-col items-center pb-28 relative z-10 w-full overflow-y-auto">
              @if (activeBottomTab() === 'inicio') {
                <div class="w-full max-w-md animate-fade-in flex flex-col gap-6">
                  
                  <!-- Monto Consumido (Premium Fintech Card) -->
                  @if (montoConsumo() !== null && montoConsumo() !== undefined && montoConsumo()! > 0) {
-                   <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2.25rem] p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
+                   <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white rounded-[2.25rem] p-5 sm:p-6 w-full flex justify-between items-center shadow-xl border border-slate-700/50 relative overflow-hidden">
                      <!-- Decorative pattern -->
                      <div class="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none"></div>
                      
@@ -136,7 +136,7 @@ import { FormsModule } from '@angular/forms';
 
                  <!-- Seguidor de Pedido Activo / Cocina Status (Premium Tracker) -->
                  @if (activePedidoTaskId()) {
-                   <div class="bg-white border border-gray-100 rounded-[2.25rem] p-6 shadow-[0_10px_35px_rgba(0,0,0,0.02)] animate-fade-in flex flex-col gap-5">
+                   <div class="bg-white border border-gray-100 rounded-[2.25rem] p-5 sm:p-6 shadow-[0_10px_35px_rgba(0,0,0,0.02)] animate-fade-in flex flex-col gap-5">
                      <div class="flex justify-between items-center pb-3 border-b border-gray-50">
                        <div class="flex flex-col text-left">
                          <span class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Seguimiento</span>
@@ -214,7 +214,7 @@ import { FormsModule } from '@angular/forms';
                    
                    <!-- 1. CARTA HERO (VER MENÚ) -->
                    <button (click)="activeBottomTab.set('menu')" 
-                           class="w-full bg-slate-900 text-white rounded-[2.25rem] p-6 text-left shadow-lg active:scale-[0.98] transition-all flex items-center justify-between border border-slate-800 relative overflow-hidden group shrink-0">
+                           class="w-full bg-slate-900 text-white rounded-[2.25rem] p-5 sm:p-6 text-left shadow-lg active:scale-[0.98] transition-all flex items-center justify-between border border-slate-800 relative overflow-hidden group shrink-0">
                      <div class="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700 pointer-events-none"></div>
                      
                      <div class="flex items-center gap-5">
@@ -239,15 +239,15 @@ import { FormsModule } from '@angular/forms';
                      
                      <!-- Llamar Mozo -->
                      @if (yaLlamo()) {
-                       <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] p-5 flex flex-col items-center justify-between text-center shadow-sm relative aspect-square w-full">
+                       <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-[2.25rem] py-6 px-3.5 flex flex-col items-center justify-between text-center shadow-sm relative min-h-[145px] w-full">
                          <div class="h-12 w-12 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600 animate-bounce mt-2 shrink-0">
                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                            </svg>
                          </div>
-                         <div class="flex flex-col items-center mb-1">
+                         <div class="flex flex-col items-center mb-0.5">
                            <span class="text-[8px] font-black uppercase text-emerald-600 tracking-[0.2em] leading-none">Asistencia</span>
-                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Mozo en camino</span>
+                           <span class="font-black text-gray-800 text-xs mt-1.5 leading-none">Mozo en camino</span>
                          </div>
                          <button (click)="cancelarLlamado()" [disabled]="loadingCancelarLlamar()" class="absolute top-3 right-3 h-7 w-7 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90">
                             @if (loadingCancelarLlamar()) {
@@ -259,7 +259,7 @@ import { FormsModule } from '@angular/forms';
                        </div>
                      } @else {
                        <button (click)="abrirModalLlamar()" [disabled]="loadingLlamar()" 
-                               class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
+                               class="bg-white border border-gray-150 rounded-[2.25rem] py-6 px-3.5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group min-h-[145px] w-full">
                           <div class="h-12 w-12 bg-accent/5 text-accent rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                             <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
@@ -267,22 +267,22 @@ import { FormsModule } from '@angular/forms';
                           </div>
                           <div class="flex flex-col items-center">
                             <span class="text-[8px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Asistencia</span>
-                            <span class="font-black text-gray-800 text-xs mt-1 leading-none">Llamar Mozo</span>
+                            <span class="font-black text-gray-800 text-xs mt-1.5 leading-none">Llamar Mozo</span>
                           </div>
                         </button>
                      }
 
                      <!-- Pedir Cuenta -->
                      @if (yaPidioCuenta()) {
-                       <div class="bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-[2.25rem] p-5 flex flex-col items-center justify-between text-center shadow-sm relative aspect-square w-full">
-                         <div class="h-12 w-12 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-600 animate-pulse mt-2 shrink-0">
+                       <div class="bg-gradient-to-br from-amber-50 to-white border border-amber-100 rounded-[2.25rem] py-6 px-3.5 flex flex-col items-center justify-between text-center shadow-sm relative min-h-[145px] w-full">
+                         <div class="h-12 w-12 bg-amber-500/10 rounded-full flex items-center justify-center text-amber-600 animate-pulse mt-1 shrink-0">
                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                            </svg>
                          </div>
-                         <div class="flex flex-col items-center mb-1">
+                         <div class="flex flex-col items-center mb-0.5">
                            <span class="text-[8px] font-black uppercase text-amber-600 tracking-[0.2em] leading-none">Pago</span>
-                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Ticket en Caja</span>
+                           <span class="font-black text-gray-800 text-xs mt-1.5 leading-none">Ticket en Caja</span>
                          </div>
                          <button (click)="cancelarCuenta()" [disabled]="loadingCancelarCuenta()" class="absolute top-3 right-3 h-7 w-7 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-all shadow-sm active:scale-90">
                             @if (loadingCancelarCuenta()) {
@@ -294,7 +294,7 @@ import { FormsModule } from '@angular/forms';
                        </div>
                      } @else {
                        <button (click)="abrirModalCuenta()" [disabled]="loadingCuenta()" 
-                               class="bg-white border border-gray-150 rounded-[2.25rem] p-5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group aspect-square w-full">
+                               class="bg-white border border-gray-150 rounded-[2.25rem] py-6 px-3.5 flex flex-col items-center justify-center gap-3 text-center shadow-sm active:scale-[0.97] transition-all group min-h-[145px] w-full">
                          <div class="h-12 w-12 bg-indigo-50/10 text-indigo-600 rounded-full flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 14l2 2 4-4m-6 2h.01M12 16h.01M15 16h.01M13 8h7m-7 4h3m-9-4h3m-3 4h3m-3 4h3m-3 4h3m-6 4h12a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -302,7 +302,7 @@ import { FormsModule } from '@angular/forms';
                          </div>
                          <div class="flex flex-col items-center">
                            <span class="text-[8px] font-black uppercase text-gray-400 tracking-[0.2em] leading-none">Cierre</span>
-                           <span class="font-black text-gray-800 text-xs mt-1 leading-none">Pedir Cuenta</span>
+                           <span class="font-black text-gray-800 text-xs mt-1.5 leading-none">Pedir Cuenta</span>
                          </div>
                        </button>
                      }
@@ -411,7 +411,7 @@ import { FormsModule } from '@angular/forms';
                      Volver a la Mesa
                   </button>
 
-                  <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm mb-6 text-center">
+                  <div class="bg-white rounded-[2.25rem] border border-gray-150 p-5 sm:p-6 shadow-sm mb-6 text-center">
                     <span class="text-4xl block mb-2 select-none">🎮</span>
                     <h2 class="font-serif font-black text-xl text-gray-800">Zona de Entretenimiento</h2>
                     <p class="text-xs text-gray-400 font-semibold mt-1">¡Jugá mientras esperas tu comida!</p>
@@ -433,7 +433,7 @@ import { FormsModule } from '@angular/forms';
 
                   <!-- GAME 1: Guerra de Dados -->
                   @if (selectedGame() === 'dados') {
-                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm animate-scale-up text-center">
+                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-5 sm:p-6 shadow-sm animate-scale-up text-center">
                       <h3 class="font-black text-sm text-gray-800 uppercase tracking-widest mb-4">🎲 Guerra de Dados</h3>
                       
                       <div class="grid grid-cols-3 gap-2 bg-slate-50 border border-slate-100 rounded-2xl p-3 mb-6 select-none">
@@ -493,7 +493,7 @@ import { FormsModule } from '@angular/forms';
 
                   <!-- GAME 2: Trivia Express -->
                   @if (selectedGame() === 'trivia') {
-                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-6 shadow-sm animate-scale-up text-left">
+                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-5 sm:p-6 shadow-sm animate-scale-up text-left">
                       <div class="flex justify-between items-center mb-4">
                         <h3 class="font-black text-sm text-gray-800 uppercase tracking-widest">🧠 Trivia Express</h3>
                         <span class="text-[10px] font-black bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full uppercase tracking-wider select-none">
@@ -609,7 +609,7 @@ import { FormsModule } from '@angular/forms';
         <!-- Cart Modal (Premium Rounded Dialog) -->
         @if (showCartModal()) {
           <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-5 sm:p-6 shadow-2xl relative border border-gray-100 animate-scale-up">
                 <button (click)="showCartModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -661,7 +661,7 @@ import { FormsModule } from '@angular/forms';
         <!-- Split check modal and other dialogs -->
         @if (showSplitModal()) {
           <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative max-h-[85vh] flex flex-col border border-gray-100 animate-scale-up">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-5 sm:p-6 shadow-2xl relative max-h-[85vh] flex flex-col border border-gray-100 animate-scale-up">
                 <button (click)="showSplitModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -733,7 +733,7 @@ import { FormsModule } from '@angular/forms';
                         
                         <div class="max-h-48 overflow-y-auto space-y-2 pr-1">
                           @for (unit of itemUnits(); track unit.unitId) {
-                            <div class="flex justify-between items-center bg-gray-50/50 p-3 rounded-2xl border border-gray-100">
+                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2.5 bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100">
                               <div class="text-left">
                                 <p class="text-xs font-black text-gray-800 leading-tight">{{ unit.nombre }}</p>
                                 <p class="text-[10px] text-gray-400 font-bold mt-0.5">\${{ formatCurrency(unit.precio) }}</p>
@@ -741,7 +741,7 @@ import { FormsModule } from '@angular/forms';
                               <select 
                                 [ngModel]="itemAssignments()[unit.unitId] || ''"
                                 (ngModelChange)="assignItem(unit.unitId, $event)"
-                                class="bg-white border border-gray-200 rounded-xl text-xs py-1.5 px-2 focus:border-accent outline-none font-bold text-gray-700 max-w-[150px] shadow-sm">
+                                class="bg-white border border-gray-200 rounded-xl text-xs py-1.5 px-2.5 focus:border-accent outline-none font-bold text-gray-700 w-full sm:w-auto sm:max-w-[150px] shadow-sm">
                                 <option value="">Compartido / Todos</option>
                                 @for (c of comensales(); track c.id) {
                                   <option [value]="c.id">{{ c.nombre }} {{ c.apellido }}</option>
@@ -812,7 +812,7 @@ import { FormsModule } from '@angular/forms';
         <!-- Llamar Mozo Modal (Premium custom description) -->
         @if (showLlamarModal()) {
           <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up text-left">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-5 sm:p-6 shadow-2xl relative border border-gray-100 animate-scale-up text-left">
                 <button (click)="showLlamarModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
@@ -845,7 +845,7 @@ import { FormsModule } from '@angular/forms';
         <!-- Pedir Cuenta Modal (Payment options and change) -->
         @if (showPedirCuentaModal()) {
           <div class="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-6 shadow-2xl relative border border-gray-100 animate-scale-up text-left">
+             <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-5 sm:p-6 shadow-2xl relative border border-gray-100 animate-scale-up text-left">
                 <button (click)="showPedirCuentaModal.set(false)" class="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors">
                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
