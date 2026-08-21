@@ -22,184 +22,210 @@ interface CocinaPedido {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen bg-sand text-primary font-sans p-4 md:p-8 space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto">
+    <div class="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 md:p-8 space-y-6 animate-fade-in pb-20 max-w-7xl mx-auto">
       
       <!-- Panel Title -->
-      <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div class="bg-slate-900/60 backdrop-blur p-6 rounded-[2rem] border border-slate-800/85 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 class="text-2xl font-black text-gray-800 tracking-tight">{{ lang.translations().kitchen.title }}</h1>
-          <p class="text-primary/60 text-sm font-medium mt-1">{{ lang.translations().kitchen.subtitle }}</p>
+          <h1 class="text-2xl font-black text-white tracking-tight flex items-center gap-2">
+            <span>🍳</span> {{ lang.translations().kitchen.title }}
+          </h1>
+          <p class="text-slate-400 text-sm font-medium mt-1">{{ lang.translations().kitchen.subtitle }}</p>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 w-full md:w-auto">
           <button (click)="toggleMute()" 
-                  [class]="signalrService.notificationSettings().muteAll ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'"
-                  class="border px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 flex items-center gap-1.5 outline-none select-none">
+                  [class]="signalrService.notificationSettings().muteAll ? 'bg-rose-950/30 text-rose-450 border-rose-900/50 hover:bg-rose-900/20' : 'bg-emerald-950/30 text-emerald-450 border-emerald-900/50 hover:bg-emerald-900/20'"
+                  class="border px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 outline-none select-none flex-1 md:flex-initial">
             <span>{{ signalrService.notificationSettings().muteAll ? '🔇' : '🔊' }}</span>
             {{ signalrService.notificationSettings().muteAll ? 'Sonido Silenciado' : 'Sonido Activado' }}
           </button>
           
-          <button (click)="loadPedidos()" class="bg-primary hover:bg-opacity-95 text-white border border-transparent px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95">
+          <button (click)="loadPedidos()" class="bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 px-5 py-3 rounded-xl text-xs font-black shadow-sm transition-all active:scale-95 flex-1 md:flex-initial">
             {{ lang.translations().kitchen.refresh }}
           </button>
         </div>
       </div>
 
-      <!-- Métricas en Tarjetas claras -->
+      <!-- Métricas en Tarjetas KDS -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div class="bg-white border border-gray-200 border-t-4 border-t-blue-500 rounded-xl p-5 shadow-sm flex justify-between items-center">
+        <div class="bg-slate-900 border-l-4 border-l-cyan-500 border-y border-r border-slate-800/60 rounded-2xl p-5 shadow-lg flex justify-between items-center">
           <div>
-            <h3 class="text-xs uppercase font-bold tracking-widest text-primary/60">{{ lang.translations().kitchen.espera }}</h3>
-            <p class="text-3xl font-black mt-1 text-gray-800">{{ pedidosEnEspera().length }}</p>
+            <h3 class="text-xs uppercase font-black tracking-wider text-slate-400">{{ lang.translations().kitchen.espera }}</h3>
+            <p class="text-4xl font-black mt-1 text-white tracking-tight">{{ pedidosEnEspera().length }}</p>
           </div>
-          <div class="text-xl text-blue-500">⏱️</div>
+          <div class="text-3xl text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]">⏱️</div>
         </div>
-        <div class="bg-white border border-gray-200 border-t-4 border-t-amber-500 rounded-xl p-5 shadow-sm flex justify-between items-center">
+        <div class="bg-slate-900 border-l-4 border-l-amber-500 border-y border-r border-slate-800/60 rounded-2xl p-5 shadow-lg flex justify-between items-center">
           <div>
-            <h3 class="text-xs uppercase font-bold tracking-widest text-primary/60">{{ lang.translations().kitchen.preparando }}</h3>
-            <p class="text-3xl font-black mt-1 text-gray-800">{{ pedidosPreparando().length }}</p>
+            <h3 class="text-xs uppercase font-black tracking-wider text-slate-400">{{ lang.translations().kitchen.preparando }}</h3>
+            <p class="text-4xl font-black mt-1 text-white tracking-tight">{{ pedidosPreparando().length }}</p>
           </div>
-          <div class="text-2xl text-amber-500">🔥</div>
+          <div class="text-3xl text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)] animate-pulse">🔥</div>
         </div>
-        <div class="bg-white border border-gray-200 border-t-4 border-t-accent rounded-xl p-5 shadow-sm flex justify-between items-center">
+        <div class="bg-slate-900 border-l-4 border-l-emerald-500 border-y border-r border-slate-800/60 rounded-2xl p-5 shadow-lg flex justify-between items-center">
           <div>
-            <h3 class="text-xs uppercase font-bold tracking-widest text-primary/60">{{ lang.translations().kitchen.despacho }}</h3>
-            <p class="text-3xl font-black mt-1 text-gray-800">{{ pedidosListos().length }}</p>
+            <h3 class="text-xs uppercase font-black tracking-wider text-slate-400">{{ lang.translations().kitchen.despacho }}</h3>
+            <p class="text-4xl font-black mt-1 text-white tracking-tight">{{ pedidosListos().length }}</p>
           </div>
-          <div class="text-2xl text-accent">✓</div>
+          <div class="text-3xl text-emerald-500 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">✓</div>
         </div>
       </div>
 
-      <!-- Columnas del Flujo -->
+      <!-- Columnas del Flujo KDS -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Columna 1: En Cola -->
-        <div class="bg-white border border-gray-200/80 p-4 rounded-2xl flex flex-col min-h-[500px] shadow-sm">
-          <div class="flex justify-between items-center mb-3.5 border-b border-gray-100 pb-2.5">
-            <h2 class="text-sm font-black text-gray-800 uppercase tracking-wider">
+        <div class="bg-slate-900/40 border border-slate-900 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
+          <div class="flex justify-between items-center mb-4.5 border-b border-slate-800/60 pb-3">
+            <h2 class="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4]"></span>
               {{ lang.translations().kitchen.waiting }} ({{ pedidosEnEspera().length }})
             </h2>
-            <span class="bg-blue-50 text-blue-700 text-[10px] px-2 py-0.5 rounded-md font-bold border border-blue-100">{{ lang.translations().kitchen.espera }}</span>
+            <span class="bg-cyan-950/40 text-cyan-400 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-cyan-900/30 uppercase tracking-wider">{{ lang.translations().kitchen.espera }}</span>
           </div>
           
-          <div class="space-y-3.5 flex-1 overflow-y-auto max-h-[600px] pr-1">
+          <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosEnEspera(); track pedido.id) {
-              <div class="bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] rounded-xl p-3.5 space-y-3 hover:border-amber-700/30 transition-colors">
+              <div class="bg-slate-900 border border-slate-850 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
                 <div class="flex justify-between items-start">
                   <div>
-                    <span class="text-base font-black text-primary bg-white/90 px-2.5 py-1 rounded-md border border-amber-900/10">Mesa {{ pedido.numeroMesa }}</span>
-                    <p class="text-[9px] text-primary/60 font-bold mt-2 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
+                    <span class="text-lg font-black text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <p class="text-[10px] text-slate-400 font-bold mt-3 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <div class="flex flex-col items-end gap-1.5 shrink-0">
-                    <span class="text-[9px] font-bold text-primary/70 bg-white px-2 py-0.5 rounded-md border border-gray-150">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
-                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-gray-500 hover:text-primary font-bold bg-white px-2 py-1 rounded-md border border-gray-200 transition-colors shadow-sm" title="Imprimir Comanda">🖨️</button>
+                  <div class="flex flex-col items-end gap-2 shrink-0">
+                    <!-- Dynamic Time Badge -->
+                    <span class="text-[10px] font-black px-2.5 py-0.75 rounded-lg border uppercase tracking-wider transition-all animate-fade-in"
+                          [ngClass]="{
+                            'bg-slate-855 text-slate-300 border-slate-750': getMinutesElapsed(pedido.fecha) < 10,
+                            'bg-amber-950/40 text-amber-400 border-amber-900/40': getMinutesElapsed(pedido.fecha) >= 10 && getMinutesElapsed(pedido.fecha) < 20,
+                            'bg-rose-950/50 text-rose-400 border-rose-900/40 animate-pulse': getMinutesElapsed(pedido.fecha) >= 20
+                          }">
+                      ⏱ {{ getMinutesElapsed(pedido.fecha) }} min
+                    </span>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-slate-400 hover:text-white font-bold bg-slate-850 px-2.5 py-1.5 rounded-lg border border-slate-750 hover:border-slate-700 transition-colors shadow-md" title="Imprimir Comanda">🖨️ Ticket</button>
                   </div>
                 </div>
                 
                 <!-- Items list -->
-                <div class="bg-white/80 rounded-lg p-2.5 space-y-1.5 border border-amber-900/5">
+                <div class="bg-slate-950/60 rounded-xl p-3 space-y-2 border border-slate-900">
                   @for (item of pedido.items; track item.nombre) {
-                    <div class="flex justify-between items-center text-xs border-b border-amber-900/5 pb-1 last:border-b-0 last:pb-0">
-                      <span class="font-bold text-gray-700">{{ item.nombre }}</span>
-                      <span class="font-black text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100">x{{ item.cantidad }}</span>
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900/50 pb-1.5 last:border-b-0 last:pb-0">
+                      <span class="font-bold text-slate-350">{{ item.nombre }}</span>
+                      <span class="font-black text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded-lg border border-cyan-900/30">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
-                <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2 rounded-lg text-xs transition-all active:scale-[0.98] flex justify-center items-center gap-1 shadow-sm">
+                <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3 rounded-xl text-xs transition-all active:scale-[0.98] flex justify-center items-center gap-1 shadow-lg shadow-cyan-955/30 uppercase tracking-wider">
                   {{ lang.translations().kitchen.startCooking }}
                 </button>
               </div>
             } @empty {
-              <p class="text-center text-primary/40 py-12 text-xs italic font-medium">{{ lang.translations().kitchen.noOrders }}</p>
+              <div class="py-16 text-center border border-dashed border-slate-800 rounded-2xl">
+                <p class="text-slate-500 text-xs font-semibold">{{ lang.translations().kitchen.noOrders }}</p>
+              </div>
             }
           </div>
         </div>
 
         <!-- Columna 2: Preparando -->
-        <div class="bg-white border border-gray-200/80 p-4 rounded-2xl flex flex-col min-h-[500px] shadow-sm">
-          <div class="flex justify-between items-center mb-3.5 border-b border-gray-100 pb-2.5">
-            <h2 class="text-sm font-black text-gray-800 uppercase tracking-wider">
+        <div class="bg-slate-900/40 border border-slate-900 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
+          <div class="flex justify-between items-center mb-4.5 border-b border-slate-800/60 pb-3">
+            <h2 class="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b] animate-pulse"></span>
               {{ lang.translations().kitchen.preparando }} ({{ pedidosPreparando().length }})
             </h2>
-            <span class="bg-amber-50 text-amber-700 text-[10px] px-2 py-0.5 rounded-md font-bold border border-amber-100">{{ lang.translations().kitchen.activos }}</span>
+            <span class="bg-amber-950/40 text-amber-400 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-amber-900/30 uppercase tracking-wider">{{ lang.translations().kitchen.activos }}</span>
           </div>
           
-          <div class="space-y-3.5 flex-1 overflow-y-auto max-h-[600px] pr-1">
+          <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosPreparando(); track pedido.id) {
-              <div class="bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] rounded-xl p-3.5 space-y-3 hover:border-amber-700/30 transition-colors">
+              <div class="bg-slate-900 border border-slate-850 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
                 <div class="flex justify-between items-start">
                   <div>
-                    <span class="text-base font-black text-primary bg-white/90 px-2.5 py-1 rounded-md border border-amber-900/10">Mesa {{ pedido.numeroMesa }}</span>
-                    <p class="text-[9px] text-primary/60 font-bold mt-2 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
+                    <span class="text-lg font-black text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <p class="text-[10px] text-slate-400 font-bold mt-3 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <div class="flex flex-col items-end gap-1.5 shrink-0">
-                    <span class="text-[9px] font-bold text-primary/70 bg-white px-2 py-0.5 rounded-md border border-gray-150">⏱ {{ getMinutesElapsed(pedido.fecha) }} min</span>
-                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-gray-500 hover:text-primary font-bold bg-white px-2 py-1 rounded-md border border-gray-200 transition-colors shadow-sm" title="Imprimir Comanda">🖨️</button>
+                  <div class="flex flex-col items-end gap-2 shrink-0">
+                    <span class="text-[10px] font-black px-2.5 py-0.75 rounded-lg border uppercase tracking-wider transition-all"
+                          [ngClass]="{
+                            'bg-slate-855 text-slate-300 border-slate-750': getMinutesElapsed(pedido.fecha) < 10,
+                            'bg-amber-950/40 text-amber-400 border-amber-900/40': getMinutesElapsed(pedido.fecha) >= 10 && getMinutesElapsed(pedido.fecha) < 20,
+                            'bg-rose-950/50 text-rose-450 border-rose-900/40 animate-pulse': getMinutesElapsed(pedido.fecha) >= 20
+                          }">
+                      ⏱ {{ getMinutesElapsed(pedido.fecha) }} min
+                    </span>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-slate-400 hover:text-white font-bold bg-slate-855 px-2.5 py-1.5 rounded-lg border border-slate-750 hover:border-slate-700 transition-colors shadow-md" title="Imprimir Comanda">🖨️ Ticket</button>
                   </div>
                 </div>
                 
-                <div class="bg-white/80 rounded-lg p-2.5 space-y-1.5 border border-amber-900/5">
+                <div class="bg-slate-950/60 rounded-xl p-3 space-y-2 border border-slate-900">
                   @for (item of pedido.items; track item.nombre) {
-                    <div class="flex justify-between items-center text-xs border-b border-amber-900/5 pb-1 last:border-b-0 last:pb-0">
-                      <span class="font-bold text-gray-700">{{ item.nombre }}</span>
-                      <span class="font-black text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">x{{ item.cantidad }}</span>
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900/50 pb-1.5 last:border-b-0 last:pb-0">
+                      <span class="font-bold text-slate-350">{{ item.nombre }}</span>
+                      <span class="font-black text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-900/30">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
                 <div class="flex gap-2">
-                  <button (click)="devolverAEspera(pedido.id)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-primary font-black py-2 rounded-lg text-xs transition border border-gray-250">
+                  <button (click)="devolverAEspera(pedido.id)" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-black py-3 rounded-xl text-xs transition border border-slate-700 uppercase tracking-wider">
                     {{ lang.translations().kitchen.back }}
                   </button>
-                  <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-accent hover:bg-accent/90 text-white font-black py-2 rounded-lg text-xs transition active:scale-[0.98] shadow-sm">
+                  <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs transition active:scale-[0.98] shadow-lg shadow-emerald-955/30 uppercase tracking-wider">
                     {{ lang.translations().kitchen.finishCooking }}
                   </button>
                 </div>
               </div>
             } @empty {
-              <p class="text-center text-primary/40 py-12 text-xs italic font-medium">{{ lang.translations().kitchen.noPreparing }}</p>
+              <div class="py-16 text-center border border-dashed border-slate-800 rounded-2xl">
+                <p class="text-slate-500 text-xs font-semibold">{{ lang.translations().kitchen.noPreparing }}</p>
+              </div>
             }
           </div>
         </div>
 
         <!-- Columna 3: Listo para despachar -->
-        <div class="bg-white border border-gray-200/80 p-4 rounded-2xl flex flex-col min-h-[500px] shadow-sm">
-          <div class="flex justify-between items-center mb-3.5 border-b border-gray-100 pb-2.5">
-            <h2 class="text-sm font-black text-gray-800 uppercase tracking-wider">
+        <div class="bg-slate-900/40 border border-slate-900 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
+          <div class="flex justify-between items-center mb-4.5 border-b border-slate-800/60 pb-3">
+            <h2 class="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
               {{ lang.translations().kitchen.listos }} ({{ pedidosListos().length }})
             </h2>
-            <span class="bg-green-50 text-green-700 text-[10px] px-2 py-0.5 rounded-md font-bold border border-green-100">{{ lang.translations().kitchen.despacho }}</span>
+            <span class="bg-emerald-950/40 text-emerald-400 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-emerald-900/30 uppercase tracking-wider">{{ lang.translations().kitchen.despacho }}</span>
           </div>
           
-          <div class="space-y-3.5 flex-1 overflow-y-auto max-h-[600px] pr-1">
+          <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosListos(); track pedido.id) {
-              <div class="bg-[#FAF6EE] border-2 border-dashed border-[#DCD0C0] rounded-xl p-3.5 space-y-3 hover:border-amber-700/30 transition-colors">
+              <div class="bg-slate-900 border border-slate-850 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
                 <div class="flex justify-between items-start">
                   <div>
-                    <span class="text-base font-black text-primary bg-white/90 px-2.5 py-1 rounded-md border border-amber-900/10">Mesa {{ pedido.numeroMesa }}</span>
-                    <p class="text-[9px] text-primary/60 font-bold mt-2 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
+                    <span class="text-lg font-black text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <p class="text-[10px] text-slate-400 font-bold mt-3 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
-                  <div class="flex flex-col items-end gap-1.5 shrink-0">
-                    <span class="text-[9px] font-black text-green-700 bg-green-50 border border-green-100 px-2.5 py-0.5 rounded-md">Listo</span>
-                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-gray-500 hover:text-primary font-bold bg-white px-2 py-1 rounded-md border border-gray-200 transition-colors shadow-sm" title="Imprimir Comanda">🖨️</button>
+                  <div class="flex flex-col items-end gap-2 shrink-0">
+                    <span class="text-[10px] font-black text-emerald-400 bg-emerald-950/40 border border-emerald-900/45 px-2.5 py-0.75 rounded-lg uppercase tracking-wider">Listo</span>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-slate-400 hover:text-white font-bold bg-slate-855 px-2.5 py-1.5 rounded-lg border border-slate-750 hover:border-slate-700 transition-colors shadow-md" title="Imprimir Comanda">🖨️ Ticket</button>
                   </div>
                 </div>
                 
-                <div class="bg-white/80 rounded-lg p-2.5 space-y-1.5 border border-amber-900/5">
+                <div class="bg-slate-950/60 rounded-xl p-3 space-y-2 border border-slate-900">
                   @for (item of pedido.items; track item.nombre) {
-                    <div class="flex justify-between items-center text-xs border-b border-amber-900/5 pb-1 last:border-b-0 last:pb-0">
-                      <span class="font-bold text-gray-700">{{ item.nombre }}</span>
-                      <span class="font-black text-green-700 bg-green-50 px-1.5 py-0.5 rounded border border-green-100">x{{ item.cantidad }}</span>
+                    <div class="flex justify-between items-center text-xs border-b border-slate-900/50 pb-1.5 last:border-b-0 last:pb-0">
+                      <span class="font-bold text-slate-355">{{ item.nombre }}</span>
+                      <span class="font-black text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-emerald-900/30">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
-                <button (click)="marcarComoEntregado(pedido.id)" class="w-full bg-accent hover:bg-accent/90 text-white font-black py-2 rounded-lg text-xs transition active:scale-[0.98] shadow-sm">
+                <button (click)="marcarComoEntregado(pedido.id)" class="w-full bg-slate-850 hover:bg-slate-800 text-emerald-400 hover:text-emerald-350 border border-slate-750 hover:border-slate-700 font-black py-3 rounded-xl text-xs transition active:scale-[0.98] shadow-md uppercase tracking-wider">
                   {{ lang.translations().kitchen.deliver }}
                 </button>
               </div>
             } @empty {
-              <p class="text-center text-primary/40 py-12 text-xs italic font-medium">{{ lang.translations().kitchen.noReady }}</p>
+              <div class="py-16 text-center border border-dashed border-slate-800 rounded-2xl">
+                <p class="text-slate-500 text-xs font-semibold">{{ lang.translations().kitchen.noReady }}</p>
+              </div>
             }
           </div>
         </div>
@@ -210,6 +236,10 @@ interface CocinaPedido {
   styles: [`
     @keyframes fade-in { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     .animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
+    .bg-slate-855 { background-color: rgb(24, 32, 49); }
+    .text-slate-350 { color: rgb(185, 195, 212); }
+    .text-slate-355 { color: rgb(190, 200, 216); }
+    .border-slate-850 { border-color: rgb(24, 32, 49); }
   `]
 })
 export class AdminCocinaComponent implements OnInit {
