@@ -140,7 +140,7 @@ El desarrollo del proyecto está organizado en tres ambientes estables de despli
 
 ### 6.1. Habilitación de Mesas
 1. El mozo/cajero ve la Mesa 3 en estado *Disponible* (Código de acceso `null`). El cliente que intente escanear verá una pantalla de "Mesa Inactiva".
-2. El mozo pulsa "Habilitar Mesa". El backend genera un código PIN de 4 dígitos aleatorio (ej: `5821`), cambia el estado a *Ocupada* y lo retorna al mozo.
+2. El mozo pulsa "Habilitar Mesa". El backend genera un código PIN de 4 dígitos aleatorio (ej: `5821`), cambia el estado a *Ocupada* and lo retorna al mozo.
 3. El mozo le comunica el PIN de 4 dígitos al cliente.
 
 ### 6.2. Acceso y Compras del Cliente
@@ -153,10 +153,10 @@ El desarrollo del proyecto está organizado en tres ambientes estables de despli
 1. El mozo o caja visualiza la tarea `Pedido` en su panel en estado "Por Aprobar". Cuenta con los botones:
    - **Aprobar**: Pasa el pedido al estado `Aprobado` y lo envía a la Cocina.
    - **Cancelar**: Pasa el pedido a `Cancelado` (eliminando la tarea).
-2. En la Cocina (KDS), los pedidos aparecen en el panel moderno con fondo oscuro neutro (`bg-slate-900`/`bg-slate-950`). Cada pedido se identifica con un borde coloreado sutil según su etapa:
-   - **En Cola (Aprobados)**: `border-l-sky-500` (Azul/Celeste). El cocinero puede presionar *Empezar a cocinar*.
-   - **Preparando**: `border-l-amber-500` (Naranja). Al finalizar el plato, presiona *Terminar*.
-   - **Listo**: `border-l-emerald-500` (Verde). Se envía notificación al mozo para retirar.
+2. En la Cocina (KDS), los pedidos aparecen en un panel moderno con fondo claro integrado con el resto del sistema (`bg-gray-50`/`#fafafa`), coronado con un banner verde esmeralda centrado que indica "Cocina". Las comandas (tarjetas de pedidos) adoptan un color de fondo sólido según su etapa:
+   - **Pendientes (En Cola)**: Fondo amarillo cálido (`bg-[#fef3c7]`). El cocinero puede presionar *Empezar a cocinar*.
+   - **En Preparación**: Fondo azul suave (`bg-[#dbeafe]`). Al finalizar el plato, presiona *Terminar*.
+   - **Listos**: Fondo verde claro esmeralda (`bg-[#d1fae5]`). Se envía notificación al mozo para retirar.
 3. El mozo entrega la comida y marca la tarea como finalizada, actualizando el estado de la mesa a `Entregado`. El consumo del pedido se acumula automáticamente en el total de consumo de la mesa.
 
 ### 6.4. Cierre de Mesa Directo
