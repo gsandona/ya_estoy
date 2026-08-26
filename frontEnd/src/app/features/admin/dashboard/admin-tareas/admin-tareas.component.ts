@@ -101,13 +101,16 @@ import { LanguageService } from '../../../../core/services/language.service';
                  }
               </div>
 
-              <div class="flex gap-2 mt-auto">
+              <div class="flex gap-2 mt-auto text-primary">
                 <button (click)="selectedTaskForView.set(task)" class="flex-1 bg-white text-gray-700 py-1.5 rounded-xl text-xs font-black border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
                   Ver
                 </button>
                 @if (task.type === 'Pedido') {
                   @if (task.pedidoEstado === 'Recibido' || !task.pedidoEstado) {
-                    <button (click)="aprobarPedido(task.id)" class="flex-[2] bg-emerald-600 text-white py-1.5 rounded-xl text-xs font-black hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
+                    <button (click)="cancelarPedido(task.id)" class="flex-1 bg-red-500 text-white py-1.5 rounded-xl text-xs font-black hover:bg-red-600 shadow-sm transition-transform active:scale-95">
+                      Cancelar
+                    </button>
+                    <button (click)="aprobarPedido(task.id)" class="flex-1 bg-emerald-600 text-white py-1.5 rounded-xl text-xs font-black hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
                       Aprobar
                     </button>
                   } @else if (task.pedidoEstado === 'EnPreparacion') {
@@ -119,6 +122,10 @@ import { LanguageService } from '../../../../core/services/language.service';
                       Entregar
                     </button>
                   }
+                } @else if (task.type === 'Cuenta') {
+                  <button (click)="iniciarCerrarMesaPorTarea(task)" class="flex-[2] bg-red-650 hover:bg-red-700 text-white py-1.5 rounded-xl text-xs font-black shadow-sm transition-transform active:scale-95">
+                    Cerrar Mesa
+                  </button>
                 } @else {
                   <button (click)="completar(task.id)" class="flex-[2] bg-primary text-white py-1.5 rounded-xl text-xs font-black hover:bg-primary/90 shadow-sm transition-transform active:scale-95">
                     Completar
@@ -206,6 +213,9 @@ import { LanguageService } from '../../../../core/services/language.service';
             </button>
             @if (selectedTaskForView()?.type === 'Pedido') {
               @if (selectedTaskForView()?.pedidoEstado === 'Recibido' || !selectedTaskForView()?.pedidoEstado) {
+                <button (click)="cancelarPedido(selectedTaskForView()!.id); selectedTaskForView.set(null);" class="flex-1 bg-red-555 text-white py-2.5 rounded-xl text-xs font-black hover:bg-red-600 shadow-sm transition-transform active:scale-95">
+                  Cancelar
+                </button>
                 <button (click)="aprobarPedido(selectedTaskForView()!.id); selectedTaskForView.set(null);" class="flex-[2] bg-emerald-600 text-white py-2.5 rounded-xl text-xs font-black hover:bg-emerald-700 shadow-sm transition-transform active:scale-95">
                   Aprobar
                 </button>
@@ -214,6 +224,10 @@ import { LanguageService } from '../../../../core/services/language.service';
                   Cerrar Pedido
                 </button>
               }
+            } @else if (selectedTaskForView()?.type === 'Cuenta') {
+              <button (click)="iniciarCerrarMesaPorTarea(selectedTaskForView()!); selectedTaskForView.set(null);" class="flex-[2] bg-red-600 text-white py-2.5 rounded-xl text-xs font-black hover:bg-red-700 shadow-sm transition-transform active:scale-95">
+                Cerrar Mesa
+              </button>
             } @else {
               <button (click)="completar(selectedTaskForView()!.id); selectedTaskForView.set(null);" class="flex-[2] bg-primary text-white py-2.5 rounded-xl text-xs font-black hover:bg-[#1a233b] shadow-sm transition-transform active:scale-95">
                 Completar
@@ -227,53 +241,26 @@ import { LanguageService } from '../../../../core/services/language.service';
     <!-- Confirm Close Modal -->
     @if (showConfirmCloseModal()) {
       <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 w-full max-w-md border border-gray-150 shadow-2xl space-y-5 animate-scale-up">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm border border-gray-150 shadow-2xl space-y-5 animate-scale-up text-left text-primary">
           <div class="pb-2 border-b border-gray-100">
-            <h3 class="text-lg font-black text-gray-800">Confirmar Cierre de Cuenta</h3>
+            <h3 class="text-lg font-black text-gray-800">Cerrar Mesa {{ billingMesa()?.numero }}</h3>
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">
-              Mesa {{ billingMesa()?.numero }} • Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
+              Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
             </p>
           </div>
 
-          <div class="space-y-3 max-h-[250px] overflow-y-auto pr-1">
-            <!-- Render already saved billing items -->
-            @for (item of billingItems(); track item.id) {
-              <div class="flex justify-between items-center text-xs font-bold text-gray-700">
-                <span>{{ item.cantidad }}x {{ item.nombre }}</span>
-                <span>\${{ item.total | number:'1.2-2' }}</span>
-              </div>
-            }
-            
-            <!-- Render pending extra items -->
-            @for (item of extraItems(); track item.menuItemId) {
-              <div class="flex justify-between items-center text-xs font-bold text-accent">
-                <span>{{ item.cantidad }}x {{ item.nombre }} (Extra)</span>
-                <span>\${{ item.total | number:'1.2-2' }}</span>
-              </div>
-            }
-
-            <!-- Render pending manual charges -->
-            @for (charge of manualCharges(); track charge.descripcion) {
-              <div class="flex justify-between items-center text-xs font-bold text-accent">
-                <span>1x {{ charge.descripcion }} (Manual)</span>
-                <span>\${{ charge.monto | number:'1.2-2' }}</span>
-              </div>
-            }
+          <div>
+            <p class="text-sm text-gray-650 font-semibold leading-relaxed">
+              ¿Está seguro que desea cerrar la Mesa {{ billingMesa()?.numero }}?
+            </p>
           </div>
 
-          <div class="pt-4 border-t border-dashed border-gray-200">
-            <div class="flex justify-between items-center font-black text-gray-800 text-sm">
-              <span>TOTAL FACTURA</span>
-              <span class="text-emerald-700 text-base">\${{ getPreviewTotal() | number:'1.2-2' }}</span>
-            </div>
-          </div>
-
-          <div class="flex gap-3 justify-end pt-2">
-            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs">
+          <div class="flex gap-2.5 justify-end pt-2 text-primary">
+            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-95">
               Cancelar
             </button>
-            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">
-              Confirmar Pago y Facturar
+            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-650 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-black text-xs shadow-md transition-all active:scale-95">
+              Confirmar Cierre
             </button>
           </div>
         </div>
@@ -563,50 +550,42 @@ export class AdminTareasComponent {
     } catch(e) { console.error(e); }
   }
 
+  iniciarCerrarMesaPorTarea(task: MesaTask) {
+    const mesa = this.dataService.mesas().find((m: any) => m.numero === task.tableId);
+    if (mesa) {
+      this.billingMesa.set(mesa);
+      this.showConfirmCloseModal.set(true);
+    } else {
+      const tempMesa: AdminMesa = {
+        id: task.tableId.toString(),
+        numero: task.tableId,
+        ubicacion: '',
+        mozoId: task.assignedMozoId || 'Sin asignar'
+      };
+      this.billingMesa.set(tempMesa);
+      this.showConfirmCloseModal.set(true);
+    }
+  }
+
   async cerrarMesa(mesaId: string) {
-    this.showConfirmCloseModal.set(true);
+    const mesa = this.dataService.mesas().find((m: any) => m.id === mesaId);
+    if (mesa) {
+      this.billingMesa.set(mesa);
+      this.showConfirmCloseModal.set(true);
+    } else {
+      this.showConfirmCloseModal.set(true);
+    }
   }
 
   async ejecutarCierreYFacturacion() {
     const mesa = this.billingMesa();
     if (!mesa) return;
-
-    const token = localStorage.getItem('auth_token');
-    if (!token) return;
-
-    // Check if there are pending extra items or manual charges to save first
-    const hasUnsavedExtras = this.extraItems().length > 0 || this.manualCharges().length > 0;
-
-    if (hasUnsavedExtras) {
-      const payload = {
-        items: [
-          ...this.extraItems().map((i: any) => ({ menuItemId: i.menuItemId, cantidad: i.cantidad })),
-          ...this.manualCharges().map((c: any) => ({ descripcion: c.descripcion, monto: c.monto }))
-        ]
-      };
-
-      this.http.post<any>(`${environment.apiUrl}/api/mesas/${mesa.id}/agregar-consumo`, payload, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json' 
-        }
-      }).subscribe({
-        next: () => {
-          this.procederConCerrarMesaAPI(mesa.id);
-        },
-        error: (err) => {
-          console.error('Error al guardar consumos antes de cerrar:', err);
-          alert('Hubo un error al guardar los consumos extras. Cierre cancelado.');
-        }
-      });
-    } else {
-      this.procederConCerrarMesaAPI(mesa.id);
-    }
+    this.procederConCerrarMesaAPI(mesa.id);
   }
 
   private procederConCerrarMesaAPI(mesaId: string) {
     const token = localStorage.getItem('auth_token');
-    this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar`, null, {
+    this.http.post(`${environment.apiUrl}/api/mesas/${mesaId}/cerrar?sinFacturar=false`, null, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: () => {
@@ -619,6 +598,19 @@ export class AdminTareasComponent {
         console.error(e);
         alert('Hubo un error al cerrar la mesa.');
       }
+    });
+  }
+
+  cancelarPedido(taskId: string) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    this.http.post(`${environment.apiUrl}/api/pedido/${taskId}/estado`, { estado: 'Cancelado' }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        this.dataService.refreshAll();
+      },
+      error: (err) => console.error('Error al cancelar pedido:', err)
     });
   }
 
@@ -637,26 +629,6 @@ export class AdminTareasComponent {
             <td style="padding: 6px 0; font-size: 13px; text-align: center;">${item.cantidad}</td>
             <td style="padding: 6px 0; font-size: 13px; text-align: right;">$${item.precioUnitario.toFixed(2)}</td>
             <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${item.total.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      this.extraItems().forEach(item => {
-        itemsHtml += `
-          <tr style="border-bottom: 1px dashed #ccc; color: #155724; background-color: #d4edda;">
-            <td style="padding: 6px 0; font-size: 13px;">* ${item.nombre} (Extra)</td>
-            <td style="padding: 6px 0; font-size: 13px; text-align: center;">${item.cantidad}</td>
-            <td style="padding: 6px 0; font-size: 13px; text-align: right;">$${item.precioUnitario.toFixed(2)}</td>
-            <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${item.total.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      this.manualCharges().forEach(charge => {
-        itemsHtml += `
-          <tr style="border-bottom: 1px dashed #ccc; color: #155724; background-color: #d4edda;">
-            <td style="padding: 6px 0; font-size: 13px;" colspan="3">* ${charge.descripcion} (Cargo)</td>
-            <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${charge.monto.toFixed(2)}</td>
           </tr>
         `;
       });
@@ -712,8 +684,8 @@ export class AdminTareasComponent {
             <div class="divider"></div>
             
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 900; margin: 15px 0;">
-              <span>TOTAL A PAGAR:</span>
-              <span>$${this.getPreviewTotal().toFixed(2)}</span>
+              <span>TOTAL CONSUMIDO:</span>
+              <span>$${this.billingTotal().toFixed(2)}</span>
             </div>
             
             <div class="divider"></div>

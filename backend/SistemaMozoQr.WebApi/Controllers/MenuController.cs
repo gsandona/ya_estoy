@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SistemaMozoQr.Domain.Entities;
 using SistemaMozoQr.Domain.Interfaces;
 using SistemaMozoQr.Application.DTOs;
+using SistemaMozoQr.Application.Interfaces;
 
 namespace SistemaMozoQr.WebApi.Controllers;
 
@@ -12,10 +13,12 @@ namespace SistemaMozoQr.WebApi.Controllers;
 public class MenuController : ControllerBase
 {
     private readonly IMenuItemRepository _menuRepository;
+    private readonly ICurrentUserService _currentUserService;
 
-    public MenuController(IMenuItemRepository menuRepository)
+    public MenuController(IMenuItemRepository menuRepository, ICurrentUserService currentUserService)
     {
         _menuRepository = menuRepository;
+        _currentUserService = currentUserService;
     }
 
     [HttpGet]
@@ -39,6 +42,12 @@ public class MenuController : ControllerBase
     {
         var item = await _menuRepository.GetByIdAsync(id);
         if (item == null) return NotFound();
+
+        if (!_currentUserService.IsSuperAdmin() && item.RestauranteId != _currentUserService.GetRestauranteId())
+        {
+            return Forbid();
+        }
+
         return Ok(item);
     }
 
@@ -66,6 +75,11 @@ public class MenuController : ControllerBase
         var item = await _menuRepository.GetByIdAsync(id);
         if (item == null) return NotFound();
 
+        if (!_currentUserService.IsSuperAdmin() && item.RestauranteId != _currentUserService.GetRestauranteId())
+        {
+            return Forbid();
+        }
+
         item.Categoria = dto.Categoria;
         item.Nombre = dto.Nombre;
         item.Precio = dto.Precio;
@@ -82,6 +96,11 @@ public class MenuController : ControllerBase
     {
         var item = await _menuRepository.GetByIdAsync(id);
         if (item == null) return NotFound();
+
+        if (!_currentUserService.IsSuperAdmin() && item.RestauranteId != _currentUserService.GetRestauranteId())
+        {
+            return Forbid();
+        }
 
         await _menuRepository.DeleteAsync(item);
         return NoContent();

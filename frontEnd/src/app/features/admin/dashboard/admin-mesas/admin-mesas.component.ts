@@ -134,7 +134,7 @@ import { LanguageService } from '../../../../core/services/language.service';
                         </span>
                       </div>
 
-                      <button (click)="openBillingModal(mesa)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
+                      <button (click)="iniciarCerrarMesa(mesa)" class="bg-red-500 hover:bg-red-600 text-white py-2 rounded-2xl text-xs font-black shadow-[0_4px_12px_rgba(239,68,68,0.15)] hover:shadow-[0_4px_16px_rgba(239,68,68,0.25)] transition-all active:scale-95 w-full flex items-center justify-center gap-1">
                         {{ lang.translations().tables.closeTable }}
                       </button>
                     </div>
@@ -207,80 +207,23 @@ import { LanguageService } from '../../../../core/services/language.service';
               </div>
             }
           }
-        </div>
-
-      <!-- Modal POS de Facturación y Consumos Extra (Caja) -->
+              <!-- Modal de Consumos (Caja) -->
     @if (showBillingModal() && billingMesa()) {
-      <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
-        <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-4xl w-full border border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-6 relative max-h-[90vh] overflow-y-auto text-primary">
+      <div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in text-primary">
+        <div class="bg-white rounded-3xl p-6 shadow-2xl max-w-md w-full border border-gray-100 relative max-h-[90vh] overflow-y-auto text-primary">
           <button (click)="showBillingModal.set(false)" class="absolute top-4 right-4 w-11 h-11 flex text-lg items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-gray-500 font-black shadow-sm transition-all cursor-pointer">&times;</button>
           
-          <!-- Columna Izquierda: Panel de Control de Cargos -->
-          <div class="space-y-6">
-            <div>
-              <h2 class="text-xl font-black text-gray-800 tracking-tight">Cobro y Consumo</h2>
-              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">
-                Mesa {{ billingMesa()?.numero }} • PIN: {{ billingMesa()?.codigoAcceso }}
-                • Mozo: {{ billingMesa()?.mozo?.nombreCompleto || billingMesa()?.mozo?.username || 'Sin mozo' }}
-              </p>
-            </div>
-
-            <!-- Formulario 1: Agregar Plato de la Carta -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-              <h3 class="text-xs font-black text-gray-700">Agregar plato del menú</h3>
-              <div class="flex gap-2">
-                <select [(ngModel)]="selectedMenuItemId" class="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none">
-                  <option value="">Selecciona un plato...</option>
-                  @for (item of dataService.menuItems(); track item.id) {
-                    @if (item.activo) {
-                      <option [value]="item.id">{{ item.nombre }} (\${{ item.precio }})</option>
-                    }
-                  }
-                </select>
-                <input type="number" [(ngModel)]="extraQuantity" min="1" class="w-16 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-center outline-none">
-                <button (click)="addExtraItem()" class="bg-primary text-white px-4 py-2 rounded-xl text-xs font-black hover:bg-opacity-90 active:scale-95 transition-all shadow-sm">
-                  +
-                </button>
-              </div>
-            </div>
-
-            <!-- Formulario 2: Agregar Cargo Manual -->
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-              <h3 class="text-xs font-black text-gray-700">Agregar cargo manual</h3>
-              <div class="grid grid-cols-3 gap-2">
-                <input type="text" [(ngModel)]="manualChargeDescription" placeholder="Ej: Servicio de mesa" class="col-span-2 px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold outline-none text-gray-800">
-                <input type="number" [(ngModel)]="manualChargeMonto" placeholder="$ Monto" class="px-3 py-2 bg-white border border-gray-200 rounded-xl text-xs font-black text-center outline-none text-gray-800">
-              </div>
-              <button (click)="addManualCharge()" class="w-full bg-primary text-white py-2 rounded-xl text-xs font-black hover:bg-opacity-90 active:scale-95 transition-all shadow-sm">
-                Agregar Cargo Extra
-              </button>
-            </div>
-
-            <!-- Botones de Acción de Consumo -->
-            <div class="pt-4 border-t border-gray-100 flex gap-2">
-              <button (click)="showBillingModal.set(false)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 py-3 rounded-2xl text-xs font-black transition-all active:scale-95">
-                Volver
-              </button>
-              @if (extraItems().length > 0 || manualCharges().length > 0) {
-                <button (click)="confirmarCobro()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl text-xs font-black transition-all active:scale-95 shadow-lg shadow-emerald-600/20">
-                  Guardar Extras
-                </button>
-              }
-            </div>
-          </div>
-
-          <!-- Columna Derecha: Ticket Previo de Consumo -->
-          <div class="bg-gray-50 border-2 border-dashed border-gray-200 p-5 rounded-3xl flex flex-col justify-between font-mono text-[11px] text-primary/95 min-h-[350px]">
+          <!-- Ticket de Consumo -->
+          <div class="bg-gray-50 border-2 border-dashed border-gray-200 p-5 rounded-3xl flex flex-col justify-between font-mono text-[11px] text-primary/95 min-h-[300px]">
             <div class="space-y-4">
               <!-- Encabezado Ticket -->
               <div class="text-center pb-3 border-b border-dashed border-gray-200 space-y-1">
-                <span class="text-xs font-black tracking-tight block">TICKET PREVIO</span>
+                <span class="text-xs font-black tracking-tight block">TICKET DE CONSUMO</span>
                 <span class="text-[9px] text-gray-500 block">Mesa {{ billingMesa()?.numero }} • PIN {{ billingMesa()?.codigoAcceso }}</span>
               </div>
 
-              <!-- Listado de Consumos (Existentes + Nuevos) -->
+              <!-- Listado de Consumos -->
               <div class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
-                <!-- Consumos de la base de datos -->
                 @for (item of billingItems(); track item.id) {
                   <div class="flex justify-between items-start gap-1">
                     <div class="flex-1 text-left">
@@ -289,34 +232,8 @@ import { LanguageService } from '../../../../core/services/language.service';
                     </div>
                     <span class="font-black text-gray-800">\${{ item.total | number:'1.2-2' }}</span>
                   </div>
-                }
-
-                <!-- Consumos extras locales -->
-                @for (item of extraItems(); track $index) {
-                  <div class="flex justify-between items-start gap-1 bg-emerald-500/5 p-1 rounded">
-                    <div class="flex-1 text-left">
-                      <span class="font-black text-emerald-800 block">* {{ item.nombre }} (Extra)</span>
-                      <span class="text-[9px] text-emerald-600 font-semibold">{{ item.cantidad }} x \${{ item.precioUnitario | number:'1.2-2' }}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 font-black text-emerald-800">
-                      <span>\${{ item.total | number:'1.2-2' }}</span>
-                      <button (click)="removeExtraItem($index)" class="text-red-500 font-black hover:text-red-700 active:scale-90 text-[13px] line-none select-none">&times;</button>
-                    </div>
-                  </div>
-                }
-
-                <!-- Cargos manuales locales -->
-                @for (charge of manualCharges(); track $index) {
-                  <div class="flex justify-between items-start gap-1 bg-emerald-500/5 p-1 rounded">
-                    <div class="flex-1 text-left">
-                      <span class="font-black text-emerald-800 block">* {{ charge.descripcion }} (Cargo)</span>
-                      <span class="text-[9px] text-emerald-600 font-semibold">1 x \${{ charge.monto | number:'1.2-2' }}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 font-black text-emerald-800">
-                      <span>\${{ charge.monto | number:'1.2-2' }}</span>
-                      <button (click)="removeManualCharge($index)" class="text-red-500 font-black hover:text-red-700 active:scale-90 text-[13px] line-none select-none">&times;</button>
-                    </div>
-                  </div>
+                } @empty {
+                  <div class="text-center py-6 text-gray-400">Sin consumos registrados</div>
                 }
               </div>
             </div>
@@ -324,8 +241,8 @@ import { LanguageService } from '../../../../core/services/language.service';
             <!-- Footer del Ticket con Total y Cierre -->
             <div class="pt-4 border-t border-dashed border-gray-200 space-y-4">
               <div class="flex justify-between items-center text-xs font-black">
-                <span>TOTAL A PAGAR</span>
-                <span class="text-emerald-700 text-sm">\${{ getPreviewTotal() | number:'1.2-2' }}</span>
+                <span>TOTAL CONSUMIDO</span>
+                <span class="text-emerald-700 text-sm">\${{ billingTotal() | number:'1.2-2' }}</span>
               </div>
 
               <!-- Botones de Acción -->
@@ -333,13 +250,12 @@ import { LanguageService } from '../../../../core/services/language.service';
                 <button (click)="imprimirTicketFactura()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1.5 border border-slate-250">
                   🖨️ Imprimir
                 </button>
-                <button (click)="showConfirmCloseModal.set(true)" class="flex-[2] bg-red-600 hover:bg-red-700 text-white py-3 rounded-2xl text-xs font-black shadow-lg shadow-red-600/20 transition-all active:scale-95 flex items-center justify-center gap-1">
-                  🧾 Cerrar Mesa
+                <button (click)="showBillingModal.set(false)" class="flex-1 bg-gray-150 hover:bg-gray-200 text-gray-650 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 text-center">
+                  Cerrar
                 </button>
               </div>
             </div>
           </div>
-          
         </div>
       </div>
     }
@@ -347,7 +263,7 @@ import { LanguageService } from '../../../../core/services/language.service';
     <!-- Confirm Close Modal -->
     @if (showConfirmCloseModal()) {
       <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm border border-gray-150 shadow-2xl space-y-5 animate-scale-up text-left">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm border border-gray-150 shadow-2xl space-y-5 animate-scale-up text-left text-primary">
           <div class="pb-2 border-b border-gray-100">
             <h3 class="text-lg font-black text-gray-800">Cerrar Mesa {{ billingMesa()?.numero }}</h3>
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">
@@ -356,16 +272,16 @@ import { LanguageService } from '../../../../core/services/language.service';
           </div>
 
           <div>
-            <p class="text-xs text-gray-550 font-semibold leading-relaxed">
-              ¿Está seguro que desea cerrar la mesa? Se guardará el registro de consumos de esta sesión para las estadísticas y métricas de ventas, y la mesa quedará disponible para nuevos clientes.
+            <p class="text-sm text-gray-650 font-semibold leading-relaxed">
+              ¿Está seguro que desea cerrar la Mesa {{ billingMesa()?.numero }}?
             </p>
           </div>
 
           <div class="flex gap-2.5 justify-end pt-2">
-            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-105 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs transition-all active:scale-95">
+            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-95">
               Cancelar
             </button>
-            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs shadow-md transition-all active:scale-95">
+            <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-black text-xs shadow-md transition-all active:scale-95">
               Confirmar Cierre
             </button>
           </div>
@@ -725,51 +641,24 @@ export class AdminMesasComponent {
     } catch(e) { console.error(e); }
   }
 
-  async cerrarMesa(mesaId: string) {
+  iniciarCerrarMesa(mesa: AdminMesa) {
+    this.billingMesa.set(mesa);
     this.showConfirmCloseModal.set(true);
+  }
+
+  async cerrarMesa(mesaId: string) {
+    const mesa = this.dataService.mesas().find((m: any) => m.id === mesaId);
+    if (mesa) {
+      this.iniciarCerrarMesa(mesa);
+    } else {
+      this.showConfirmCloseModal.set(true);
+    }
   }
 
   async ejecutarCierreYFacturacion() {
     const mesa = this.billingMesa();
     if (!mesa) return;
-
-    const token = localStorage.getItem('auth_token');
-    if (!token) return;
-
-    // Check if there are pending extra items or manual charges to save first
-    const hasUnsavedExtras = this.extraItems().length > 0 || this.manualCharges().length > 0;
-
-    if (hasUnsavedExtras) {
-      const payload = {
-        items: [
-          ...this.extraItems().map((i: any) => ({ menuItemId: i.menuItemId, cantidad: i.cantidad })),
-          ...this.manualCharges().map((c: any) => ({ descripcion: c.descripcion, monto: c.monto }))
-        ]
-      };
-
-      this.http.post<any>(`${environment.apiUrl}/api/mesas/${mesa.id}/agregar-consumo`, payload, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json' 
-        }
-      }).subscribe({
-        next: () => {
-          this.procederConCerrarMesaAPI(mesa.id);
-        },
-        error: (err) => {
-          console.error('Error al guardar consumos antes de cerrar:', err);
-          alert('Hubo un error al guardar los consumos extras. Cierre cancelado.');
-        }
-      });
-    } else {
-      this.procederConCerrarMesaAPI(mesa.id);
-    }
-  }
-
-  async ejecutarCierreSinFacturar() {
-    const mesa = this.billingMesa();
-    if (!mesa) return;
-    this.procederConCerrarMesaAPI(mesa.id, true);
+    this.procederConCerrarMesaAPI(mesa.id, false);
   }
 
   private procederConCerrarMesaAPI(mesaId: string, sinFacturar: boolean = false) {
@@ -787,6 +676,19 @@ export class AdminMesasComponent {
         console.error(e);
         alert('Hubo un error al cerrar la mesa.');
       }
+    });
+  }
+
+  cancelarPedido(taskId: string) {
+    const token = localStorage.getItem('auth_token');
+    if (!token) return;
+    this.http.post(`${environment.apiUrl}/api/pedido/${taskId}/estado`, { estado: 'Cancelado' }, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).subscribe({
+      next: () => {
+        this.dataService.refreshAll();
+      },
+      error: (err) => console.error('Error al cancelar pedido:', err)
     });
   }
 
@@ -816,15 +718,6 @@ export class AdminMesasComponent {
             <td style="padding: 6px 0; font-size: 13px; text-align: center;">${item.cantidad}</td>
             <td style="padding: 6px 0; font-size: 13px; text-align: right;">$${item.precioUnitario.toFixed(2)}</td>
             <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${item.total.toFixed(2)}</td>
-          </tr>
-        `;
-      });
-
-      this.manualCharges().forEach(charge => {
-        itemsHtml += `
-          <tr style="border-bottom: 1px dashed #ccc; color: #155724; background-color: #d4edda;">
-            <td style="padding: 6px 0; font-size: 13px;" colspan="3">* ${charge.descripcion} (Cargo)</td>
-            <td style="padding: 6px 0; font-size: 13px; font-weight: bold; text-align: right;">$${charge.monto.toFixed(2)}</td>
           </tr>
         `;
       });
@@ -880,8 +773,8 @@ export class AdminMesasComponent {
             <div class="divider"></div>
             
             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 900; margin: 15px 0;">
-              <span>TOTAL A PAGAR:</span>
-              <span>$${this.getPreviewTotal().toFixed(2)}</span>
+              <span>TOTAL CONSUMIDO:</span>
+              <span>$${this.billingTotal().toFixed(2)}</span>
             </div>
             
             <div class="divider"></div>

@@ -154,6 +154,11 @@ public class MesasConfigController : ControllerBase
         var mesa = await _dbContext.Mesas.IgnoreQueryFilters().Include(m => m.Mozo).FirstOrDefaultAsync(m => m.Id == id);
         if (mesa == null) return NotFound();
 
+        if (!_dbContext.IsSuperAdmin && mesa.RestauranteId != _dbContext.CurrentTenantId)
+        {
+            return Forbid();
+        }
+
         // 1. Registrar la Venta en el histórico antes de limpiar la sesión (solo si no es sinFacturar)
         if (!sinFacturar && !string.IsNullOrEmpty(mesa.CodigoAcceso))
         {

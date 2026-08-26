@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SistemaMozoQr.Infrastructure.Data;
+using SistemaMozoQr.Domain.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,19 +53,25 @@ public class VentasController : ControllerBase
             targetEnd = DateTime.SpecifyKind(targetDate.AddDays(1), DateTimeKind.Utc);
         }
 
-        var query = _context.Ventas.IgnoreQueryFilters().AsQueryable();
-
-        // Si es Admin, obligatoriamente su restaurante
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-        var tenantIdClaim = User.FindFirst("RestauranteId")?.Value;
-        
-        if ((userRole == "Admin" || userRole == "Caja") && Guid.TryParse(tenantIdClaim, out Guid adminTenantId))
+        var isSuperAdmin = userRole == "SuperAdmin";
+        var tenantIdClaim = User.FindFirst("TenantId")?.Value;
+
+        IQueryable<Venta> query = isSuperAdmin ? _context.Ventas.IgnoreQueryFilters() : _context.Ventas;
+
+        if (isSuperAdmin)
         {
-            query = query.Where(v => v.RestauranteId == adminTenantId);
+            if (restauranteId.HasValue)
+            {
+                query = query.Where(v => v.RestauranteId == restauranteId.Value);
+            }
         }
-        else if (restauranteId.HasValue)
+        else
         {
-            query = query.Where(v => v.RestauranteId == restauranteId.Value);
+            if (Guid.TryParse(tenantIdClaim, out Guid userTenantId))
+            {
+                query = query.Where(v => v.RestauranteId == userTenantId);
+            }
         }
 
         // SQLite almacena fechas en formato de texto ISO. Hacemos filtrado entre inicio y fin de día en UTC
@@ -96,19 +103,25 @@ public class VentasController : ControllerBase
             targetEnd = DateTime.SpecifyKind(targetEnd, DateTimeKind.Utc);
         }
 
-        var query = _context.Ventas.IgnoreQueryFilters().AsQueryable();
-
         var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-        var tenantIdClaim = User.FindFirst("RestauranteId")?.Value;
-        
-        Guid adminTenantId = Guid.Empty;
-        if ((userRole == "Admin" || userRole == "Caja") && Guid.TryParse(tenantIdClaim, out adminTenantId))
+        var isSuperAdmin = userRole == "SuperAdmin";
+        var tenantIdClaim = User.FindFirst("TenantId")?.Value;
+
+        IQueryable<Venta> query = isSuperAdmin ? _context.Ventas.IgnoreQueryFilters() : _context.Ventas;
+
+        if (isSuperAdmin)
         {
-            query = query.Where(v => v.RestauranteId == adminTenantId);
+            if (restauranteId.HasValue)
+            {
+                query = query.Where(v => v.RestauranteId == restauranteId.Value);
+            }
         }
-        else if (restauranteId.HasValue)
+        else
         {
-            query = query.Where(v => v.RestauranteId == restauranteId.Value);
+            if (Guid.TryParse(tenantIdClaim, out Guid userTenantId))
+            {
+                query = query.Where(v => v.RestauranteId == userTenantId);
+            }
         }
 
         query = query.Where(v => v.FechaHora >= targetStart && v.FechaHora < targetEnd);

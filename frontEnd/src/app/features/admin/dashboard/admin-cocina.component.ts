@@ -48,12 +48,12 @@ interface CocinaPedido {
 
       <!-- Métricas en Tarjetas KDS -->
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div class="bg-slate-900 border-l-4 border-l-cyan-500 border-y border-r border-slate-800/60 rounded-2xl p-5 shadow-lg flex justify-between items-center">
+        <div class="bg-slate-900 border-l-4 border-l-sky-500 border-y border-r border-slate-800/60 rounded-2xl p-5 shadow-lg flex justify-between items-center">
           <div>
             <h3 class="text-xs uppercase font-black tracking-wider text-slate-400">{{ lang.translations().kitchen.espera }}</h3>
             <p class="text-4xl font-black mt-1 text-white tracking-tight">{{ pedidosEnEspera().length }}</p>
           </div>
-          <div class="text-3xl text-cyan-500 drop-shadow-[0_0_8px_rgba(6,182,212,0.3)]">⏱️</div>
+          <div class="text-3xl text-sky-500 drop-shadow-[0_0_8px_rgba(14,165,233,0.3)]">⏱️</div>
         </div>
         <div class="bg-slate-900 border-l-4 border-l-amber-500 border-y border-r border-slate-800/60 rounded-2xl p-5 shadow-lg flex justify-between items-center">
           <div>
@@ -75,21 +75,21 @@ interface CocinaPedido {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Columna 1: En Cola -->
-        <div class="bg-slate-900/40 border border-slate-900 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
           <div class="flex justify-between items-center mb-4.5 border-b border-slate-800/60 pb-3">
             <h2 class="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4]"></span>
+              <span class="h-2 w-2 rounded-full bg-sky-500 shadow-[0_0_8px_#0284c7]"></span>
               {{ lang.translations().kitchen.waiting }} ({{ pedidosEnEspera().length }})
             </h2>
-            <span class="bg-cyan-950/40 text-cyan-400 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-cyan-900/30 uppercase tracking-wider">{{ lang.translations().kitchen.espera }}</span>
+            <span class="bg-slate-850 text-slate-350 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-slate-750 uppercase tracking-wider">Cola</span>
           </div>
           
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosEnEspera(); track pedido.id) {
-              <div class="bg-slate-900 border border-slate-850 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
+              <div class="bg-slate-950 border border-slate-850 border-l-4 border-l-sky-500 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
                 <div class="flex justify-between items-start">
                   <div>
-                    <span class="text-lg font-black text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <span class="text-lg font-black text-white bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">Mesa {{ pedido.numeroMesa }}</span>
                     <p class="text-[10px] text-slate-400 font-bold mt-3 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
                   <div class="flex flex-col items-end gap-2 shrink-0">
@@ -98,25 +98,25 @@ interface CocinaPedido {
                           [ngClass]="{
                             'bg-slate-855 text-slate-300 border-slate-750': getMinutesElapsed(pedido.fecha) < 10,
                             'bg-amber-950/40 text-amber-400 border-amber-900/40': getMinutesElapsed(pedido.fecha) >= 10 && getMinutesElapsed(pedido.fecha) < 20,
-                            'bg-rose-950/50 text-rose-400 border-rose-900/40 animate-pulse': getMinutesElapsed(pedido.fecha) >= 20
+                            'bg-rose-950/50 text-rose-450 border-rose-900/40 animate-pulse': getMinutesElapsed(pedido.fecha) >= 20
                           }">
                       ⏱ {{ getMinutesElapsed(pedido.fecha) }} min
                     </span>
-                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-slate-400 hover:text-white font-bold bg-slate-850 px-2.5 py-1.5 rounded-lg border border-slate-750 hover:border-slate-700 transition-colors shadow-md" title="Imprimir Comanda">🖨️ Ticket</button>
+                    <button (click)="imprimirPedidoCocina(pedido)" class="text-[10px] text-slate-400 hover:text-white font-bold bg-slate-855 px-2.5 py-1.5 rounded-lg border border-slate-750 hover:border-slate-700 transition-colors shadow-md" title="Imprimir Comanda">🖨️ Ticket</button>
                   </div>
                 </div>
                 
                 <!-- Items list -->
-                <div class="bg-slate-950/60 rounded-xl p-3 space-y-2 border border-slate-900">
+                <div class="bg-slate-900/60 rounded-xl p-3 space-y-2 border border-slate-850">
                   @for (item of pedido.items; track item.nombre) {
                     <div class="flex justify-between items-center text-xs border-b border-slate-900/50 pb-1.5 last:border-b-0 last:pb-0">
-                      <span class="font-bold text-slate-350">{{ item.nombre }}</span>
-                      <span class="font-black text-cyan-400 bg-cyan-950/40 px-2 py-0.5 rounded-lg border border-cyan-900/30">x{{ item.cantidad }}</span>
+                      <span class="font-bold text-slate-300">{{ item.nombre }}</span>
+                      <span class="font-black text-sky-400 bg-sky-950/40 px-2 py-0.5 rounded-lg border border-sky-900/30">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
-                <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-3 rounded-xl text-xs transition-all active:scale-[0.98] flex justify-center items-center gap-1 shadow-lg shadow-cyan-955/30 uppercase tracking-wider">
+                <button (click)="empezarAPreparar(pedido.id)" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-black py-3 rounded-xl text-xs transition-all active:scale-[0.98] flex justify-center items-center gap-1 shadow-lg shadow-sky-950/30 uppercase tracking-wider">
                   {{ lang.translations().kitchen.startCooking }}
                 </button>
               </div>
@@ -129,21 +129,21 @@ interface CocinaPedido {
         </div>
 
         <!-- Columna 2: Preparando -->
-        <div class="bg-slate-900/40 border border-slate-900 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
           <div class="flex justify-between items-center mb-4.5 border-b border-slate-800/60 pb-3">
             <h2 class="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
               <span class="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_#f59e0b] animate-pulse"></span>
               {{ lang.translations().kitchen.preparando }} ({{ pedidosPreparando().length }})
             </h2>
-            <span class="bg-amber-950/40 text-amber-400 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-amber-900/30 uppercase tracking-wider">{{ lang.translations().kitchen.activos }}</span>
+            <span class="bg-slate-850 text-slate-355 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-slate-750 uppercase tracking-wider">Preparando</span>
           </div>
           
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosPreparando(); track pedido.id) {
-              <div class="bg-slate-900 border border-slate-850 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
+              <div class="bg-slate-950 border border-slate-855 border-l-4 border-l-amber-500 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
                 <div class="flex justify-between items-start">
                   <div>
-                    <span class="text-lg font-black text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <span class="text-lg font-black text-white bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">Mesa {{ pedido.numeroMesa }}</span>
                     <p class="text-[10px] text-slate-400 font-bold mt-3 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
                   <div class="flex flex-col items-end gap-2 shrink-0">
@@ -159,20 +159,20 @@ interface CocinaPedido {
                   </div>
                 </div>
                 
-                <div class="bg-slate-950/60 rounded-xl p-3 space-y-2 border border-slate-900">
+                <div class="bg-slate-900/60 rounded-xl p-3 space-y-2 border border-slate-855">
                   @for (item of pedido.items; track item.nombre) {
                     <div class="flex justify-between items-center text-xs border-b border-slate-900/50 pb-1.5 last:border-b-0 last:pb-0">
-                      <span class="font-bold text-slate-350">{{ item.nombre }}</span>
+                      <span class="font-bold text-slate-300">{{ item.nombre }}</span>
                       <span class="font-black text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-900/30">x{{ item.cantidad }}</span>
                     </div>
                   }
                 </div>
 
                 <div class="flex gap-2">
-                  <button (click)="devolverAEspera(pedido.id)" class="flex-1 bg-slate-800 hover:bg-slate-750 text-slate-300 font-black py-3 rounded-xl text-xs transition border border-slate-700 uppercase tracking-wider">
+                  <button (click)="devolverAEspera(pedido.id)" class="flex-1 bg-slate-850 hover:bg-slate-800 text-slate-300 font-black py-3 rounded-xl text-xs transition border border-slate-750 uppercase tracking-wider">
                     {{ lang.translations().kitchen.back }}
                   </button>
-                  <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs transition active:scale-[0.98] shadow-lg shadow-emerald-955/30 uppercase tracking-wider">
+                  <button (click)="marcarComoListo(pedido.id)" class="flex-[2] bg-emerald-650 hover:bg-emerald-500 text-white font-black py-3 rounded-xl text-xs transition active:scale-[0.98] shadow-lg shadow-emerald-950/30 uppercase tracking-wider">
                     {{ lang.translations().kitchen.finishCooking }}
                   </button>
                 </div>
@@ -186,21 +186,21 @@ interface CocinaPedido {
         </div>
 
         <!-- Columna 3: Listo para despachar -->
-        <div class="bg-slate-900/40 border border-slate-900 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
+        <div class="bg-slate-900 border border-slate-800 p-5 rounded-3xl flex flex-col min-h-[500px] shadow-2xl">
           <div class="flex justify-between items-center mb-4.5 border-b border-slate-800/60 pb-3">
             <h2 class="text-xs font-black text-slate-200 uppercase tracking-widest flex items-center gap-1.5">
               <span class="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
               {{ lang.translations().kitchen.listos }} ({{ pedidosListos().length }})
             </h2>
-            <span class="bg-emerald-950/40 text-emerald-400 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-emerald-900/30 uppercase tracking-wider">{{ lang.translations().kitchen.despacho }}</span>
+            <span class="bg-slate-850 text-slate-355 text-[10px] px-2.5 py-0.5 rounded-lg font-black border border-slate-750 uppercase tracking-wider">Listos</span>
           </div>
           
           <div class="space-y-4 flex-1 overflow-y-auto max-h-[600px] pr-1">
             @for (pedido of pedidosListos(); track pedido.id) {
-              <div class="bg-slate-900 border border-slate-850 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
+              <div class="bg-slate-950 border border-slate-850 border-l-4 border-l-emerald-500 hover:border-slate-800 rounded-2xl p-4.5 space-y-4 shadow-xl transition-all relative overflow-hidden group">
                 <div class="flex justify-between items-start">
                   <div>
-                    <span class="text-lg font-black text-white bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">Mesa {{ pedido.numeroMesa }}</span>
+                    <span class="text-lg font-black text-white bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">Mesa {{ pedido.numeroMesa }}</span>
                     <p class="text-[10px] text-slate-400 font-bold mt-3 truncate max-w-[140px]">Mozo: {{ pedido.mozoEmail }}</p>
                   </div>
                   <div class="flex flex-col items-end gap-2 shrink-0">
@@ -209,10 +209,10 @@ interface CocinaPedido {
                   </div>
                 </div>
                 
-                <div class="bg-slate-950/60 rounded-xl p-3 space-y-2 border border-slate-900">
+                <div class="bg-slate-900/60 rounded-xl p-3 space-y-2 border border-slate-855">
                   @for (item of pedido.items; track item.nombre) {
                     <div class="flex justify-between items-center text-xs border-b border-slate-900/50 pb-1.5 last:border-b-0 last:pb-0">
-                      <span class="font-bold text-slate-355">{{ item.nombre }}</span>
+                      <span class="font-bold text-slate-300">{{ item.nombre }}</span>
                       <span class="font-black text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded-lg border border-emerald-900/30">x{{ item.cantidad }}</span>
                     </div>
                   }
