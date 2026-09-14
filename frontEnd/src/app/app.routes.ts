@@ -39,6 +39,12 @@ export const routes: Routes = [
         data: { feature: 'Sistema' }
       },
       {
+        path: 'imagenes',
+        loadComponent: () => import('./features/admin/config/superadmin-images.component').then(m => m.SuperadminImagesComponent),
+        canActivate: [featureGuard],
+        data: { feature: 'Sistema' }
+      },
+      {
         path: 'inicio',
         loadComponent: () => import('./features/admin/dashboard/admin-inicio.component').then(m => m.AdminInicioComponent),
         canActivate: [featureGuard],

@@ -7,6 +7,7 @@ import { AbmRestaurantesComponent } from './config/abm-restaurantes.component';
 import { SuperadminCategoriesComponent } from './config/superadmin-categories.component';
 import { SuperadminUsuariosComponent } from './config/superadmin-usuarios.component';
 import { SuperadminFeaturesComponent } from './config/superadmin-features.component';
+import { SuperadminImagesComponent } from './config/superadmin-images.component';
 
 interface Restaurante {
   id: string;
@@ -44,7 +45,7 @@ interface ErrorLog {
 @Component({
   selector: 'app-super-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, AbmRestaurantesComponent, SuperadminCategoriesComponent, SuperadminUsuariosComponent, SuperadminFeaturesComponent],
+  imports: [CommonModule, FormsModule, AbmRestaurantesComponent, SuperadminCategoriesComponent, SuperadminUsuariosComponent, SuperadminFeaturesComponent, SuperadminImagesComponent],
   template: `
     <div class="p-6">
       <h1 class="text-3xl font-black mb-8">Centro de Control SaaS</h1>
@@ -59,12 +60,20 @@ interface ErrorLog {
         <button (click)="activeTab.set('auditoria')" [class.bg-primary]="activeTab() === 'auditoria'" [class.text-white]="activeTab() === 'auditoria'" [class.bg-white]="activeTab() !== 'auditoria'" [class.text-gray-600]="activeTab() !== 'auditoria'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Auditoría</button>
         <button (click)="activeTab.set('errores')" [class.bg-primary]="activeTab() === 'errores'" [class.text-white]="activeTab() === 'errores'" [class.bg-white]="activeTab() !== 'errores'" [class.text-gray-600]="activeTab() !== 'errores'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Errores</button>
         <button (click)="activeTab.set('branding')" [class.bg-primary]="activeTab() === 'branding'" [class.text-white]="activeTab() === 'branding'" [class.bg-white]="activeTab() !== 'branding'" [class.text-gray-600]="activeTab() !== 'branding'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Branding Global</button>
+        <button (click)="activeTab.set('imagenes')" [class.bg-primary]="activeTab() === 'imagenes'" [class.text-white]="activeTab() === 'imagenes'" [class.bg-white]="activeTab() !== 'imagenes'" [class.text-gray-600]="activeTab() !== 'imagenes'" class="px-6 py-2.5 rounded-xl font-bold shadow-sm transition-all hover:scale-105 active:scale-95">Imágenes</button>
       </div>
 
       <!-- Tab Restaurantes -->
       @if (activeTab() === 'restaurantes') {
         <div class="animate-fade-in">
           <app-abm-restaurantes></app-abm-restaurantes>
+        </div>
+      }
+      
+      <!-- Tab Imagenes -->
+      @if (activeTab() === 'imagenes') {
+        <div class="animate-fade-in">
+          <app-superadmin-images></app-superadmin-images>
         </div>
       }
 
@@ -342,7 +351,7 @@ interface ErrorLog {
 export class SuperAdminDashboardComponent {
   private http = inject(HttpClient);
   
-  activeTab = signal<'restaurantes' | 'usuarios' | 'permisos' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding' | 'menu-categories'>('restaurantes');
+  activeTab = signal<'restaurantes' | 'usuarios' | 'permisos' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding' | 'menu-categories' | 'imagenes'>('restaurantes');
   restaurantes = signal<Restaurante[]>([]);
   logsAuditoria = signal<Log[]>([]);
   logsErrores = signal<ErrorLog[]>([]);

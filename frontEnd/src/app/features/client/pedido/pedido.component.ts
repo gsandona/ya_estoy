@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, MenuComponent, FormsModule, SplitCheckWizardComponent],
   template: `
     @if (requirePin()) {
-      <div class="min-h-dvh bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden bg-grid">
+      <div class="min-h-dvh bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 px-4 animate-fade-in text-center relative overflow-hidden">
         <!-- Radial light accent -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -52,7 +52,7 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === undefined) {
-      <div class="min-h-dvh bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden bg-grid">
+      <div class="min-h-dvh bg-gradient-to-br from-sand via-white to-sand/40 flex flex-col items-center justify-center p-6 animate-fade-in text-center relative overflow-hidden">
         <!-- Radial light accent -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-accent/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -71,7 +71,7 @@ import { FormsModule } from '@angular/forms';
         </div>
       </div>
     } @else if (isValidSession() === false) {
-      <div class="min-h-dvh bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden bg-grid">
+      <div class="min-h-dvh bg-red-50/50 flex flex-col items-center justify-center p-6 px-10 text-center animate-fade-in relative overflow-hidden">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[240px] bg-gradient-to-b from-red-500/5 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="h-28 w-28 bg-white text-red-500 rounded-[2rem] shadow-xl flex items-center justify-center mb-8 border border-red-100 animate-[shake_0.5s_ease-out] relative z-10">
@@ -92,7 +92,7 @@ import { FormsModule } from '@angular/forms';
       </div>
     } @else {
       <div class="min-h-dvh bg-[#f8f9fa] flex justify-center items-stretch w-full">
-        <div class="w-full max-w-md min-h-dvh bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden bg-grid shadow-[0_0_80px_rgba(0,0,0,0.03)] border-x border-gray-100/50">
+        <div class="w-full max-w-md min-h-dvh bg-gradient-to-b from-sand via-white to-sand/40 flex flex-col animate-fade-in relative overflow-hidden shadow-[0_0_80px_rgba(0,0,0,0.03)] border-x border-gray-100/50">
           <!-- Radial light accent background -->
           <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-lg h-[260px] bg-gradient-to-b from-primary/10 to-transparent rounded-full blur-3xl pointer-events-none"></div>
 
@@ -911,11 +911,6 @@ import { FormsModule } from '@angular/forms';
     @keyframes scale-up { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
     .animate-scale-up { animation: scale-up 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    .bg-grid {
-      background-size: 24px 24px;
-      background-image: linear-gradient(to right, rgba(15, 81, 50, 0.015) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(15, 81, 50, 0.015) 1px, transparent 1px);
-    }
   `]
 })
 export class PedidoComponent implements OnInit {
