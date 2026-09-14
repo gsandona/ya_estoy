@@ -420,14 +420,19 @@ import { FormsModule } from '@angular/forms';
                   <!-- Game Selectors -->
                   <div class="flex gap-2 mb-6 select-none">
                     <button (click)="selectedGame.set('dados')" 
-                            class="flex-1 py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
+                            class="flex-1 py-3 px-2 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
                             [ngClass]="selectedGame() === 'dados' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-slate-50 border-gray-200 text-gray-600 hover:bg-slate-100'">
                       🎲 Dados
                     </button>
                     <button (click)="selectedGame.set('trivia')" 
-                            class="flex-1 py-3 px-4 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
+                            class="flex-1 py-3 px-2 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
                             [ngClass]="selectedGame() === 'trivia' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-slate-50 border-gray-200 text-gray-600 hover:bg-slate-100'">
                       🧠 Trivia
+                    </button>
+                    <button (click)="selectedGame.set('memoria')" 
+                            class="flex-1 py-3 px-2 rounded-2xl font-black text-xs uppercase tracking-wider border transition-all active:scale-95"
+                            [ngClass]="selectedGame() === 'memoria' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-slate-50 border-gray-200 text-gray-600 hover:bg-slate-100'">
+                      🃏 Memoria
                     </button>
                   </div>
 
@@ -532,6 +537,59 @@ import { FormsModule } from '@angular/forms';
                                   class="bg-primary text-white px-6 py-3 rounded-2xl text-xs font-black shadow-md hover:bg-slate-800 active:scale-95 transition-all select-none">
                             Siguiente Pregunta ➔
                           </button>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- GAME 3: Memoria -->
+                  @if (selectedGame() === 'memoria') {
+                    <div class="bg-white rounded-[2.25rem] border border-gray-150 p-5 sm:p-6 shadow-sm animate-scale-up text-center">
+                      <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-black text-sm text-gray-800 uppercase tracking-widest">🃏 Memoria</h3>
+                        <div class="flex gap-2">
+                           <span class="text-[10px] font-black bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full uppercase tracking-wider select-none">
+                             ⏱️ {{ memoryTimer() }}s
+                           </span>
+                           <span class="text-[10px] font-black bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full uppercase tracking-wider select-none">
+                             🎯 {{ memoryMatches() }}/6
+                           </span>
+                        </div>
+                      </div>
+
+                      @if (!memoryGameStarted() && memoryMatches() === 0) {
+                        <div class="py-10">
+                          <p class="text-sm font-bold text-gray-400 mb-6">Encuentra los pares de comida lo más rápido posible.</p>
+                          <button (click)="initMemoryGame()" class="bg-accent text-white px-8 py-3.5 rounded-2xl text-xs font-black shadow-md hover:opacity-90 active:scale-95 transition-all">
+                            ▶️ Iniciar Juego
+                          </button>
+                        </div>
+                      } @else if (!memoryGameStarted() && memoryMatches() === 6) {
+                        <div class="py-10 animate-fade-in">
+                          <div class="text-6xl mb-4">🏆</div>
+                          <h4 class="font-black text-xl text-gray-800 mb-2">¡Excelente memoria!</h4>
+                          <p class="text-sm font-bold text-gray-500 mb-6">Completaste el juego en {{ memoryTimer() }} segundos.</p>
+                          <button (click)="initMemoryGame()" class="bg-primary text-white px-8 py-3.5 rounded-2xl text-xs font-black shadow-md hover:bg-slate-800 active:scale-95 transition-all">
+                            🔄 Jugar de nuevo
+                          </button>
+                        </div>
+                      } @else {
+                        <!-- Grid 3x4 = 12 cards -->
+                        <div class="grid grid-cols-3 gap-3 mb-2">
+                          @for (card of memoryCards(); let i = $index; track card.id) {
+                            <button 
+                               (click)="flipMemoryCard(i)"
+                               [disabled]="card.matched"
+                               class="aspect-[3/4] rounded-xl flex items-center justify-center text-4xl shadow-sm transition-all duration-300 transform preserve-3d"
+                               [ngClass]="card.flipped || card.matched ? 'bg-slate-50 border-2 border-slate-200' : 'bg-primary border-b-4 border-slate-800 active:border-b-0 active:translate-y-1'">
+                               
+                               @if (card.flipped || card.matched) {
+                                 <span class="animate-scale-up">{{ card.emoji }}</span>
+                               } @else {
+                                 <span class="text-white/50 text-2xl font-black">?</span>
+                               }
+                            </button>
+                          }
                         </div>
                       }
                     </div>
@@ -937,7 +995,7 @@ export class PedidoComponent implements OnInit {
   numeroMesa = signal<string>('');
   restauranteId = signal<string>('');
 
-  selectedGame = signal<'dados' | 'trivia'>('dados');
+  selectedGame = signal<'dados' | 'trivia' | 'memoria'>('dados');
 
   // Dice game states
   rollingDice = signal(false);
@@ -967,6 +1025,14 @@ export class PedidoComponent implements OnInit {
 
   currentQuestionIndex = signal<number>(0);
   currentQuestion = computed(() => this.triviaQuestions[this.currentQuestionIndex()]);
+
+  // Memory Game states
+  memoryCards = signal<{ id: number; emoji: string; flipped: boolean; matched: boolean }[]>([]);
+  memoryFlippedCards = signal<number[]>([]);
+  memoryMatches = signal<number>(0);
+  memoryTimer = signal<number>(0);
+  memoryInterval: any;
+  memoryGameStarted = signal<boolean>(false);
 
   // Split bill states
   showSplitModal = signal(false);
@@ -1699,5 +1765,74 @@ export class PedidoComponent implements OnInit {
       nextIdx = 0;
     }
     this.currentQuestionIndex.set(nextIdx);
+  }
+
+  initMemoryGame() {
+    const emojis = ['🍔', '🍕', '🌮', '🍣', '🍩', '🍺'];
+    const cards = [...emojis, ...emojis]
+      .sort(() => Math.random() - 0.5)
+      .map((emoji, idx) => ({ id: idx, emoji, flipped: false, matched: false }));
+    this.memoryCards.set(cards);
+    this.memoryMatches.set(0);
+    this.memoryTimer.set(0);
+    this.memoryFlippedCards.set([]);
+    this.memoryGameStarted.set(true);
+    if (this.memoryInterval) clearInterval(this.memoryInterval);
+    this.memoryInterval = setInterval(() => {
+      this.memoryTimer.update(t => t + 1);
+    }, 1000);
+  }
+
+  flipMemoryCard(index: number) {
+    if (!this.memoryGameStarted()) return;
+    const cards = this.memoryCards();
+    const card = cards[index];
+    if (card.flipped || card.matched) return;
+    
+    const flipped = this.memoryFlippedCards();
+    if (flipped.length === 2) return; // wait for timeout
+
+    this.memoryCards.update(c => {
+      const copy = [...c];
+      copy[index] = { ...copy[index], flipped: true };
+      return copy;
+    });
+
+    this.memoryFlippedCards.update(f => [...f, index]);
+
+    if (flipped.length === 1) {
+      const firstIdx = flipped[0];
+      const secondIdx = index;
+      if (cards[firstIdx].emoji === cards[secondIdx].emoji) {
+        setTimeout(() => {
+          this.memoryCards.update(c => {
+             const copy = [...c];
+             copy[firstIdx].matched = true;
+             copy[secondIdx].matched = true;
+             return copy;
+          });
+          this.memoryFlippedCards.set([]);
+          this.memoryMatches.update(m => m + 1);
+          if (this.memoryMatches() === 6) {
+             clearInterval(this.memoryInterval);
+             this.memoryGameStarted.set(false);
+          }
+        }, 500);
+      } else {
+        setTimeout(() => {
+          this.memoryCards.update(c => {
+             const copy = [...c];
+             copy[firstIdx].flipped = false;
+             copy[secondIdx].flipped = false;
+             return copy;
+          });
+          this.memoryFlippedCards.set([]);
+        }, 1000);
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.memoryInterval) clearInterval(this.memoryInterval);
   }
 }
