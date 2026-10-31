@@ -5,6 +5,7 @@ import { throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SignalrService } from './signalr.service';
 import { TenantContextService } from './tenant-context.service';
+import { BrandingService } from './branding.service';
 
 export interface User {
   id: string;
@@ -21,6 +22,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private signalrService = inject(SignalrService);
   private tenantContext = inject(TenantContextService);
+  private brandingService = inject(BrandingService);
   private _currentUser = signal<User | null>(null);
   private _token: string | null = null;
   
@@ -106,6 +108,16 @@ export class AuthService {
         localStorage.setItem('auth_token', user.token);
         localStorage.setItem('auth_user', JSON.stringify(user));
 
+        if (user.restauranteId && this.brandingService.restauranteId() && this.brandingService.restauranteId() !== user.restauranteId) {
+          this.brandingService.resetBranding();
+        }
+        if (user.restauranteId) {
+          this.brandingService.restauranteId.set(user.restauranteId);
+        }
+        if (user.restauranteNombre) {
+          this.brandingService.appName.set(user.restauranteNombre);
+        }
+
         // Auto-set the active tenant ID for Admin and Mozo
         if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && user.restauranteId) {
           this.tenantContext.setTenantId(user.restauranteId);
@@ -139,6 +151,8 @@ export class AuthService {
       } catch (e) {}
       return true; // Portal session restored
     }
+
+    this.brandingService.resetBranding();
     return false; // Full logout
   }
 

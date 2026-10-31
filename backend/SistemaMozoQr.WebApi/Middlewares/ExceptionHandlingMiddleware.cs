@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SistemaMozoQr.Domain.Entities;
 using SistemaMozoQr.Infrastructure.Data;
@@ -11,11 +12,13 @@ public class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+    private readonly IHostEnvironment _env;
 
-    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+    public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IHostEnvironment env)
     {
         _next = next;
         _logger = logger;
+        _env = env;
     }
 
     public async Task InvokeAsync(HttpContext context, IServiceProvider serviceProvider)
@@ -26,7 +29,7 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Uncaught exception intercepted by middleware.");
+            _logger.LogError(ex, "Uncaught exception intercepted by middleware. TraceId: {TraceId}", context.TraceIdentifier);
             await HandleExceptionAsync(context, ex, serviceProvider);
         }
     }
@@ -57,8 +60,35 @@ public class ExceptionHandlingMiddleware
             _logger.LogError(dbEx, "Failed to save error log to database.");
         }
 
+        var (statusCode, message) = exception switch
+        {
+            UnauthorizedAccessException => (
+                StatusCodes.Status401Unauthorized,
+                string.IsNullOrWhiteSpace(exception.Message) ? "No autorizado para realizar esta acción." : exception.Message
+            ),
+            KeyNotFoundException => (
+                StatusCodes.Status404NotFound,
+                string.IsNullOrWhiteSpace(exception.Message) ? "El recurso solicitado no fue encontrado." : exception.Message
+            ),
+            ArgumentException => (
+                StatusCodes.Status400BadRequest,
+                string.IsNullOrWhiteSpace(exception.Message) ? "Los datos proporcionados no son válidos." : exception.Message
+            ),
+            _ => (
+                StatusCodes.Status500InternalServerError,
+                _env.IsDevelopment()
+                    ? exception.Message
+                    : "Ocurrió un error interno en el servidor."
+            )
+        };
+
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        await context.Response.WriteAsJsonAsync(new { message = "An internal server error occurred." });
+        context.Response.StatusCode = statusCode;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            statusCode,
+            message,
+            traceId = context.TraceIdentifier
+        });
     }
 }

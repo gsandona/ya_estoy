@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as signalR from '@microsoft/signalr';
 import { MesaTask } from '../models/task.model';
@@ -29,6 +29,10 @@ export class SignalrService {
   public readonly mesaMontoConsumo = signal<{ mesaId: string, monto: number | null } | null>(null);
   public readonly currentRestauranteId = signal<string | null>(null);
 
+  public readonly notificationPermission = signal<NotificationPermission>(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
+
   // Notification settings signal
   public readonly notificationSettings = signal<NotificationSettings>({
     muteAll: false,
@@ -45,6 +49,11 @@ export class SignalrService {
     this.fetchPendingTasks();
     this.setupAudioUnlock();
 
+    effect(() => {
+      const pendingCount = this.pendingTasks().length;
+      this.updateAppBadge(pendingCount);
+    });
+
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (event) => {
         if (event.key === this.getSettingsKey()) {
@@ -54,20 +63,112 @@ export class SignalrService {
     }
   }
 
+  private updateAppBadge(count: number) {
+    if (typeof navigator === 'undefined') return;
+    const nav = navigator as any;
+    try {
+      if (count > 0 && typeof nav.setAppBadge === 'function') {
+        nav.setAppBadge(count).catch(() => {});
+      } else if (count === 0 && typeof nav.clearAppBadge === 'function') {
+        nav.clearAppBadge().catch(() => {});
+      }
+    } catch (e) {}
+  }
+
+  public async requestNotificationPermission(): Promise<NotificationPermission> {
+    this.initAudioContext();
+    this.playSilentSound();
+
+    if (typeof Notification === 'undefined') {
+      return 'default';
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      this.notificationPermission.set(permission);
+      return permission;
+    } catch (e) {
+      console.warn('Error requesting notification permission:', e);
+      return this.notificationPermission();
+    }
+  }
+
+  public showNativeNotification(title: string, body: string, tag?: string, force = false) {
+    if (typeof Notification === 'undefined') return;
+    this.notificationPermission.set(Notification.permission);
+    if (Notification.permission !== 'granted') return;
+    if (!force && this.notificationSettings().muteAll) return;
+
+    const options: NotificationOptions = {
+      body,
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-72x72.png',
+      tag: tag || 'mozogo-alert-' + Date.now(),
+      requireInteraction: false
+    };
+
+    try {
+      const notif = new Notification(title, options);
+      notif.onclick = () => {
+        window.focus();
+        notif.close();
+      };
+    } catch (e) {
+      // Fallback for mobile browsers (e.g., Android Chrome) that require ServiceWorkerRegistration
+      if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(reg => {
+          if (reg && typeof reg.showNotification === 'function') {
+            reg.showNotification(title, options).catch(() => {});
+          }
+        }).catch(() => {});
+      }
+    }
+  }
+
+  public async testAlert() {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      await this.requestNotificationPermission();
+    } else {
+      this.initAudioContext();
+    }
+
+    try {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([300, 100, 300]);
+      }
+    } catch (e) {}
+
+    this.playChimeSequence();
+    this.showNativeNotification(
+      '🔔 Prueba de Alerta MozoGo',
+      '¡Las notificaciones y el sonido funcionan correctamente en tu dispositivo!',
+      'mozogo-test-alert',
+      true
+    );
+  }
+
   private setupAudioUnlock() {
     const unlockAudio = () => {
       this.initAudioContext();
       this.playSilentSound();
+      if (typeof Notification !== 'undefined') {
+        this.notificationPermission.set(Notification.permission);
+      }
       window.removeEventListener('click', unlockAudio);
       window.removeEventListener('touchstart', unlockAudio);
     };
     window.addEventListener('click', unlockAudio);
     window.addEventListener('touchstart', unlockAudio);
 
-    // Auto-resumir en iOS Safari cuando la pestaña vuelve al primer plano
+    // Auto-resumir en iOS Safari / macOS cuando la pestaña vuelve al primer plano
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && this.audioCtx) {
-        this.audioCtx.resume().catch(e => console.warn('Could not resume AudioContext on visibilitychange:', e));
+      if (document.visibilityState === 'visible') {
+        if (this.audioCtx) {
+          this.audioCtx.resume().catch(e => console.warn('Could not resume AudioContext on visibilitychange:', e));
+        }
+        if (typeof Notification !== 'undefined') {
+          this.notificationPermission.set(Notification.permission);
+        }
       }
     });
   }
@@ -215,6 +316,13 @@ export class SignalrService {
 
     this.hubConnection.on('NotificarLlamadoMozo', (taskId: string, numeroMesa: number, details?: string) => {
       this.playAudioAlert('tasks');
+      if (this.notificationSettings().tasks) {
+        this.showNativeNotification(
+          `🔔 Mesa ${numeroMesa} llama al mozo`,
+          details || 'Solicita asistencia en la mesa',
+          `task-${taskId}`
+        );
+      }
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
@@ -227,6 +335,13 @@ export class SignalrService {
 
     this.hubConnection.on('NotificarNuevoPedido', (pedidoId: string, taskId: string, numeroMesa: number, details?: string) => {
       this.playAudioAlert('tasks');
+      if (this.notificationSettings().tasks) {
+        this.showNativeNotification(
+          `🍽️ Nuevo Pedido - Mesa ${numeroMesa}`,
+          details || 'Nuevos productos solicitados',
+          `pedido-${pedidoId}`
+        );
+      }
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
@@ -240,6 +355,13 @@ export class SignalrService {
 
     this.hubConnection.on('NotificarPidiendoCuenta', (taskId: string, numeroMesa: number, details?: string) => {
       this.playAudioAlert('tasks');
+      if (this.notificationSettings().tasks) {
+        this.showNativeNotification(
+          `💳 Mesa ${numeroMesa} pide la cuenta`,
+          details || 'Solicita la cuenta',
+          `cuenta-${taskId}`
+        );
+      }
       this.addTask({
         id: taskId,
         tableId: numeroMesa,
@@ -252,6 +374,13 @@ export class SignalrService {
 
     this.hubConnection.on('TareaReasignada', (taskId: string, newMozoId: string) => {
       this.playAudioAlert('reassignments');
+      if (this.notificationSettings().reassignments) {
+        this.showNativeNotification(
+          '🔄 Tarea Reasignada',
+          'Se ha actualizado la asignación de una mesa',
+          `reassign-${taskId}`
+        );
+      }
       this._tasks.update(tasks => tasks.map(t => 
         t.id.toLowerCase() === taskId.toLowerCase() ? { ...t, assignedMozoId: newMozoId } : t
       ));
@@ -281,6 +410,13 @@ export class SignalrService {
 
     this.hubConnection.on('NotificarPedidoListo', (pedidoId: string, taskId: string, numeroMesa: number) => {
       this.playAudioAlert('orderStatus');
+      if (this.notificationSettings().orderStatus) {
+        this.showNativeNotification(
+          `✅ Pedido Listo - Mesa ${numeroMesa}`,
+          '¡Pedido listo en cocina para retirar y entregar!',
+          `listo-${pedidoId}`
+        );
+      }
       const exists = this._tasks().some(t => t.id.toLowerCase() === pedidoId.toLowerCase());
       if (exists) {
         this._tasks.update(tasks => tasks.map(t => 
@@ -321,58 +457,73 @@ export class SignalrService {
     }
   }
 
-  private playAudioAlert(type: 'tasks' | 'orderStatus' | 'reassignments') {
-    const settings = this.notificationSettings();
-    console.log('playAudioAlert check:', { type, settings });
-    if (settings.muteAll) {
-      console.log('playAudioAlert: Mute All is active. Skip audio.');
-      return;
-    }
-    if (!settings[type]) {
-      console.log(`playAudioAlert: Setting for ${type} is disabled. Skip audio.`);
-      return;
-    }
-
+  private playChimeSequence() {
     try {
-      // Vibración para celulares (patrón: vibra 200ms, pausa 100ms, vibra 200ms)
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]);
-      }
-
-      // Asegurar que el AudioContext esté inicializado y activo
       this.initAudioContext();
-
       if (!this.audioCtx) return;
 
       if (this.audioCtx.state === 'suspended') {
         this.audioCtx.resume();
       }
-      
-      const playChime = (freq: number, startTime: number) => {
+
+      const playBellNote = (freq: number, startTime: number, duration = 0.9) => {
         if (!this.audioCtx) return;
-        const oscillator = this.audioCtx.createOscillator();
-        const gainNode = this.audioCtx.createGain();
-        
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(freq, startTime);
-        
-        // Ataque suave, decaimiento largo
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(0.3, startTime + 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.8);
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioCtx.destination);
-        
-        oscillator.start(startTime);
-        oscillator.stop(startTime + 1);
+        const oscMain = this.audioCtx.createOscillator();
+        const oscHarmonic = this.audioCtx.createOscillator();
+        const gainMain = this.audioCtx.createGain();
+        const gainHarmonic = this.audioCtx.createGain();
+
+        oscMain.type = 'sine';
+        oscMain.frequency.setValueAtTime(freq, startTime);
+
+        oscHarmonic.type = 'triangle';
+        oscHarmonic.frequency.setValueAtTime(freq * 2, startTime);
+
+        // Louder, clearer attack and bell decay
+        gainMain.gain.setValueAtTime(0.001, startTime);
+        gainMain.gain.linearRampToValueAtTime(0.55, startTime + 0.025);
+        gainMain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+        gainHarmonic.gain.setValueAtTime(0.001, startTime);
+        gainHarmonic.gain.linearRampToValueAtTime(0.18, startTime + 0.015);
+        gainHarmonic.gain.exponentialRampToValueAtTime(0.001, startTime + duration * 0.6);
+
+        oscMain.connect(gainMain);
+        oscHarmonic.connect(gainHarmonic);
+        gainMain.connect(this.audioCtx.destination);
+        gainHarmonic.connect(this.audioCtx.destination);
+
+        oscMain.start(startTime);
+        oscHarmonic.start(startTime);
+        oscMain.stop(startTime + duration + 0.05);
+        oscHarmonic.stop(startTime + duration + 0.05);
       };
 
-      // Doble campanilla (e.g., C6 y E6)
+      // 3-note ascending bell chime (C6 -> E6 -> G6)
       const now = this.audioCtx.currentTime;
-      playChime(1046.50, now);        // C6
-      playChime(1318.51, now + 0.15); // E6
+      playBellNote(1046.50, now, 0.85);        // C6
+      playBellNote(1318.51, now + 0.14, 0.85); // E6
+      playBellNote(1567.98, now + 0.28, 1.1);  // G6
+    } catch (e) {
+      console.warn('Audio playChimeSequence failed:', e);
+    }
+  }
 
+  private playAudioAlert(type: 'tasks' | 'orderStatus' | 'reassignments') {
+    const settings = this.notificationSettings();
+    if (settings.muteAll) {
+      return;
+    }
+    if (!settings[type]) {
+      return;
+    }
+
+    try {
+      // Vibración para celulares (patrón: vibra 300ms, pausa 100ms, vibra 300ms)
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate([300, 100, 300]);
+      }
+      this.playChimeSequence();
     } catch (e) {
       console.warn('Audio/Vibrate play failed (maybe no user interaction yet):', e);
     }

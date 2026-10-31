@@ -3,8 +3,10 @@ using SistemaMozoQr.Infrastructure;
 using SistemaMozoQr.Infrastructure.Data;
 using SistemaMozoQr.Infrastructure.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -54,6 +56,43 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// Rate Limiting & Brute-Force Protection
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            message = "Demasiados intentos. Por favor, espere un minuto antes de volver a intentar."
+        }, cancellationToken);
+    };
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? httpContext.Request.Headers.Host.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 120,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+
+    options.AddPolicy("AuthPolicy", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? httpContext.Request.Headers.Host.ToString(),
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 10,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
 // SignalR
 builder.Services.AddSignalR();
 
@@ -77,6 +116,16 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Security Headers Middleware
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["X-Permitted-Cross-Domain-Policies"] = "none";
+    await next();
+});
 
 app.UseCors("AllowAll");
 
@@ -103,6 +152,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<SistemaMozoQr.WebApi.Middlewares.ExceptionHandlingMiddleware>();
+
+app.UseRateLimiter();
 
 // Importante: User Authentication antes de Authorization
 app.UseAuthentication();
@@ -144,16 +195,7 @@ using (var scope = app.Services.CreateScope())
         }
         catch (Exception ex) when (ex.Message.Contains("42P07") || ex.Message.Contains("already exists"))
         {
-            if (context.Database.ProviderName == "Npgsql.EntityFrameworkCore.PostgreSQL")
-            {
-                // Wipe old schema and retry (only for Postgres in dev/staging reset scenarios)
-                context.Database.ExecuteSqlRaw("DROP SCHEMA public CASCADE; CREATE SCHEMA public;");
-                context.Database.Migrate();
-            }
-            else
-            {
-                throw;
-            }
+            Console.WriteLine($"Aviso de migración: {ex.Message}");
         }
     }
 

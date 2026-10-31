@@ -37,7 +37,7 @@ import { BrandingService } from '../../../core/services/branding.service';
       <!-- Desktop Sidebar -->
       <aside [ngClass]="sidebarCollapsed() ? 'w-20' : 'w-72'" class="bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all duration-300">
         <div class="p-4 border-b border-white/10 mt-4 flex items-center justify-between">
-          <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3">
+          <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3 overflow-hidden">
             <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
               <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
             </div>
@@ -55,7 +55,7 @@ import { BrandingService } from '../../../core/services/branding.service';
         </div>
         @if (!sidebarCollapsed()) {
           <div class="px-6 py-2 border-b border-white/5 select-none">
-            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">{{ lang.translations().sidebar.roleLabel }} • {{ auth.currentUser()?.role }}</p>
+            <p class="text-slate-300 text-xs font-semibold uppercase tracking-wider">{{ lang.translations().sidebar.roleLabel }} • {{ auth.currentUser()?.role }}</p>
           </div>
         }
         <nav class="flex-1 p-4 space-y-2">
@@ -137,9 +137,9 @@ import { BrandingService } from '../../../core/services/branding.service';
           }
         </nav>
         <div class="p-4">
-          <button (click)="logout()" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="w-full flex items-center py-3 rounded-xl bg-red-500/10 text-red-400 font-semibold hover:bg-red-500/20 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.logout : ''">
+          <button (click)="logout()" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="w-full flex items-center py-3 rounded-xl bg-red-500/20 text-red-200 font-bold hover:bg-red-500/30 transition-all border border-red-400/20" [title]="sidebarCollapsed() ? lang.translations().sidebar.logout : ''">
             <span class="flex items-center justify-center shrink-0">
-              <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg class="w-4 h-4 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </span>
             @if (!sidebarCollapsed()) {
               <span class="truncate">{{ lang.translations().sidebar.logout }}</span>
@@ -154,7 +154,7 @@ import { BrandingService } from '../../../core/services/branding.service';
           
           <!-- Mobile Hamburger Toggle -->
           <div class="flex items-center gap-3 md:hidden">
-            <button (click)="mobileMenuOpen.set(true)" class="p-2 bg-surface rounded-xl hover:bg-gray-100 transition-colors active:scale-95">
+            <button (click)="mobileMenuOpen.set(true)" class="p-2 bg-gray-100 rounded-xl hover:bg-gray-200 text-gray-800 transition-colors active:scale-95">
               <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 max-w-[200px] truncate">
@@ -167,20 +167,20 @@ import { BrandingService } from '../../../core/services/branding.service';
           
           <!-- Desktop Title -->
           <div class="hidden md:block">
-            <h2 class="text-xl font-bold text-gray-800">{{ lang.translations().common.appName }} <span class="text-accent">({{ auth.currentUser()?.role }})</span></h2>
+            <h2 class="text-xl font-bold text-gray-800">{{ brandingService.appName() }} <span class="text-accent">({{ auth.currentUser()?.role }})</span></h2>
           </div>
           
           <!-- User Profile and Tenant Selector -->
           <div class="flex items-center gap-4">
             <!-- Language Selector -->
-            <button (click)="lang.toggleLanguage()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-primary hover:bg-gray-100 text-xs font-black transition-all active:scale-95 outline-none select-none">
+            <button (click)="lang.toggleLanguage()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-800 hover:bg-gray-200 text-xs font-black transition-all active:scale-95 outline-none select-none">
               <span>🌐</span> {{ lang.currentLang() | uppercase }}
             </button>
 
             <!-- Notification Settings Menu -->
             <div id="notif-settings-menu-container" class="relative">
               <button (click)="showNotificationSettings.set(!showNotificationSettings())" 
-                      class="relative flex items-center justify-center p-2 rounded-xl bg-gray-50 border border-gray-200 text-primary hover:bg-gray-100 transition-all active:scale-95 outline-none select-none"
+                      class="relative flex items-center justify-center p-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-800 hover:bg-gray-200 transition-all active:scale-95 outline-none select-none"
                       [title]="lang.translations().notifications?.title || 'Notificaciones'">
                 @if (signalrService.notificationSettings().muteAll) {
                   <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -203,12 +203,12 @@ import { BrandingService } from '../../../core/services/branding.service';
 
               <!-- Dropdown Panel -->
               @if (showNotificationSettings()) {
-                <div class="absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 p-5 select-none animate-fade-in">
+                <div class="absolute right-0 mt-2.5 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 p-5 select-none animate-fade-in">
                   <h3 class="text-sm font-black text-gray-800 mb-4 flex items-center justify-between border-b border-gray-100 pb-2.5">
-                    <span class="flex items-center gap-1.5 text-primary">
+                    <span class="flex items-center gap-1.5 text-gray-900">
                       🔔 {{ lang.translations().notifications?.title || 'Notificaciones' }}
                     </span>
-                    <button (click)="showNotificationSettings.set(false)" class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-50">
+                    <button (click)="showNotificationSettings.set(false)" class="text-gray-500 hover:text-gray-800 transition-colors p-1 rounded-lg hover:bg-gray-100">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                   </h3>
@@ -217,12 +217,12 @@ import { BrandingService } from '../../../core/services/branding.service';
                     <!-- Silenciar Todo -->
                     <div class="flex items-center justify-between">
                       <div class="flex flex-col pr-3">
-                        <span class="text-sm font-bold text-gray-700">{{ lang.translations().notifications?.muteAll || 'Silenciar Todo' }}</span>
+                        <span class="text-sm font-bold text-gray-800">{{ lang.translations().notifications?.muteAll || 'Silenciar Todo' }}</span>
                       </div>
                       <button type="button"
                               (click)="toggleSetting('muteAll')"
                               class="relative inline-flex items-center cursor-pointer w-11 h-6 rounded-full transition-colors duration-250 focus:outline-none shadow-inner"
-                              [class]="signalrService.notificationSettings().muteAll ? 'bg-red-500' : 'bg-gray-200'">
+                              [class]="signalrService.notificationSettings().muteAll ? 'bg-red-500' : 'bg-gray-300'">
                         <span class="inline-block w-5 h-5 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
                               [class]="signalrService.notificationSettings().muteAll ? 'translate-x-[22px]' : 'translate-x-0.5'"></span>
                       </button>
@@ -239,7 +239,7 @@ import { BrandingService } from '../../../core/services/branding.service';
                               (click)="toggleSetting('tasks')"
                               [disabled]="signalrService.notificationSettings().muteAll"
                               class="relative inline-flex items-center cursor-pointer w-9 h-5 rounded-full transition-colors duration-250 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
-                              [class]="signalrService.notificationSettings().tasks ? 'bg-accent' : 'bg-gray-200'">
+                              [class]="signalrService.notificationSettings().tasks ? 'bg-emerald-600' : 'bg-gray-300'">
                         <span class="inline-block w-4 h-4 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
                               [class]="signalrService.notificationSettings().tasks ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
                       </button>
@@ -254,7 +254,7 @@ import { BrandingService } from '../../../core/services/branding.service';
                               (click)="toggleSetting('orderStatus')"
                               [disabled]="signalrService.notificationSettings().muteAll"
                               class="relative inline-flex items-center cursor-pointer w-9 h-5 rounded-full transition-colors duration-250 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
-                              [class]="signalrService.notificationSettings().orderStatus ? 'bg-accent' : 'bg-gray-200'">
+                              [class]="signalrService.notificationSettings().orderStatus ? 'bg-emerald-600' : 'bg-gray-300'">
                         <span class="inline-block w-4 h-4 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
                               [class]="signalrService.notificationSettings().orderStatus ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
                       </button>
@@ -269,15 +269,35 @@ import { BrandingService } from '../../../core/services/branding.service';
                               (click)="toggleSetting('reassignments')"
                               [disabled]="signalrService.notificationSettings().muteAll"
                               class="relative inline-flex items-center cursor-pointer w-9 h-5 rounded-full transition-colors duration-250 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
-                              [class]="signalrService.notificationSettings().reassignments ? 'bg-accent' : 'bg-gray-200'">
+                              [class]="signalrService.notificationSettings().reassignments ? 'bg-emerald-600' : 'bg-gray-300'">
                         <span class="inline-block w-4 h-4 bg-white rounded-full transition-transform duration-250 transform shadow-sm"
                               [class]="signalrService.notificationSettings().reassignments ? 'translate-x-[18px]' : 'translate-x-0.5'"></span>
                       </button>
                     </div>
 
+                    <!-- Permiso nativo y Botón de prueba Mac / Móvil -->
+                    <div class="border-t border-gray-100 pt-3 space-y-2.5">
+                      <div class="flex items-center justify-between text-[11px] font-bold">
+                        <span class="text-gray-600">Alertas del Sistema (Mac/Móvil):</span>
+                        @if (signalrService.notificationPermission() === 'granted') {
+                          <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Activas</span>
+                        } @else if (signalrService.notificationPermission() === 'denied') {
+                          <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-700">Bloqueadas</span>
+                        } @else {
+                          <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Pendiente</span>
+                        }
+                      </div>
+
+                      <button type="button"
+                              (click)="testNotifications()"
+                              class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white text-xs font-black shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>🔔</span> Probar Sonido y Notificación (Mac / Móvil)
+                      </button>
+                    </div>
+
                     <!-- Footer Warning -->
                     @if (!signalrService.notificationSettings().muteAll) {
-                      <div class="text-[10px] text-accent font-semibold uppercase tracking-wider text-center mt-2.5">
+                      <div class="text-[10px] text-emerald-700 font-bold uppercase tracking-wider text-center mt-1">
                         🔊 {{ lang.translations().notifications?.soundWarning || 'Sonido y vibración habilitados' }}
                       </div>
                     }
@@ -288,10 +308,10 @@ import { BrandingService } from '../../../core/services/branding.service';
 
             <app-tenant-selector></app-tenant-selector>
             <div class="hidden sm:flex flex-col items-end">
-               <span class="font-bold text-sm">{{ auth.currentUser()?.username }}</span>
-               <span class="text-xs text-green-500 font-semibold">{{ lang.translations().common.online }}</span>
+               <span class="font-bold text-sm text-gray-800">{{ auth.currentUser()?.username }}</span>
+               <span class="text-xs text-green-600 font-semibold">{{ lang.translations().common.online }}</span>
             </div>
-            <div class="h-10 w-10 flex items-center justify-center bg-surface border border-gray-200 rounded-full font-bold text-primary">
+            <div class="h-10 w-10 flex items-center justify-center bg-gray-100 border border-gray-200 rounded-full font-bold text-gray-800">
               {{ auth.currentUser()?.username?.charAt(0) | uppercase}}
             </div>
           </div>
@@ -302,13 +322,13 @@ import { BrandingService } from '../../../core/services/branding.service';
             <div class="absolute inset-0 bg-white/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-fade-in">
               <div class="flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-xs">
                 <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
-                  <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
+                  <span class="animate-spin absolute h-full w-full border-4 border-emerald-600 border-t-transparent rounded-full"></span>
                   <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex">
                     <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
                   </div>
                 </div>
                 <h3 class="text-lg font-black text-gray-800">Cargando datos...</h3>
-                <p class="text-gray-400 text-xs mt-1 font-semibold uppercase tracking-wider animate-pulse">Sincronizando con MozoGo</p>
+                <p class="text-gray-400 text-xs mt-1 font-semibold uppercase tracking-wider animate-pulse">Sincronizando con {{ brandingService.appName() }}</p>
               </div>
             </div>
           }
@@ -322,16 +342,16 @@ import { BrandingService } from '../../../core/services/branding.service';
           <div class="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm animate-fade-in" (click)="mobileMenuOpen.set(false)"></div>
           <aside class="fixed top-0 left-0 bottom-0 w-[280px] bg-primary text-white flex flex-col z-50 md:hidden shadow-2xl animate-[slide-right_0.3s_ease-out]">
             <div class="p-6 border-b border-white/10 mt-4 flex justify-between items-center">
-              <div>
+              <div class="overflow-hidden">
                 <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
                   <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
                     <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
                   </div>
                   <span class="truncate">{{ brandingService.appName() }}</span>
                 </h2>
-                <p class="text-slate-400 text-xs mt-1 font-medium">{{ auth.currentUser()?.role }}</p>
+                <p class="text-slate-300 text-xs mt-1 font-medium">{{ auth.currentUser()?.role }}</p>
               </div>
-              <button (click)="mobileMenuOpen.set(false)" class="p-2 bg-white/5 rounded-full hover:bg-white/10 active:scale-95 transition-all text-white">
+              <button (click)="mobileMenuOpen.set(false)" class="p-2 bg-white/10 rounded-full hover:bg-white/20 active:scale-95 transition-all text-white">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               </button>
             </div>
@@ -437,39 +457,54 @@ export class AdminLayoutComponent {
   isBrandingLoaded = signal(false);
 
   constructor() {
-    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe(data => {
-      const appName = data.find(s => s.key === 'GlobalAppName')?.value;
-      const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
-      if (appName) {
-        this.globalAppName.set(appName);
-        this.brandingService.appName.set(appName);
-      }
-      if (appLogo) {
-        this.globalLogoBase64.set(appLogo);
-        if (!this.auth.currentUser()?.restauranteId) {
-          this.brandingService.logo.set(appLogo);
+    const user = this.auth.currentUser();
+
+    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe({
+      next: (data) => {
+        const appName = data.find(s => s.key === 'GlobalAppName')?.value;
+        const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
+        const currentUser = this.auth.currentUser();
+        const hasRestaurant = !!currentUser?.restauranteId;
+
+        if (appName) {
+          this.globalAppName.set(appName);
+          if (!hasRestaurant) {
+            this.brandingService.appName.set(appName);
+          }
         }
-      }
+        if (appLogo) {
+          this.globalLogoBase64.set(appLogo);
+          if (!hasRestaurant) {
+            this.brandingService.logo.set(appLogo);
+          }
+        }
+      },
+      error: () => {}
     });
 
-    const user = this.auth.currentUser();
     if (user && user.restauranteId) {
+      // If we already have cached branding for this restaurant in localStorage, render immediately with zero flash on F5
+      if (this.brandingService.hasCachedRestaurantBranding(user.restauranteId)) {
+        this.isBrandingLoaded.set(true);
+      } else if (user.restauranteNombre) {
+        this.brandingService.appName.set(user.restauranteNombre);
+      }
+
       this.restauranteService.getById(user.restauranteId).subscribe({
         next: (res) => {
           if (res) {
-            this.brandingService.applyBranding({
+            this.brandingService.setRestaurantBranding({
+              id: user.restauranteId,
+              nombre: res.nombre || user.restauranteNombre,
+              logoUrl: res.logoUrl,
               primary: res.colorPrimario,
               secondary: res.colorSecundario,
               background: res.colorFondo
             });
-            if (res.logoUrl) {
-              this.brandingService.logo.set(res.logoUrl);
-            }
-            if (res.nombre) {
-              this.brandingService.appName.set(res.nombre);
-            }
           }
-          setTimeout(() => this.isBrandingLoaded.set(true), 150); // Pequeño delay para aplicar estilos CSS
+          if (!this.isBrandingLoaded()) {
+            setTimeout(() => this.isBrandingLoaded.set(true), 100);
+          }
         },
         error: (err) => {
           console.warn('Error cargando branding global:', err);
@@ -491,6 +526,11 @@ export class AdminLayoutComponent {
     this.signalrService.updateNotificationSettings({
       [key]: !current[key]
     });
+  }
+
+  async testNotifications() {
+    await this.signalrService.requestNotificationPermission();
+    await this.signalrService.testAlert();
   }
 
   @HostListener('document:click', ['$event'])
