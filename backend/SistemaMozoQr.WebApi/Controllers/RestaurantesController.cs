@@ -104,23 +104,22 @@ public class RestaurantesController : ControllerBase
         if (!_context.IsSuperAdmin && existing.ParentRestauranteId != _context.CurrentTenantId)
             return Forbid();
 
-        // Eliminar entidades dependientes usando ExecuteDeleteAsync para evitar sobrecarga de memoria
-        await _context.Usuarios.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
-        
+        // Eliminar entidades dependientes en orden de clave foránea usando ExecuteDeleteAsync
+        await _context.Valoraciones.IgnoreQueryFilters().Where(v => v.RestauranteId == id).ExecuteDeleteAsync();
+
+        var orderIds = _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).Select(p => p.Id);
+        await _context.PedidoItems.IgnoreQueryFilters().Where(pi => orderIds.Contains(pi.PedidoId) || pi.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).ExecuteDeleteAsync();
+
         await _context.Tasks.IgnoreQueryFilters().Where(t => t.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.Ventas.IgnoreQueryFilters().Where(v => v.RestauranteId == id).ExecuteDeleteAsync();
         await _context.Auditorias.IgnoreQueryFilters().Where(a => a.RestauranteId == id).ExecuteDeleteAsync();
         await _context.ErrorLogs.IgnoreQueryFilters().Where(e => e.RestauranteId == id).ExecuteDeleteAsync();
         await _context.DashboardWidgetConfigs.IgnoreQueryFilters().Where(w => w.RestauranteId == id).ExecuteDeleteAsync();
-        
-        // Para PedidoItems, necesitamos borrar los asociados a los pedidos del restaurante
-        var orderIds = _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).Select(p => p.Id);
-        await _context.PedidoItems.IgnoreQueryFilters().Where(pi => orderIds.Contains(pi.PedidoId)).ExecuteDeleteAsync();
-        
-        await _context.Ventas.IgnoreQueryFilters().Where(v => v.RestauranteId == id).ExecuteDeleteAsync();
         await _context.PushSubscriptions.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
-        await _context.Pedidos.IgnoreQueryFilters().Where(p => p.RestauranteId == id).ExecuteDeleteAsync();
         await _context.MenuItems.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ExecuteDeleteAsync();
         await _context.Mesas.IgnoreQueryFilters().Where(m => m.RestauranteId == id).ExecuteDeleteAsync();
+        await _context.Usuarios.IgnoreQueryFilters().Where(u => u.RestauranteId == id).ExecuteDeleteAsync();
 
         _context.Restaurantes.Remove(existing);
         await _context.SaveChangesAsync();

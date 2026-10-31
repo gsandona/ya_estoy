@@ -24,13 +24,13 @@ export interface SystemUser {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="bg-white rounded-3xl p-6 border border-gray-200/80 shadow-sm text-primary">
+    <div class="bg-white rounded-3xl p-6 border border-gray-200 shadow-sm text-slate-900">
       <div class="flex justify-between items-center mb-6">
         <div>
           <h2 class="text-2xl font-black text-gray-800 tracking-tight">Usuarios de Sistema</h2>
           <p class="text-xs text-gray-400 font-semibold mt-1">Crea y administra los usuarios para todos los restaurantes y roles.</p>
         </div>
-        <button (click)="openCreateForm()" class="bg-primary text-white px-5 py-3 rounded-2xl text-xs font-black shadow-md hover:bg-slate-800 transition active:scale-95">
+        <button (click)="openCreateForm()" class="bg-slate-900 text-white px-5 py-3 rounded-2xl text-xs font-black shadow-md hover:bg-slate-800 transition active:scale-95">
           + Nuevo Usuario
         </button>
       </div>
@@ -45,37 +45,76 @@ export interface SystemUser {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Nombre Completo -->
               <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Nombre Completo</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre Completo</label>
                 <input type="text" [(ngModel)]="formData.nombreCompleto" name="nombreCompleto" required
-                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-accent text-sm" />
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-slate-900 text-sm bg-white text-gray-900" />
               </div>
 
               <!-- Username -->
               <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Nombre de Usuario</label>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-xs font-bold text-slate-600">
+                    @if (isSuperAdminRole()) {
+                      Nombre de Usuario (Admin Global)
+                    } @else {
+                      Nombre de Usuario (Formato usuario&#64;local)
+                    }
+                  </label>
+                  @if (!isSuperAdminRole()) {
+                    <button type="button" (click)="applySuggestedSuffix()"
+                            class="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-lg transition">
+                      + Usar {{ getSuggestedSuffix() }}
+                    </button>
+                  }
+                </div>
                 <input type="text" [(ngModel)]="formData.username" name="username" required minlength="3"
-                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-accent text-sm" />
+                       [pattern]="getUsernamePattern()"
+                       [placeholder]="isSuperAdminRole() ? 'Ej: gino' : 'Ej: juan' + getSuggestedSuffix()"
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-slate-900 text-sm bg-white text-gray-900"
+                       [ngClass]="{
+                         'border-emerald-500': formData.username && isUsernameValid(),
+                         'border-red-500': formData.username && !isUsernameValid()
+                       }" />
+                <div class="mt-1.5">
+                  @if (formData.username && isUsernameValid()) {
+                    <span class="text-emerald-600 text-[11px] font-bold">
+                      @if (isSuperAdminRole()) {
+                        ✓ Formato válido (SuperAdmin)
+                      } @else {
+                        ✓ Formato válido (usuario&#64;local)
+                      }
+                    </span>
+                  } @else if (formData.username && !isUsernameValid()) {
+                    <span class="text-red-600 text-[11px] font-bold">
+                      ✗ Debe usar formato usuario&#64;local (ej: juan{{ getSuggestedSuffix() }})
+                    </span>
+                  } @else if (!isSuperAdminRole()) {
+                    <span class="text-slate-500 text-[11px] font-semibold">
+                      Sufijo sugerido según restaurante: <strong class="text-slate-700">{{ getSuggestedSuffix() }}</strong>
+                    </span>
+                  }
+                </div>
               </div>
 
               <!-- Rol -->
               <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Rol</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Rol</label>
                 <select [(ngModel)]="formData.role" name="role" required
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-accent text-sm bg-white cursor-pointer">
-                  <option [value]="1">Mozo</option>
-                  <option [value]="2">Admin</option>
-                  <option [value]="3">SuperAdmin</option>
-                  <option [value]="4">Cocina</option>
-                  <option [value]="5">Caja</option>
-                  <option [value]="6">MozoPortal</option>
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-slate-900 text-sm bg-white text-gray-900 cursor-pointer">
+                  <option [ngValue]="1">Mozo</option>
+                  <option [ngValue]="2">Admin</option>
+                  <option [ngValue]="3">SuperAdmin</option>
+                  <option [ngValue]="4">Cocina</option>
+                  <option [ngValue]="5">Caja</option>
+                  <option [ngValue]="6">MozoPortal</option>
                 </select>
               </div>
 
               <!-- Restaurante -->
               <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Restaurante</label>
-                <select [(ngModel)]="formData.restauranteId" name="restauranteId" required
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-accent text-sm bg-white cursor-pointer">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Restaurante</label>
+                <select [(ngModel)]="formData.restauranteId" name="restauranteId" [required]="!isSuperAdminRole()"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-slate-900 text-sm bg-white text-gray-900 cursor-pointer">
                   @for (r of restaurantes(); track r.id) {
                     <option [value]="r.id">{{ r.iconoPrincipal || '🍽️' }} {{ r.nombre }}</option>
                   }
@@ -85,19 +124,19 @@ export interface SystemUser {
               <!-- Contraseña (Solo nuevo) -->
               @if (!editingId()) {
                 <div class="md:col-span-2">
-                  <label class="block text-xs font-bold text-slate-500 mb-1">Contraseña</label>
-                  <input type="password" [(ngModel)]="formData.password" name="password" required
-                         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-accent text-sm" />
-                  <p class="text-[10px] text-gray-400 mt-1">Mínimo 8 caracteres, al menos 1 mayúscula y 1 símbolo especial.</p>
+                  <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña</label>
+                  <input type="password" [(ngModel)]="formData.password" name="password" required minlength="8"
+                         class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-slate-900 text-sm bg-white text-gray-900" />
+                  <p class="text-[10px] text-gray-500 mt-1">Mínimo 8 caracteres, al menos 1 mayúscula y 1 símbolo especial.</p>
                 </div>
               }
             </div>
 
             <div class="flex justify-end gap-2 pt-2">
-              <button type="button" (click)="closeForm()" class="bg-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-gray-300 transition">
+              <button type="button" (click)="closeForm()" class="bg-gray-200 text-gray-700 px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-gray-300 transition">
                 Cancelar
               </button>
-              <button type="submit" [disabled]="userForm.invalid" class="bg-accent text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:opacity-90 transition">
+              <button type="submit" [disabled]="userForm.invalid || !isUsernameValid()" class="bg-slate-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition">
                 {{ editingId() ? 'Actualizar' : 'Guardar' }}
               </button>
             </div>
@@ -109,7 +148,7 @@ export interface SystemUser {
       <div class="overflow-x-auto rounded-2xl border border-gray-200">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="bg-slate-50 text-slate-400 font-bold text-xs uppercase border-b border-gray-200 select-none">
+            <tr class="bg-slate-50 text-slate-500 font-bold text-xs uppercase border-b border-gray-200 select-none">
               <th class="p-4">Nombre Completo</th>
               <th class="p-4">Usuario</th>
               <th class="p-4">Rol</th>
@@ -117,11 +156,11 @@ export interface SystemUser {
               <th class="p-4 text-center">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-150 text-sm font-medium">
+          <tbody class="divide-y divide-gray-200 text-sm font-medium">
             @for (u of usuarios(); track u.id) {
               <tr class="hover:bg-slate-50/50 transition">
                 <td class="p-4 font-bold text-gray-800">{{ u.nombreCompleto || 'Usuario' }}</td>
-                <td class="p-4 text-gray-600">{{ u.username }}</td>
+                <td class="p-4 text-gray-700 font-semibold">{{ u.username }}</td>
                 <td class="p-4">
                   <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase"
                         [ngClass]="{
@@ -135,7 +174,7 @@ export interface SystemUser {
                     {{ u.role }}
                   </span>
                 </td>
-                <td class="p-4 text-slate-500 font-semibold">{{ u.restauranteNombre || 'Sin asignar' }}</td>
+                <td class="p-4 text-slate-600 font-semibold">{{ u.restauranteNombre || 'Sin asignar' }}</td>
                 <td class="p-4">
                   <div class="flex gap-2 justify-center">
                     <button (click)="openEditForm(u)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[11px] bg-indigo-50 px-3 py-1.5 rounded-xl border border-indigo-100 transition active:scale-95">
@@ -144,7 +183,7 @@ export interface SystemUser {
                     <button (click)="openChangePasswordModal(u)" class="text-amber-600 hover:text-amber-800 font-bold text-[11px] bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-100 transition active:scale-95">
                       Cambiar Clave
                     </button>
-                    <button (click)="deleteUser(u.id)" class="text-red-500 hover:text-red-700 font-bold text-[11px] bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition active:scale-95">
+                    <button (click)="deleteUser(u.id)" class="text-red-600 hover:text-red-800 font-bold text-[11px] bg-red-50 px-3 py-1.5 rounded-xl border border-red-100 transition active:scale-95">
                       Eliminar
                     </button>
                   </div>
@@ -164,13 +203,13 @@ export interface SystemUser {
             
             <div class="space-y-4">
               <div>
-                <label class="block text-xs font-bold text-slate-500 mb-1">Nueva Contraseña</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Nueva Contraseña</label>
                 <input type="password" [(ngModel)]="newPassword" (ngModelChange)="checkPasswordStrength()" name="newPassword"
-                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-accent text-sm" />
+                       class="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 focus:outline-none focus:border-slate-900 text-sm text-gray-900 bg-white" />
               </div>
 
               <!-- Requisitos de Contraseña -->
-              <div class="bg-slate-50 p-4 rounded-2xl border border-gray-150 text-xs font-medium space-y-2 select-none">
+              <div class="bg-slate-50 p-4 rounded-2xl border border-gray-200 text-xs font-medium space-y-2 select-none">
                 <span class="block text-slate-400 font-bold uppercase tracking-wider text-[10px] mb-1.5">Requisitos obligatorios:</span>
                 <div class="flex items-center gap-2" [class.text-emerald-600]="strengthChecks.length" [class.text-slate-400]="!strengthChecks.length">
                   <span>{{ strengthChecks.length ? '✓' : '○' }}</span> Al menos 8 caracteres
@@ -184,11 +223,11 @@ export interface SystemUser {
               </div>
 
               @if (passwordError()) {
-                <div class="text-xs font-bold text-red-500 px-1">{{ passwordError() }}</div>
+                <div class="text-xs font-bold text-red-600 px-1">{{ passwordError() }}</div>
               }
 
               <div class="flex justify-end gap-2 pt-2">
-                <button (click)="closePasswordModal()" class="bg-gray-100 hover:bg-gray-250 text-gray-700 border border-gray-250 px-5 py-3 rounded-xl font-bold text-xs">
+                <button (click)="closePasswordModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 px-5 py-3 rounded-xl font-bold text-xs">
                   Cancelar
                 </button>
                 <button (click)="submitPasswordChange()" [disabled]="!isPasswordValid || submittingPassword()"
@@ -239,6 +278,42 @@ export class SuperadminUsuariosComponent implements OnInit {
   ngOnInit() {
     this.loadUsuarios();
     this.loadRestaurantes();
+  }
+
+  isSuperAdminRole(): boolean {
+    return Number(this.formData.role) === 3;
+  }
+
+  getUsernamePattern(): string {
+    return this.isSuperAdminRole()
+      ? '^[a-zA-Z0-9._-]{3,30}(@[a-zA-Z0-9_-]{2,30})?$'
+      : '^[a-zA-Z0-9._-]{2,30}@[a-zA-Z0-9_-]{2,30}$';
+  }
+
+  isUsernameValid(): boolean {
+    const clean = (this.formData.username || '').trim().toLowerCase();
+    if (!clean) return false;
+    if (this.isSuperAdminRole()) {
+      return /^[a-zA-Z0-9._-]{3,30}(@[a-zA-Z0-9_-]{2,30})?$/.test(clean);
+    }
+    return /^[a-zA-Z0-9._-]{2,30}@[a-zA-Z0-9_-]{2,30}$/.test(clean);
+  }
+
+  getSuggestedSuffix(): string {
+    const rest = this.restaurantes().find(r => r.id === this.formData.restauranteId);
+    if (!rest) return '@local';
+    const norm = rest.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (norm.includes('pub')) return '@pub';
+    if (norm.includes('pizzeria') || norm.includes('donatello')) return '@pizzeria';
+    const slug = norm.replace(/[^a-z0-9]/g, '').slice(0, 20);
+    return slug ? `@${slug}` : '@local';
+  }
+
+  applySuggestedSuffix() {
+    const suffix = this.getSuggestedSuffix();
+    const raw = (this.formData.username || '').trim().toLowerCase();
+    const prefix = raw ? raw.split('@')[0].replace(/[^a-z0-9._-]/g, '') : 'usuario';
+    this.formData.username = `${prefix || 'usuario'}${suffix}`;
   }
 
   loadUsuarios() {
@@ -295,6 +370,11 @@ export class SuperadminUsuariosComponent implements OnInit {
 
   saveForm(e: Event) {
     e.preventDefault();
+    this.formData.username = this.formData.username.trim().toLowerCase();
+    if (!this.isUsernameValid()) {
+      return;
+    }
+
     const token = localStorage.getItem('auth_token');
     const headers = { Authorization: `Bearer ${token}` };
 

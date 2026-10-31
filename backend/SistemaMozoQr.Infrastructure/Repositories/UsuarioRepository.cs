@@ -16,6 +16,7 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario> AddAsync(Usuario usuario)
     {
+        usuario.Username = (usuario.Username ?? string.Empty).Trim().ToLowerInvariant();
         await _context.Usuarios.AddAsync(usuario);
         await _context.SaveChangesAsync();
         return usuario;
@@ -23,6 +24,13 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task DeleteAsync(Usuario usuario)
     {
+        // Desvincular mesas y valoraciones que apunten a este mozo antes de borrar
+        var mesas = await _context.Mesas.IgnoreQueryFilters().Where(m => m.MozoId == usuario.Id).ToListAsync();
+        foreach (var mesa in mesas)
+        {
+            mesa.MozoId = null;
+        }
+
         _context.Usuarios.Remove(usuario);
         await _context.SaveChangesAsync();
     }
@@ -39,11 +47,15 @@ public class UsuarioRepository : IUsuarioRepository
 
     public async Task<Usuario?> GetByUsernameAsync(string username)
     {
-        return await _context.Usuarios.IgnoreQueryFilters().FirstOrDefaultAsync(u => u.Username == username);
+        var normalizedUsername = (username ?? string.Empty).Trim().ToLowerInvariant();
+        return await _context.Usuarios
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Username.ToLower() == normalizedUsername);
     }
 
     public async Task UpdateAsync(Usuario usuario)
     {
+        usuario.Username = (usuario.Username ?? string.Empty).Trim().ToLowerInvariant();
         _context.Usuarios.Update(usuario);
         await _context.SaveChangesAsync();
     }
@@ -66,6 +78,7 @@ public class UsuarioRepository : IUsuarioRepository
 
         foreach (var inc in incomingItems)
         {
+            inc.Username = (inc.Username ?? string.Empty).Trim().ToLowerInvariant();
             var dbItem = dbItems.FirstOrDefault(db => db.Id == inc.Id);
             if (dbItem != null)
             {
@@ -80,7 +93,7 @@ public class UsuarioRepository : IUsuarioRepository
             else
             {
                 if (inc.Id == Guid.Empty) inc.Id = Guid.NewGuid();
-                inc.PasswordHash = string.IsNullOrEmpty(inc.PasswordHash) ? BCrypt.Net.BCrypt.HashPassword("123456") : inc.PasswordHash;
+                inc.PasswordHash = string.IsNullOrEmpty(inc.PasswordHash) ? BCrypt.Net.BCrypt.HashPassword("MozoGo1234!") : inc.PasswordHash;
                 inc.NombreCompleto = "Nuevo Usuario";
                 _context.Usuarios.Add(inc);
             }

@@ -1,16 +1,21 @@
 using SistemaMozoQr.Application.DTOs;
 using SistemaMozoQr.Application.Interfaces;
 using SistemaMozoQr.Domain.Entities;
+using SistemaMozoQr.Domain.Enums;
 using SistemaMozoQr.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SistemaMozoQr.Application.Services;
 
 public class UsuarioService : IUsuarioService
 {
+    private static readonly Regex TenantUsernameRegex = new(@"^[a-z0-9._-]{2,30}@[a-z0-9_-]{2,30}$", RegexOptions.Compiled);
+    private static readonly Regex SuperAdminSimpleRegex = new(@"^[a-z0-9._-]{3,30}$", RegexOptions.Compiled);
+
     private readonly IUsuarioRepository _usuarioRepository;
     private readonly IRestauranteRepository _restauranteRepository;
     private readonly ICurrentUserService _currentUserService;
@@ -25,30 +30,56 @@ public class UsuarioService : IUsuarioService
         _currentUserService = currentUserService;
     }
 
+    private static void ValidarFormatoUsername(string username, Rol rol)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            throw new ArgumentException("El nombre de usuario es obligatorio.");
+        }
+
+        if (rol == Rol.SuperAdmin)
+        {
+            if (!SuperAdminSimpleRegex.IsMatch(username) && !TenantUsernameRegex.IsMatch(username))
+            {
+                throw new ArgumentException("El nombre de usuario de SuperAdmin debe tener entre 3 y 30 caracteres válidos o el formato usuario@local.");
+            }
+        }
+        else
+        {
+            if (!TenantUsernameRegex.IsMatch(username))
+            {
+                throw new ArgumentException("El nombre de usuario debe tener el formato usuario@local (por ejemplo: juan@pub o caja@pizzeria).");
+            }
+        }
+    }
+
     private void ValidarFortalezaPassword(string? password)
     {
         if (string.IsNullOrEmpty(password)) return;
         
         // Mínimo 8 caracteres
         if (password.Length < 8)
-            throw new Exception("La contraseña debe tener al menos 8 caracteres de longitud.");
+            throw new ArgumentException("La contraseña debe tener al menos 8 caracteres de longitud.");
             
         // Al menos 1 mayúscula
         bool hasUpper = password.Any(char.IsUpper);
         if (!hasUpper)
-            throw new Exception("La contraseña debe tener al menos una letra mayúscula.");
+            throw new ArgumentException("La contraseña debe tener al menos una letra mayúscula.");
             
         // Al menos 1 símbolo
         bool hasSymbol = password.Any(c => !char.IsLetterOrDigit(c));
         if (!hasSymbol)
-            throw new Exception("La contraseña debe tener al menos un símbolo especial (ej. .,+°!).");
+            throw new ArgumentException("La contraseña debe tener al menos un símbolo especial (ej. .,+°!).");
     }
 
     public async Task<UsuarioDto> CrearUsuarioAsync(CrearUsuarioDto dto)
     {
+        dto.Username = (dto.Username ?? string.Empty).Trim().ToLowerInvariant();
+        ValidarFormatoUsername(dto.Username, dto.Role);
+
         var existing = await _usuarioRepository.GetByUsernameAsync(dto.Username);
         if (existing != null)
-            throw new Exception("El nombre de usuario ya está en uso.");
+            throw new ArgumentException("El nombre de usuario ya está en uso.");
 
         ValidarFortalezaPassword(dto.Password);
 
@@ -61,7 +92,7 @@ public class UsuarioService : IUsuarioService
                 var rests = await _restauranteRepository.GetAllAsync();
                 var firstRest = rests.FirstOrDefault();
                 if (firstRest == null)
-                    throw new Exception("No hay restaurantes en el sistema para asociar al usuario.");
+                    throw new ArgumentException("No hay restaurantes en el sistema para asociar al usuario.");
                 restauranteId = firstRest.Id;
             }
         }
@@ -95,13 +126,16 @@ public class UsuarioService : IUsuarioService
     {
         var user = await _usuarioRepository.GetByIdAsync(id);
         if (user == null)
-            throw new Exception("Usuario no encontrado.");
+            throw new ArgumentException("Usuario no encontrado.");
 
-        if (user.Username != dto.Username)
+        dto.Username = (dto.Username ?? string.Empty).Trim().ToLowerInvariant();
+        ValidarFormatoUsername(dto.Username, dto.Role);
+
+        if (!string.Equals(user.Username, dto.Username, StringComparison.OrdinalIgnoreCase))
         {
             var existing = await _usuarioRepository.GetByUsernameAsync(dto.Username);
-            if (existing != null)
-                throw new Exception("El nombre de usuario ya está en uso.");
+            if (existing != null && existing.Id != id)
+                throw new ArgumentException("El nombre de usuario ya está en uso.");
         }
 
         if (!string.IsNullOrEmpty(dto.Password))
@@ -137,7 +171,7 @@ public class UsuarioService : IUsuarioService
     {
         var user = await _usuarioRepository.GetByIdAsync(id);
         if (user == null)
-            throw new Exception("Usuario no encontrado.");
+            throw new ArgumentException("Usuario no encontrado.");
             
         await _usuarioRepository.DeleteAsync(user);
     }
@@ -162,7 +196,7 @@ public class UsuarioService : IUsuarioService
     {
         var user = await _usuarioRepository.GetByIdAsync(id);
         if (user == null)
-            throw new Exception("Usuario no encontrado.");
+            throw new ArgumentException("Usuario no encontrado.");
 
         ValidarFortalezaPassword(nuevaPassword);
 

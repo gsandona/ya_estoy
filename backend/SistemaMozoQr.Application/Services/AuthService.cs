@@ -24,6 +24,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
     {
+        loginDto.Username = (loginDto.Username ?? string.Empty).Trim().ToLowerInvariant();
         var user = await _usuarioRepository.GetByUsernameAsync(loginDto.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
         {

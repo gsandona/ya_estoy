@@ -85,8 +85,14 @@ export class AdminDataService {
   }
 
   // CRUD Usuarios Memoria Local Bulk
-  addUser(u: AdminUser) { this.users.update(l => [...l, u]); }
-  updateUser(u: AdminUser) { this.users.update(l => l.map(x => x.id === u.id ? u : x)); }
+  addUser(u: AdminUser) {
+    const normalized: AdminUser = { ...u, username: u.username.trim().toLowerCase() };
+    this.users.update(l => [...l, normalized]);
+  }
+  updateUser(u: AdminUser) {
+    const normalized: AdminUser = { ...u, username: u.username.trim().toLowerCase() };
+    this.users.update(l => l.map(x => x.id === normalized.id ? normalized : x));
+  }
   deleteUser(id: string) { this.users.update(l => l.filter(x => x.id !== id)); }
 
   // CRUD Mesas Memoria Local Bulk

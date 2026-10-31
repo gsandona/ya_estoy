@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SistemaMozoQr.Domain.Entities;
+using SistemaMozoQr.Domain.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -7,197 +8,213 @@ namespace SistemaMozoQr.Infrastructure.Data;
 
 public static class ModelBuilderExtensions
 {
-    public static void SeedData(this ModelBuilder modelBuilder)
+    public static readonly Guid TemplePubId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+    public static readonly Guid DonatelloPizzeriaId = Guid.Parse("22222222-2222-2222-2222-222222222222");
+
+    // Contraseña staff: "MozoGo1234!"
+    public const string DemoStaffPasswordHash = "$2a$11$QZiZ0I01OY9YHmu28SD3puogxLv8eZr0bbrj8pUvL/eoVHeZRUgJm";
+
+    // Contraseña SuperAdmin ("gino" y "tiziano"): "@Manzana.2024" (con salt determinístico para EF Core HasData)
+    public static readonly string SuperAdminPasswordHash = BCrypt.Net.BCrypt.HashPassword("@Manzana.2024", "$2a$11$QZiZ0I01OY9YHmu28SD3pu");
+
+    public static List<Role> GetSeededRoles() => new()
     {
-        // Contraseña fuerte: "MozoGo1234!"
-        var passHash = "$2a$11$QZiZ0I01OY9YHmu28SD3puogxLv8eZr0bbrj8pUvL/eoVHeZRUgJm";
-        
-        var rest1Id = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var rest2Id = Guid.Parse("22222222-2222-2222-2222-222222222222");
-        var rest3Id = Guid.Parse("33333333-3333-3333-3333-333333333333");
-        var rest4Id = Guid.Parse("44444444-4444-4444-4444-444444444444");
-        var rest5Id = Guid.Parse("55555555-5555-5555-5555-555555555555");
-        var rest6Id = Guid.Parse("66666666-6666-6666-6666-666666666666");
-        var rest7Id = Guid.Parse("77777777-7777-7777-7777-777777777777");
+        new Role { Id = 1, Nombre = "Mozo", Descripcion = "Mozo del restaurante" },
+        new Role { Id = 2, Nombre = "Admin", Descripcion = "Administrador del restaurante" },
+        new Role { Id = 3, Nombre = "SuperAdmin", Descripcion = "Super Administrador global del sistema" },
+        new Role { Id = 4, Nombre = "Cocina", Descripcion = "Personal de cocina" },
+        new Role { Id = 5, Nombre = "Caja", Descripcion = "Cajero del restaurante" },
+        new Role { Id = 6, Nombre = "MozoPortal", Descripcion = "Portal de selección para Mozos" }
+    };
 
-        // Seed Roles
-        modelBuilder.Entity<Role>().HasData(
-            new Role { Id = 1, Nombre = "Mozo", Descripcion = "Mozo del restaurante" },
-            new Role { Id = 2, Nombre = "Admin", Descripcion = "Administrador del restaurante" },
-            new Role { Id = 3, Nombre = "SuperAdmin", Descripcion = "Super Administrador global del sistema" },
-            new Role { Id = 4, Nombre = "Cocina", Descripcion = "Personal de cocina" },
-            new Role { Id = 5, Nombre = "Caja", Descripcion = "Cajero del restaurante" },
-            new Role { Id = 6, Nombre = "MozoPortal", Descripcion = "Portal de selección para Mozos" }
-        );
+    public static List<RoleFeature> GetSeededRoleFeatures() => new()
+    {
+        // SuperAdmin (all 7 features)
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000001"), RoleId = 3, FeatureKey = "Metricas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000002"), RoleId = 3, FeatureKey = "MesasTareas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000003"), RoleId = 3, FeatureKey = "Cocina", Activo = true },
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000004"), RoleId = 3, FeatureKey = "Ventas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000005"), RoleId = 3, FeatureKey = "MetricasMenu", Activo = true },
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000006"), RoleId = 3, FeatureKey = "ConfigPersonal", Activo = true },
+        new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000007"), RoleId = 3, FeatureKey = "Sistema", Activo = true },
 
-        // Seed RoleFeatures
-        modelBuilder.Entity<RoleFeature>().HasData(
-            // SuperAdmin (all 7 features)
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000001"), RoleId = 3, FeatureKey = "Metricas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000002"), RoleId = 3, FeatureKey = "MesasTareas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000003"), RoleId = 3, FeatureKey = "Cocina", Activo = true },
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000004"), RoleId = 3, FeatureKey = "Ventas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000005"), RoleId = 3, FeatureKey = "MetricasMenu", Activo = true },
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000006"), RoleId = 3, FeatureKey = "ConfigPersonal", Activo = true },
-            new RoleFeature { Id = Guid.Parse("f0000000-0000-0000-0000-000000000007"), RoleId = 3, FeatureKey = "Sistema", Activo = true },
+        // Admin (6 features, no 'Sistema')
+        new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000001"), RoleId = 2, FeatureKey = "Metricas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000002"), RoleId = 2, FeatureKey = "MesasTareas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000003"), RoleId = 2, FeatureKey = "Cocina", Activo = true },
+        new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000004"), RoleId = 2, FeatureKey = "Ventas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000005"), RoleId = 2, FeatureKey = "MetricasMenu", Activo = true },
+        new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000006"), RoleId = 2, FeatureKey = "ConfigPersonal", Activo = true },
 
-            // Admin (6 features, no 'Sistema')
-            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000001"), RoleId = 2, FeatureKey = "Metricas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000002"), RoleId = 2, FeatureKey = "MesasTareas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000003"), RoleId = 2, FeatureKey = "Cocina", Activo = true },
-            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000004"), RoleId = 2, FeatureKey = "Ventas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000005"), RoleId = 2, FeatureKey = "MetricasMenu", Activo = true },
-            new RoleFeature { Id = Guid.Parse("e0000000-0000-0000-0000-000000000006"), RoleId = 2, FeatureKey = "ConfigPersonal", Activo = true },
+        // Mozo (only 'MesasTareas')
+        new RoleFeature { Id = Guid.Parse("d0000000-0000-0000-0000-000000000001"), RoleId = 1, FeatureKey = "MesasTareas", Activo = true },
 
-            // Mozo (only 'MesasTareas')
-            new RoleFeature { Id = Guid.Parse("d0000000-0000-0000-0000-000000000001"), RoleId = 1, FeatureKey = "MesasTareas", Activo = true },
+        // Cocina (only 'Cocina')
+        new RoleFeature { Id = Guid.Parse("c0000000-0000-0000-0000-000000000001"), RoleId = 4, FeatureKey = "Cocina", Activo = true },
 
-            // Cocina (only 'Cocina')
-            new RoleFeature { Id = Guid.Parse("c0000000-0000-0000-0000-000000000001"), RoleId = 4, FeatureKey = "Cocina", Activo = true },
+        // Caja (Cocina, Ventas, ConfigPersonal)
+        new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000001"), RoleId = 5, FeatureKey = "Cocina", Activo = true },
+        new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000002"), RoleId = 5, FeatureKey = "Ventas", Activo = true },
+        new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000003"), RoleId = 5, FeatureKey = "ConfigPersonal", Activo = true }
+    };
 
-            // Caja (Cocina, Ventas, ConfigPersonal)
-            new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000001"), RoleId = 5, FeatureKey = "Cocina", Activo = true },
-            new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000002"), RoleId = 5, FeatureKey = "Ventas", Activo = true },
-            new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000003"), RoleId = 5, FeatureKey = "ConfigPersonal", Activo = true }
-        );
+    public static List<Restaurante> GetSeededRestaurantes() => new()
+    {
+        new Restaurante
+        {
+            Id = TemplePubId,
+            Nombre = "Temple Craft Pub",
+            IconoPrincipal = "🍺",
+            ColorPrimario = "#18181b",
+            ColorSecundario = "#d97706",
+            ColorFondo = "#fafaf9",
+            ImagenFondoUrl = "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80",
+            Activo = true,
+            FechaCreacion = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+        },
+        new Restaurante
+        {
+            Id = DonatelloPizzeriaId,
+            Nombre = "Donatello Pizzería",
+            IconoPrincipal = "🍕",
+            ColorPrimario = "#7f1d1d",
+            ColorSecundario = "#dc2626",
+            ColorFondo = "#fffbeb",
+            ImagenFondoUrl = "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=80",
+            Activo = true,
+            FechaCreacion = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+        }
+    };
 
-        // Seed Restaurantes
-        modelBuilder.Entity<Restaurante>().HasData(
-            new Restaurante { Id = rest1Id, Nombre = "El Gran Sabor", IconoPrincipal = "🍽️", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest2Id, Nombre = "La Parrilla de Juan", IconoPrincipal = "🥩", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest3Id, Nombre = "La Pasiva", IconoPrincipal = "🌭", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), ColorPrimario = "#b91c1c", ColorSecundario = "#dc2626", ColorFondo = "#fef2f2", ImagenFondoUrl = "https://images.unsplash.com/photo-1550547660-d9450f859349?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" },
-            new Restaurante { Id = rest4Id, Nombre = "La Merienda", IconoPrincipal = "☕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest5Id, Nombre = "Bella Italia", IconoPrincipal = "🍕", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest6Id, Nombre = "Cordon Beer", IconoPrincipal = "🍺", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-            new Restaurante { Id = rest7Id, Nombre = "TuRestaurante", IconoPrincipal = "🍔", Activo = true, FechaCreacion = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc), ImagenFondoUrl = "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" }
-        );
+    public static List<Usuario> GetSeededUsuarios() => new()
+    {
+        // SuperAdmins Globales
+        new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999999"), Username = "gino", PasswordHash = SuperAdminPasswordHash, NombreCompleto = "Gino Sandona", Rol = Rol.SuperAdmin, RestauranteId = TemplePubId },
+        new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999998"), Username = "tiziano", PasswordHash = SuperAdminPasswordHash, NombreCompleto = "Tiziano", Rol = Rol.SuperAdmin, RestauranteId = TemplePubId },
 
-        // Seed Usuarios (Email -> Username)
-        modelBuilder.Entity<Usuario>().HasData(
-            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999999"), Username = "supergino", PasswordHash = passHash, NombreCompleto = "Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
-            new Usuario { Id = Guid.Parse("99999999-9999-9999-9999-999999999998"), Username = "tizisuper", PasswordHash = passHash, NombreCompleto = "Tizi Super Admin", Rol = SistemaMozoQr.Domain.Enums.Rol.SuperAdmin, RestauranteId = rest1Id },
-            
-            // Rest 1 & 2
-            new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000001"), RestauranteId = rest1Id, Username = "adminsabor", PasswordHash = passHash, NombreCompleto = "Admin Sabor", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000002"), RestauranteId = rest1Id, Username = "mozosabor", PasswordHash = passHash, NombreCompleto = "Mozo Sabor", Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000001"), RestauranteId = rest2Id, Username = "adminroma", PasswordHash = passHash, NombreCompleto = "Admin Roma", Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000002"), RestauranteId = rest2Id, Username = "mozoroma", PasswordHash = passHash, NombreCompleto = "Mozo Roma", Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+        // Temple Craft Pub (@pub)
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000001"), RestauranteId = TemplePubId, Username = "admin@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Admin Temple Pub", Rol = Rol.Admin },
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000002"), RestauranteId = TemplePubId, Username = "caja@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Caja Temple Pub", Rol = Rol.Caja },
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000003"), RestauranteId = TemplePubId, Username = "cocina@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Cocina & Barra Pub", Rol = Rol.Cocina },
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000004"), RestauranteId = TemplePubId, Username = "portal@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Portal Mozos Pub", Rol = Rol.MozoPortal },
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000005"), RestauranteId = TemplePubId, Username = "juan@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Juan Pérez", Rol = Rol.Mozo },
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000006"), RestauranteId = TemplePubId, Username = "lucia@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Lucía Gómez", Rol = Rol.Mozo },
+        new Usuario { Id = Guid.Parse("10000000-0000-0000-0000-000000000007"), RestauranteId = TemplePubId, Username = "mateo@pub", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Mateo Rodríguez", Rol = Rol.Mozo },
 
-            // La Pasiva (Rest3) - 1 Admin, 10 Mozos
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000000"), Username = "adminlapasiva", PasswordHash = passHash, NombreCompleto = "Admin Pasiva", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000001"), Username = "mozo1lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 1", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000002"), Username = "mozo2lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 2", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000003"), Username = "mozo3lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 3", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000004"), Username = "mozo4lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 4", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000005"), Username = "mozo5lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 5", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000006"), Username = "mozo6lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 6", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000007"), Username = "mozo7lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 7", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000008"), Username = "mozo8lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 8", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000009"), Username = "mozo9lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 9", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("30000000-0000-0000-0000-000000000010"), Username = "mozo10lapasiva", PasswordHash = passHash, NombreCompleto = "Mozo 10", RestauranteId = rest3Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+        // Donatello Pizzería (@pizzeria)
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000001"), RestauranteId = DonatelloPizzeriaId, Username = "admin@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Admin Donatello", Rol = Rol.Admin },
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000002"), RestauranteId = DonatelloPizzeriaId, Username = "caja@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Caja Donatello", Rol = Rol.Caja },
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000003"), RestauranteId = DonatelloPizzeriaId, Username = "cocina@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Maestro Pizzero", Rol = Rol.Cocina },
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000004"), RestauranteId = DonatelloPizzeriaId, Username = "portal@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Portal Mozos Pizzería", Rol = Rol.MozoPortal },
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000005"), RestauranteId = DonatelloPizzeriaId, Username = "juan@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Juan Rossi", Rol = Rol.Mozo },
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000006"), RestauranteId = DonatelloPizzeriaId, Username = "sofia@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Sofía Bianchi", Rol = Rol.Mozo },
+        new Usuario { Id = Guid.Parse("20000000-0000-0000-0000-000000000007"), RestauranteId = DonatelloPizzeriaId, Username = "marco@pizzeria", PasswordHash = DemoStaffPasswordHash, NombreCompleto = "Marco Conti", Rol = Rol.Mozo }
+    };
 
-            // La Merienda (Rest4) - 1 Admin, 3 Mozos
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000000"), Username = "adminlamerienda", PasswordHash = passHash, NombreCompleto = "Admin Merienda", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000001"), Username = "lucialamerienda", PasswordHash = passHash, NombreCompleto = "Lucia", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000002"), Username = "mateolamerienda", PasswordHash = passHash, NombreCompleto = "Mateo", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("40000000-0000-0000-0000-000000000003"), Username = "sofialamerienda", PasswordHash = passHash, NombreCompleto = "Sofia", RestauranteId = rest4Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+    public static List<Mesa> GetSeededMesas()
+    {
+        var juanPubId = Guid.Parse("10000000-0000-0000-0000-000000000005");
+        var luciaPubId = Guid.Parse("10000000-0000-0000-0000-000000000006");
+        var mateoPubId = Guid.Parse("10000000-0000-0000-0000-000000000007");
 
-            // Bella Italia (Rest5) - 1 Admin, 2 Mozos
-            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000000"), Username = "adminbellaitalia", PasswordHash = passHash, NombreCompleto = "Admin Bella Italia", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000001"), Username = "mariobellaitalia", PasswordHash = passHash, NombreCompleto = "Mario", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("50000000-0000-0000-0000-000000000002"), Username = "luigibellaitalia", PasswordHash = passHash, NombreCompleto = "Luigi", RestauranteId = rest5Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+        var juanPizzeriaId = Guid.Parse("20000000-0000-0000-0000-000000000005");
+        var sofiaPizzeriaId = Guid.Parse("20000000-0000-0000-0000-000000000006");
+        var marcoPizzeriaId = Guid.Parse("20000000-0000-0000-0000-000000000007");
 
-            // Cordon Beer (Rest6) - 1 Admin, 5 Mozos
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000000"), Username = "admincordonbeer", PasswordHash = passHash, NombreCompleto = "Admin Cordon Beer", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000001"), Username = "bartender1cordonbeer", PasswordHash = passHash, NombreCompleto = "Bartender 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000002"), Username = "bartender2cordonbeer", PasswordHash = passHash, NombreCompleto = "Bartender 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000003"), Username = "mesero1cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 1", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000004"), Username = "mesero2cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 2", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("60000000-0000-0000-0000-000000000005"), Username = "mesero3cordonbeer", PasswordHash = passHash, NombreCompleto = "Mesero 3", RestauranteId = rest6Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
+        return new List<Mesa>
+        {
+            // 10 Mesas para Temple Craft Pub
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000001"), RestauranteId = TemplePubId, Numero = 1, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-1", Ubicacion = "Barra Cervecera 1 (4 pers.)", MozoId = juanPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000002"), RestauranteId = TemplePubId, Numero = 2, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-2", Ubicacion = "Barra Cervecera 2 (4 pers.)", MozoId = juanPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000003"), RestauranteId = TemplePubId, Numero = 3, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-3", Ubicacion = "Mesa Alta Ventanal (4 pers.)", MozoId = juanPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000004"), RestauranteId = TemplePubId, Numero = 4, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-4", Ubicacion = "Mesa Alta Centro (4 pers.)", MozoId = juanPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000005"), RestauranteId = TemplePubId, Numero = 5, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-5", Ubicacion = "Box Madera Izquierdo (6 pers.)", MozoId = luciaPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000006"), RestauranteId = TemplePubId, Numero = 6, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-6", Ubicacion = "Box Madera Derecho (6 pers.)", MozoId = luciaPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000007"), RestauranteId = TemplePubId, Numero = 7, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-7", Ubicacion = "Living Cuero VIP (6 pers.)", MozoId = luciaPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000008"), RestauranteId = TemplePubId, Numero = 8, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-8", Ubicacion = "Patio Cervecero 1 (4 pers.)", MozoId = mateoPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000009"), RestauranteId = TemplePubId, Numero = 9, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-9", Ubicacion = "Patio Cervecero 2 (6 pers.)", MozoId = mateoPubId },
+            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000010"), RestauranteId = TemplePubId, Numero = 10, Estado = EstadoMesa.Disponible, TokenQR = "qr-pub-mesa-10", Ubicacion = "Terraza Calefaccionada (6 pers.)", MozoId = mateoPubId },
 
-            // TuRestaurante (Rest7) - Admin, Caja, Cocina, MozoPortal, 4 Mozos
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000000"), Username = "admin_turestaurante", PasswordHash = passHash, NombreCompleto = "Admin TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Admin },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000005"), Username = "caja_turestaurante", PasswordHash = passHash, NombreCompleto = "Caja TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Caja },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000006"), Username = "cocina_turestaurante", PasswordHash = passHash, NombreCompleto = "Cocina TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Cocina },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000007"), Username = "mozo_portal_turestaurante", PasswordHash = passHash, NombreCompleto = "Portal Mozo TuRestaurante", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.MozoPortal },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000001"), Username = "mozo_juan", PasswordHash = passHash, NombreCompleto = "Juan Pérez", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000002"), Username = "mozo_pedro", PasswordHash = passHash, NombreCompleto = "Pedro Gómez", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000003"), Username = "mozo_maria", PasswordHash = passHash, NombreCompleto = "María López", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo },
-            new Usuario { Id = Guid.Parse("70000000-0000-0000-0000-000000000004"), Username = "mozo_ana", PasswordHash = passHash, NombreCompleto = "Ana Silva", RestauranteId = rest7Id, Rol = SistemaMozoQr.Domain.Enums.Rol.Mozo }
-        );
+            // 10 Mesas para Donatello Pizzería
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000001"), RestauranteId = DonatelloPizzeriaId, Numero = 1, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-1", Ubicacion = "Salón Frente al Horno 1 (4 pers.)", MozoId = juanPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000002"), RestauranteId = DonatelloPizzeriaId, Numero = 2, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-2", Ubicacion = "Salón Frente al Horno 2 (4 pers.)", MozoId = juanPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000003"), RestauranteId = DonatelloPizzeriaId, Numero = 3, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-3", Ubicacion = "Ventanal Calle (4 pers.)", MozoId = juanPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000004"), RestauranteId = DonatelloPizzeriaId, Numero = 4, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-4", Ubicacion = "Salón Central 1 (4 pers.)", MozoId = juanPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000005"), RestauranteId = DonatelloPizzeriaId, Numero = 5, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-5", Ubicacion = "Salón Central 2 (6 pers.)", MozoId = sofiaPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000006"), RestauranteId = DonatelloPizzeriaId, Numero = 6, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-6", Ubicacion = "Box Familiar Napolitano (6 pers.)", MozoId = sofiaPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000007"), RestauranteId = DonatelloPizzeriaId, Numero = 7, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-7", Ubicacion = "Rincón Cava de Vinos (4 pers.)", MozoId = sofiaPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000008"), RestauranteId = DonatelloPizzeriaId, Numero = 8, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-8", Ubicacion = "Pérgola Jardín 1 (4 pers.)", MozoId = marcoPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000009"), RestauranteId = DonatelloPizzeriaId, Numero = 9, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-9", Ubicacion = "Pérgola Jardín 2 (6 pers.)", MozoId = marcoPizzeriaId },
+            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000010"), RestauranteId = DonatelloPizzeriaId, Numero = 10, Estado = EstadoMesa.Disponible, TokenQR = "qr-pizzeria-mesa-10", Ubicacion = "Mesa Imperial Terraza (6 pers.)", MozoId = marcoPizzeriaId }
+        };
+    }
 
-        // Seed Mesas
-        modelBuilder.Entity<Mesa>().HasData(
-            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000001"), RestauranteId = rest1Id, Numero = 1, TokenQR = "MESA1_R1_QR" },
-            new Mesa { Id = Guid.Parse("11111000-0000-0000-0000-000000000002"), RestauranteId = rest1Id, Numero = 2, TokenQR = "MESA2_R1_QR" },
-            new Mesa { Id = Guid.Parse("22222000-0000-0000-0000-000000000001"), RestauranteId = rest2Id, Numero = 1, TokenQR = "MESA1_R2_QR" },
+    public static List<MenuCategory> GetSeededMenuCategories()
+    {
+        var comidasId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000001");
+        var bebidaAlcoholId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000002");
+        var bebidaFriaId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000003");
+        var postreId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000004");
+        var bebidaCalienteId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000005");
 
-            // Pasiva
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000001"), Numero = 1, RestauranteId = rest3Id, TokenQR = "PASIVA_QR_1", Ubicacion = "Mesa principal entrada", MozoId = Guid.Parse("30000000-0000-0000-0000-000000000001") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000002"), Numero = 2, RestauranteId = rest3Id, TokenQR = "PASIVA_QR_2", Ubicacion = "Mesa redonda en el centro", MozoId = Guid.Parse("30000000-0000-0000-0000-000000000001") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000003"), Numero = 3, RestauranteId = rest3Id, TokenQR = "PASIVA_QR_3", Ubicacion = "Box familiar derecha", MozoId = Guid.Parse("30000000-0000-0000-0000-000000000002") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000004"), Numero = 4, RestauranteId = rest3Id, TokenQR = "PASIVA_QR_4", Ubicacion = "Ambiente intimo al fondo", MozoId = Guid.Parse("30000000-0000-0000-0000-000000000002") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000005"), Numero = 5, RestauranteId = rest3Id, TokenQR = "PASIVA_QR_5", Ubicacion = "Sector fumadores terraza", MozoId = Guid.Parse("30000000-0000-0000-0000-000000000003") },
-            
-            // Merienda
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000006"), Numero = 1, RestauranteId = rest4Id, TokenQR = "MERIENDA_QR_1", Ubicacion = "Ventana luminosa", MozoId = Guid.Parse("40000000-0000-0000-0000-000000000001") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000007"), Numero = 2, RestauranteId = rest4Id, TokenQR = "MERIENDA_QR_2", Ubicacion = "Sofa grande", MozoId = Guid.Parse("40000000-0000-0000-0000-000000000002") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000008"), Numero = 3, RestauranteId = rest4Id, TokenQR = "MERIENDA_QR_3", Ubicacion = "Rincon lectura", MozoId = Guid.Parse("40000000-0000-0000-0000-000000000003") },
-            
-            // Italia
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000009"), Numero = 1, RestauranteId = rest5Id, TokenQR = "ITALIA_QR_1", Ubicacion = "Mesa romantica", MozoId = Guid.Parse("50000000-0000-0000-0000-000000000001") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000010"), Numero = 2, RestauranteId = rest5Id, TokenQR = "ITALIA_QR_2", Ubicacion = "Mesa central", MozoId = Guid.Parse("50000000-0000-0000-0000-000000000002") },
-            
-            // Beer
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000011"), Numero = 1, RestauranteId = rest6Id, TokenQR = "BEER_QR_1", Ubicacion = "Barra 1", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000001") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000012"), Numero = 2, RestauranteId = rest6Id, TokenQR = "BEER_QR_2", Ubicacion = "Mesa Alta", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000003") },
-            new Mesa { Id = Guid.Parse("88888888-8888-8888-8888-000000000013"), Numero = 3, RestauranteId = rest6Id, TokenQR = "BEER_QR_3", Ubicacion = "Sector Pool", MozoId = Guid.Parse("60000000-0000-0000-0000-000000000005") },
+        return new List<MenuCategory>
+        {
+            new MenuCategory { Id = comidasId, Nombre = "Comidas", Emoji = "🍔", ParentCategoryId = null },
+            new MenuCategory { Id = bebidaAlcoholId, Nombre = "Bebida con alcohol", Emoji = "🍷", ParentCategoryId = null },
+            new MenuCategory { Id = bebidaFriaId, Nombre = "Bebida fria", Emoji = "🥤", ParentCategoryId = null },
+            new MenuCategory { Id = postreId, Nombre = "Postre", Emoji = "🍰", ParentCategoryId = null },
+            new MenuCategory { Id = bebidaCalienteId, Nombre = "Bebidas calientes", Emoji = "☕", ParentCategoryId = null },
 
-            // TuRestaurante (Rest7) - 5 Mesas
-            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000001"), Numero = 1, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_1", Ubicacion = "Terraza Vista Calle", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000001") },
-            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000002"), Numero = 2, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_2", Ubicacion = "Salón Principal Ventana", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000002") },
-            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000003"), Numero = 3, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_3", Ubicacion = "Salón Centro", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000003") },
-            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000004"), Numero = 4, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_4", Ubicacion = "VIP Box", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000004") },
-            new Mesa { Id = Guid.Parse("77777000-0000-0000-0000-000000000005"), Numero = 5, RestauranteId = rest7Id, TokenQR = "TURESTAURANTE_QR_5", Ubicacion = "Barra Alta", MozoId = Guid.Parse("70000000-0000-0000-0000-000000000001") }
-        );
+            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000011"), Nombre = "Entradas", Emoji = "🥗", ParentCategoryId = comidasId },
+            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Nombre = "Platos", Emoji = "🍝", ParentCategoryId = comidasId },
+            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000013"), Nombre = "Panes", Emoji = "🍞", ParentCategoryId = comidasId }
+        };
+    }
 
-        // Seed MenuItems
-        modelBuilder.Entity<MenuItem>().HasData(
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000014"), RestauranteId = rest1Id, Categoria = "Bebidas", Nombre = "Agua Mineral", Precio = 1500, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000015"), RestauranteId = rest1Id, Categoria = "Platos", Nombre = "Milanesa con Papas Fritas", Precio = 8500, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000016"), RestauranteId = rest2Id, Categoria = "Pizzas", Nombre = "Pizza Muzzarella", Precio = 9000, Activo = true },
+    public static List<MenuItem> GetSeededMenuItems()
+    {
+        var bebidaAlcoholId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000002");
+        var bebidaFriaId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000003");
+        var postreId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000004");
+        var entradasId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000011");
+        var platosId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012");
+        var panesId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000013");
 
-            // Pasiva
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000017"), RestauranteId = rest3Id, Categoria = "Pizzas", Nombre = "Pizza Servilleta", Descripcion = "Clásica porción fina", Precio = 250, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000018"), RestauranteId = rest3Id, Categoria = "Clásicos", Nombre = "Panchos con mostaza", Precio = 350, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000019"), RestauranteId = rest3Id, Categoria = "Bebidas", Nombre = "Cerveza Patricia 1L", Precio = 450, Activo = true },
+        return new List<MenuItem>
+        {
+            // 12 Productos para Temple Craft Pub
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000001"), RestauranteId = TemplePubId, Categoria = "Cervezas Artesanales", Nombre = "Pinta American IPA", Descripcion = "Lúpulos cítricos intensos, notas a maracuyá y pino con amargor equilibrado (500ml - IBU 48).", Precio = 3800, MenuCategoryId = bebidaAlcoholId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000002"), RestauranteId = TemplePubId, Categoria = "Cervezas Artesanales", Nombre = "Pinta Golden Honey", Descripcion = "Rubia suave y refrescante elaborada con miel orgánica de pradera (500ml - IBU 16).", Precio = 3500, MenuCategoryId = bebidaAlcoholId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000003"), RestauranteId = TemplePubId, Categoria = "Cervezas Artesanales", Nombre = "Pinta Irish Red Ale", Descripcion = "Roja acaramelada con notas a malta tostada, toffee y final seco (500ml - IBU 22).", Precio = 3600, MenuCategoryId = bebidaAlcoholId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000004"), RestauranteId = TemplePubId, Categoria = "Cervezas Artesanales", Nombre = "Pinta Cream Stout", Descripcion = "Negra cremosa con intensos aromas a café tostado, cacao amargo y avena (500ml - IBU 30).", Precio = 3800, MenuCategoryId = bebidaAlcoholId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000005"), RestauranteId = TemplePubId, Categoria = "Hamburguesas", Nombre = "Doble Crispy Cheddar Burger", Descripcion = "Doble medallón smash 100% roast beef, cuádruple cheddar inglés, panceta ahumada crocante y salsa Temple en pan brioche.", Precio = 9800, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000006"), RestauranteId = TemplePubId, Categoria = "Hamburguesas", Nombre = "Blue Cheese & Caramelized Burger", Descripcion = "Doble medallón smash, queso azul fundido, cebolla caramelizada al stout y rúcula fresca con papas rústicas.", Precio = 10200, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000007"), RestauranteId = TemplePubId, Categoria = "Hamburguesas", Nombre = "Trufa & Hongos Smash Burger", Descripcion = "Doble carne smash, provolone grillado, salteado de portobellos a la manteca y alioli de trufa negra.", Precio = 10800, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000008"), RestauranteId = TemplePubId, Categoria = "Picadas & Tapas", Nombre = "Papas Temple con Cheddar y Panceta", Descripcion = "Bandeja para compartir de papas triple cocción con salsa cheddar artesanal, lluvia de bacon y verdeo.", Precio = 6500, MenuCategoryId = entradasId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000009"), RestauranteId = TemplePubId, Categoria = "Picadas & Tapas", Nombre = "Bastones de Muzzarella Rebozados", Descripcion = "Seis bastones gigantes de muzzarella rebozados en panko y hierbas con dip de salsa fileto picante.", Precio = 6200, MenuCategoryId = entradasId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000010"), RestauranteId = TemplePubId, Categoria = "Picadas & Tapas", Nombre = "Tabla Cervecera Caliente", Descripcion = "Tenders de pollo crispy, aros de cebolla en masa de cerveza, tequeños, papas rústicas y 3 dips caseros.", Precio = 14500, MenuCategoryId = entradasId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000011"), RestauranteId = TemplePubId, Categoria = "Tragos & Bebidas", Nombre = "Gin Tonic Botánico", Descripcion = "Gin destilado en alambique de cobre, agua tónica premium, bayas de enebro, piel de pomelo rosado y romero.", Precio = 5200, MenuCategoryId = bebidaAlcoholId, Activo = true },
+            new MenuItem { Id = Guid.Parse("11111999-0000-0000-0000-000000000012"), RestauranteId = TemplePubId, Categoria = "Postres", Nombre = "Brownie Tibio con Stout Fudge", Descripcion = "Brownie húmedo de chocolate belga 70% con nueces pecan, salsa tibia de reducción de cerveza Stout y helado de crema americana.", Precio = 5400, MenuCategoryId = postreId, Activo = true },
 
-            // Merienda
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000020"), RestauranteId = rest4Id, Categoria = "Cafetería", Nombre = "Café de Especialidad", Precio = 280, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000021"), RestauranteId = rest4Id, Categoria = "Dulces", Nombre = "Medialunas Rellenas", Precio = 320, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000022"), RestauranteId = rest4Id, Categoria = "Salados", Nombre = "Tostado de Campo", Precio = 450, Activo = true },
+            // 12 Productos para Donatello Pizzería
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000001"), RestauranteId = DonatelloPizzeriaId, Categoria = "Pizzas Napolitanas", Nombre = "Pizza Margherita D.O.P.", Descripcion = "Masa de fermentación lenta 48hs al horno de leña, pomodoro San Marzano, fior di latte fresca, albahaca y aceite de oliva virgen extra.", Precio = 10500, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000002"), RestauranteId = DonatelloPizzeriaId, Categoria = "Pizzas Napolitanas", Nombre = "Pizza Diavola Pepperoni", Descripcion = "Pomodoro San Marzano, fior di latte, pepperoni curado ligeramente picante, orégano fresco y miel picante.", Precio = 12200, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000003"), RestauranteId = DonatelloPizzeriaId, Categoria = "Pizzas Napolitanas", Nombre = "Pizza Prosciutto e Rucola", Descripcion = "Base blanca de fior di latte, jamón crudo tipo Parma estacionado 18 meses, rúcula selvática, lascas de Parmigiano Reggiano y oliva.", Precio = 13400, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000004"), RestauranteId = DonatelloPizzeriaId, Categoria = "Pizzas Napolitanas", Nombre = "Pizza Quattro Formaggi", Descripcion = "Fusión cremosa de fior di latte, gorgonzola italiano, fontina patagónica, Parmigiano Reggiano y pimienta negra recién molida.", Precio = 12800, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000005"), RestauranteId = DonatelloPizzeriaId, Categoria = "Pizzas Napolitanas", Nombre = "Pizza Mortadella e Pistacchio", Descripcion = "Base blanca de fior di latte, mortadela italiana con pistachos, stracciatella cremosa, pesto de pistacho de Bronte y ralladura de limón.", Precio = 13900, MenuCategoryId = platosId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000006"), RestauranteId = DonatelloPizzeriaId, Categoria = "Antipasti & Entradas", Nombre = "Burrata Pugliese con Focaccia", Descripcion = "Burrata fresca de 200g sobre colchón de rúcula, tomates cherry confitados, reducción de aceto balsámico y focaccia tibia al romero.", Precio = 8900, MenuCategoryId = entradasId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000007"), RestauranteId = DonatelloPizzeriaId, Categoria = "Antipasti & Entradas", Nombre = "Bruschetta Tradizionale", Descripcion = "Cuatro rodajas de pan de masa madre tostado al horno de leña con ajo, tomates reliquia marinados, albahaca fresca y oliva.", Precio = 5600, MenuCategoryId = entradasId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000008"), RestauranteId = DonatelloPizzeriaId, Categoria = "Antipasti & Entradas", Nombre = "Fainá Crocante al Romero", Descripcion = "Porción doble de fainá tradicional de harina de garbanzos al horno de barro con romero fresco y pimienta negra.", Precio = 3200, MenuCategoryId = panesId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000009"), RestauranteId = DonatelloPizzeriaId, Categoria = "Bebidas & Vinos", Nombre = "Limonada Siciliana con Menta", Descripcion = "Jugo de limones recién exprimidos, almíbar de jengibre orgánico, hojas de menta fresca y agua con gas (500ml).", Precio = 3400, MenuCategoryId = bebidaFriaId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000010"), RestauranteId = DonatelloPizzeriaId, Categoria = "Bebidas & Vinos", Nombre = "Copa Vino Malbec Reserva", Descripcion = "Copa de Malbec Reserva de altura (Valle de Uco), notas a frutos rojos maduros, violetas y crianza en roble francés.", Precio = 4800, MenuCategoryId = bebidaAlcoholId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000011"), RestauranteId = DonatelloPizzeriaId, Categoria = "Dolci & Postres", Nombre = "Tiramisú Tradizionale della Nonna", Descripcion = "Vainillas artesanales embebidas en espresso italiano, crema de mascarpone legítimo y cacao amargo holandés.", Precio = 5800, MenuCategoryId = postreId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000012"), RestauranteId = DonatelloPizzeriaId, Categoria = "Dolci & Postres", Nombre = "Cannoli Siciliani", Descripcion = "Dos tubos crujientes de masa frita rellenos al momento con crema de ricotta dulce, chips de chocolate amargo y pistachos tostados.", Precio = 5400, MenuCategoryId = postreId, Activo = true }
+        };
+    }
 
-            // Italia
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000023"), RestauranteId = rest5Id, Categoria = "Pastas", Nombre = "Ravioles de espinaca con salsa", Precio = 800, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000024"), RestauranteId = rest5Id, Categoria = "Pizzas", Nombre = "Pizza Margherita", Precio = 700, Activo = true },
-
-            // Beer
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000025"), RestauranteId = rest6Id, Categoria = "Cervezas", Nombre = "Cerveza IPA Cordon", Precio = 350, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000026"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Hamburguesa Completa con Fritas", Precio = 650, Activo = true },
-            new MenuItem { Id = Guid.Parse("88888888-8888-8888-8888-000000000027"), RestauranteId = rest6Id, Categoria = "Comidas", Nombre = "Papas Cheddar y Bacon", Precio = 450, Activo = true },
-
-            // TuRestaurante (Rest7) - 7 MenuItems
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000011"), RestauranteId = rest7Id, Categoria = "Comidas", Nombre = "Pizza Pepperoni", Descripcion = "Salsa de tomate, muzzarella y abundante pepperoni premium", Precio = 750, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Activo = true },
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000012"), RestauranteId = rest7Id, Categoria = "Comidas", Nombre = "Hamburguesa Especial", Descripcion = "Doble carne smash, queso cheddar, panceta crujiente y salsa secreta", Precio = 680, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Activo = true },
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000013"), RestauranteId = rest7Id, Categoria = "Comidas", Nombre = "Papas Rústicas", Descripcion = "Papas horneadas con romero y alioli casero", Precio = 350, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000011"), Activo = true },
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000014"), RestauranteId = rest7Id, Categoria = "Bebidas", Nombre = "Cerveza IPA Artesanal", Descripcion = "Medida pinta, sabor lúpulo intenso", Precio = 420, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000002"), Activo = true },
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000015"), RestauranteId = rest7Id, Categoria = "Bebidas", Nombre = "Refresco Cola 500ml", Descripcion = "Botella individual fría", Precio = 250, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000003"), Activo = true },
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000016"), RestauranteId = rest7Id, Categoria = "Postres", Nombre = "Volcán de Chocolate", Descripcion = "Con helado de crema americana", Precio = 480, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000004"), Activo = true },
-            new MenuItem { Id = Guid.Parse("77777000-0000-0000-0000-000000000017"), RestauranteId = rest7Id, Categoria = "Bebidas", Nombre = "Café Capuccino", Descripcion = "Con espuma de leche y canela", Precio = 290, MenuCategoryId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000005"), Activo = true }
-        );
-
-        // Seed Default DashboardWidgetConfigs for all 7 Restaurants
-        var restaurants = new List<Guid> { rest1Id, rest2Id, rest3Id, rest4Id, rest5Id, rest6Id, rest7Id };
+    public static List<DashboardWidgetConfig> GetSeededDashboardWidgetConfigs()
+    {
+        var restaurants = new List<Guid> { TemplePubId, DonatelloPizzeriaId };
         var widgets = new List<string> { "KPI_Ventas", "KPI_Pedidos", "KPI_Llamados", "KPI_Alertas", "StaffPerformance", "TopTables", "PeakHours" };
 
         var configs = new List<DashboardWidgetConfig>();
@@ -217,25 +234,18 @@ public static class ModelBuilderExtensions
                 widgetSeedCounter++;
             }
         }
-        modelBuilder.Entity<DashboardWidgetConfig>().HasData(configs);
+        return configs;
+    }
 
-        // Seed Menu Categories & Subcategories
-        var comidasId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000001");
-        var bebidaAlcoholId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000002");
-        var bebidaFriaId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000003");
-        var postreId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000004");
-        var bebidaCalienteId = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000005");
-
-        modelBuilder.Entity<MenuCategory>().HasData(
-            new MenuCategory { Id = comidasId, Nombre = "Comidas", Emoji = "🍔", ParentCategoryId = null },
-            new MenuCategory { Id = bebidaAlcoholId, Nombre = "Bebida con alcohol", Emoji = "🍷", ParentCategoryId = null },
-            new MenuCategory { Id = bebidaFriaId, Nombre = "Bebida fria", Emoji = "🥤", ParentCategoryId = null },
-            new MenuCategory { Id = postreId, Nombre = "Postre", Emoji = "🍰", ParentCategoryId = null },
-            new MenuCategory { Id = bebidaCalienteId, Nombre = "Bebidas calientes", Emoji = "☕", ParentCategoryId = null },
-
-            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000011"), Nombre = "Entradas", Emoji = "🥗", ParentCategoryId = comidasId },
-            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000012"), Nombre = "Platos", Emoji = "🍝", ParentCategoryId = comidasId },
-            new MenuCategory { Id = Guid.Parse("cccccccc-cccc-cccc-cccc-000000000013"), Nombre = "Panes", Emoji = "🍞", ParentCategoryId = comidasId }
-        );
+    public static void SeedData(this ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Role>().HasData(GetSeededRoles());
+        modelBuilder.Entity<RoleFeature>().HasData(GetSeededRoleFeatures());
+        modelBuilder.Entity<Restaurante>().HasData(GetSeededRestaurantes());
+        modelBuilder.Entity<Usuario>().HasData(GetSeededUsuarios());
+        modelBuilder.Entity<Mesa>().HasData(GetSeededMesas());
+        modelBuilder.Entity<MenuCategory>().HasData(GetSeededMenuCategories());
+        modelBuilder.Entity<MenuItem>().HasData(GetSeededMenuItems());
+        modelBuilder.Entity<DashboardWidgetConfig>().HasData(GetSeededDashboardWidgetConfigs());
     }
 }

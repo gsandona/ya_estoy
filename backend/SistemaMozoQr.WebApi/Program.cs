@@ -199,6 +199,15 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    try
+    {
+        await DatabaseSeeder.EnsureCleanDemoDataAsync(context);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error en DatabaseSeeder.EnsureCleanDemoDataAsync: {ex.Message}");
+    }
+
     // Generar e inicializar llaves VAPID si no existen en la base de datos
     try
     {
