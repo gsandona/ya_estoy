@@ -61,8 +61,8 @@ public static class DatabaseSeeder
 
         bool hasLegacyUsers = allUsernames.Any(u => LegacyUsernames.Contains(u));
 
-        // Si ya existe el SuperAdmin "gino" y no quedan restaurantes ni usuarios basura antiguos, no tocamos nada.
-        if (ginoExists && !hasLegacyRestaurants && !hasLegacyUsers)
+        // Si ya existe el SuperAdmin "gino", existen los 2 restaurantes demo y no quedan restaurantes ni usuarios basura antiguos, no tocamos nada.
+        if (ginoExists && allRestaurants.Count >= 2 && !hasLegacyRestaurants && !hasLegacyUsers)
         {
             return;
         }
@@ -93,7 +93,11 @@ public static class DatabaseSeeder
 
         context.ChangeTracker.Clear();
 
-        // 2. Asegurar Roles y RoleFeatures
+        // 2. Insertar primero los 2 restaurantes de demostración (necesarios como FK para las demás entidades y AuditoriaLog)
+        await context.Restaurantes.AddRangeAsync(ModelBuilderExtensions.GetSeededRestaurantes());
+        await context.SaveChangesAsync();
+
+        // 3. Asegurar Roles y RoleFeatures
         var existingRoleIds = await context.Roles.IgnoreQueryFilters().Select(r => r.Id).ToListAsync();
         var missingRoles = ModelBuilderExtensions.GetSeededRoles().Where(r => !existingRoleIds.Contains(r.Id)).ToList();
         if (missingRoles.Any())
@@ -110,7 +114,7 @@ public static class DatabaseSeeder
             await context.SaveChangesAsync();
         }
 
-        // 3. Insertar categorías de menú (raíz primero, luego subcategorías)
+        // 4. Insertar categorías de menú (raíz primero, luego subcategorías)
         var allSeededCategories = ModelBuilderExtensions.GetSeededMenuCategories();
         var rootCategories = allSeededCategories.Where(c => c.ParentCategoryId == null).ToList();
         var subCategories = allSeededCategories.Where(c => c.ParentCategoryId != null).ToList();
@@ -119,10 +123,6 @@ public static class DatabaseSeeder
         await context.SaveChangesAsync();
 
         await context.MenuCategories.AddRangeAsync(subCategories);
-        await context.SaveChangesAsync();
-
-        // 4. Insertar los 2 restaurantes de demostración
-        await context.Restaurantes.AddRangeAsync(ModelBuilderExtensions.GetSeededRestaurantes());
         await context.SaveChangesAsync();
 
         // 5. Insertar los 2 SuperAdmins y los 14 usuarios de locales (@pub y @pizzeria)
@@ -140,6 +140,9 @@ public static class DatabaseSeeder
         // 8. Insertar la configuración de widgets del dashboard para ambos locales
         await context.DashboardWidgetConfigs.AddRangeAsync(ModelBuilderExtensions.GetSeededDashboardWidgetConfigs());
         await context.SaveChangesAsync();
+
+        // Limpiar registros de auditoría generados durante el seed inicial para entregar la tabla limpia
+        await context.Auditorias.IgnoreQueryFilters().ExecuteDeleteAsync();
 
         Console.WriteLine("[DatabaseSeeder] Base de datos inicializada exitosamente con Temple Craft Pub y Donatello Pizzería.");
     }
