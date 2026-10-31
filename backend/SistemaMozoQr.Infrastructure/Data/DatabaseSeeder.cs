@@ -48,7 +48,6 @@ public static class DatabaseSeeder
 
         var allRestaurants = await context.Restaurantes
             .IgnoreQueryFilters()
-            .Select(r => new { r.Id, r.Nombre })
             .ToListAsync();
 
         bool hasLegacyRestaurants = allRestaurants.Any(r =>
@@ -61,9 +60,19 @@ public static class DatabaseSeeder
 
         bool hasLegacyUsers = allUsernames.Any(u => LegacyUsernames.Contains(u));
 
-        // Si ya existe el SuperAdmin "gino", existen los 2 restaurantes demo y no quedan restaurantes ni usuarios basura antiguos, no tocamos nada.
+        // Si ya existe el SuperAdmin "gino", existen los 2 restaurantes demo y no quedan restaurantes ni usuarios basura antiguos, aseguramos logos y retornamos.
         if (ginoExists && allRestaurants.Count >= 2 && !hasLegacyRestaurants && !hasLegacyUsers)
         {
+            bool updatedLogos = false;
+            foreach (var r in allRestaurants.Where(r => string.IsNullOrWhiteSpace(r.LogoUrl)))
+            {
+                r.LogoUrl = "/logo.png";
+                updatedLogos = true;
+            }
+            if (updatedLogos)
+            {
+                await context.SaveChangesAsync();
+            }
             return;
         }
 

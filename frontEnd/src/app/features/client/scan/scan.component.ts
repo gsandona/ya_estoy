@@ -18,8 +18,8 @@ import { BrandingService } from '../../../core/services/branding.service';
       @if (status() === 'loading') {
         <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2 z-10">
           <span class="animate-spin absolute h-16 w-16 border-4 border-accent border-t-transparent rounded-full"></span>
-          <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex">
-            <img [src]="branding.logo()" class="w-full h-full object-cover" />
+          <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-100 flex bg-[#042f2e]">
+            <img [src]="branding.resolveImageUrl(branding.logo())" (error)="$any($event.target).src = '/logo.png'" alt="Logo" class="w-full h-full object-cover" />
           </div>
         </div>
         <h2 class="text-xl font-bold text-gray-800 tracking-tight z-10">Conectando con tu Mesa...</h2>
@@ -63,7 +63,6 @@ export class ScanComponent implements OnInit {
   status = signal<'loading' | 'error'>('loading');
 
   ngOnInit() {
-    // Analizamos los parámetros clásicos de la URL: /mesa/:numero/:token
     this.route.paramMap.subscribe(params => {
       const numeroMesa = params.get('numero');
       const tokenMesa = params.get('token');
@@ -73,10 +72,8 @@ export class ScanComponent implements OnInit {
         return;
       }
 
-      // Validamos llamando a la ruta original solicitada por el Arquitecto de Backend
       this.http.get<TableSession>(`${environment.apiUrl}/api/mesas/verify?mesaId=${numeroMesa}&token=${tokenMesa}`).subscribe({
         next: (mesaData) => {
-          // El backend dice OK. Guardamos en el estado y avanzamos al Menú
           this.sessionService.setSession(mesaData);
           this.router.navigate(['/pedido']);
         },

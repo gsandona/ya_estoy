@@ -61,7 +61,7 @@ import { FormsModule } from '@angular/forms';
           <div class="h-24 w-24 flex items-center justify-center mb-8 relative p-2">
             <span class="animate-spin absolute h-20 w-20 border-4 border-slate-900 border-t-transparent rounded-full"></span>
             <div class="w-14 h-14 rounded-2xl overflow-hidden shadow-lg border border-gray-200 flex bg-white p-2">
-              <img [src]="brandingService.logo()" class="w-full h-full object-contain" />
+              <img [src]="brandingService.resolveImageUrl(brandingService.logo())" (error)="$any($event.target).src = '/logo.png'" alt="Logo" class="w-full h-full object-cover" />
             </div>
           </div>
           <h2 class="text-3xl font-serif font-black text-slate-900 tracking-tight mb-2">{{ brandingService.appName() }}</h2>
@@ -1454,10 +1454,10 @@ export class PedidoComponent implements OnInit {
         background: res.colorFondo
       });
       if (res.restauranteFondo) {
-        this.restauranteFondo.set(res.restauranteFondo);
+        this.restauranteFondo.set(this.brandingService.resolveImageUrl(res.restauranteFondo, ''));
       }
       if (res.restauranteLogo) {
-        this.brandingService.logo.set(res.restauranteLogo);
+        this.brandingService.logo.set(this.brandingService.resolveImageUrl(res.restauranteLogo));
       }
       if (res.restauranteNombre) {
         this.brandingService.appName.set(res.restauranteNombre);

@@ -64,6 +64,7 @@ public static class ModelBuilderExtensions
         {
             Id = TemplePubId,
             Nombre = "Temple Craft Pub",
+            LogoUrl = "/logo.png",
             IconoPrincipal = "🍺",
             ColorPrimario = "#18181b",
             ColorSecundario = "#d97706",
@@ -76,6 +77,7 @@ public static class ModelBuilderExtensions
         {
             Id = DonatelloPizzeriaId,
             Nombre = "Donatello Pizzería",
+            LogoUrl = "/logo.png",
             IconoPrincipal = "🍕",
             ColorPrimario = "#7f1d1d",
             ColorSecundario = "#dc2626",

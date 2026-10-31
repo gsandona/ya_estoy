@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SistemaMozoQr.Application.DTOs;
 using SistemaMozoQr.Application.Interfaces;
+using SistemaMozoQr.Domain.Enums;
 using SistemaMozoQr.Domain.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -31,6 +32,8 @@ public class AuthService : IAuthService
             return null; // Credenciales inválidas
         }
 
+        bool isSuperAdmin = user.Rol == Rol.SuperAdmin;
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:Secret"] ?? "clave_secreta_super_larga_de_ejemplo_jwt_123");
         
@@ -41,7 +44,7 @@ public class AuthService : IAuthService
             new Claim(ClaimTypes.Role, user.Rol.ToString())
         };
 
-        if (user.RestauranteId != Guid.Empty)
+        if (!isSuperAdmin && user.RestauranteId != Guid.Empty)
         {
             claims.Add(new Claim("TenantId", user.RestauranteId.ToString()));
         }
@@ -58,7 +61,7 @@ public class AuthService : IAuthService
         var token = tokenHandler.CreateToken(tokenDescriptor);
 
         string? restauranteNombre = null;
-        if (user.RestauranteId != Guid.Empty)
+        if (!isSuperAdmin && user.RestauranteId != Guid.Empty)
         {
             var restaurante = await _restauranteRepository.GetByIdAsync(user.RestauranteId);
             if (restaurante != null)
@@ -75,7 +78,7 @@ public class AuthService : IAuthService
             Username = user.Username,
             Role = user.Rol.ToString(),
             Token = tokenHandler.WriteToken(token),
-            RestauranteId = user.RestauranteId != Guid.Empty ? user.RestauranteId : null,
+            RestauranteId = (!isSuperAdmin && user.RestauranteId != Guid.Empty) ? user.RestauranteId : null,
             RestauranteNombre = restauranteNombre,
             Features = features
         };

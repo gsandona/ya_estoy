@@ -23,8 +23,8 @@ import { BrandingService } from '../../../core/services/branding.service';
         <div class="relative flex flex-col items-center">
           <div class="h-20 w-20 flex items-center justify-center mb-6 relative p-2">
             <span class="animate-spin absolute h-16 w-16 border-4 border-gray-300 border-t-gray-600 rounded-full"></span>
-            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-200 flex">
-              <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
+            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-gray-200 flex bg-[#042f2e]">
+              <img [src]="brandingService.resolveImageUrl(brandingService.logo())" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
             </div>
           </div>
           <h2 class="text-xl font-black text-gray-800 tracking-tight mb-2">{{ brandingService.appName() }}</h2>
@@ -38,8 +38,8 @@ import { BrandingService } from '../../../core/services/branding.service';
       <aside [ngClass]="sidebarCollapsed() ? 'w-20' : 'w-72'" class="bg-primary text-white flex-col hidden md:flex shadow-2xl z-10 transition-all duration-300">
         <div class="p-4 border-b border-white/10 mt-4 flex items-center justify-between">
           <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-3 overflow-hidden">
-            <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
-              <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
+            <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex bg-[#042f2e]">
+              <img [src]="brandingService.resolveImageUrl(brandingService.logo())" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
             </div>
             @if (!sidebarCollapsed()) {
               <span class="truncate">{{ brandingService.appName() }}</span>
@@ -92,28 +92,6 @@ import { BrandingService } from '../../../core/services/branding.service';
             </a>
           }
 
-          @if (false) {
-            <a routerLink="/admin/ventas" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.sales : ''">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
-              </span>
-              @if (!sidebarCollapsed()) {
-                <span class="truncate">{{ lang.translations().sidebar.sales }}</span>
-              }
-            </a>
-          }
-
-          @if (false) {
-            <a routerLink="/admin/metricas-menu" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? 'Platos Vendidos' : ''">
-              <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5z" /></svg>
-              </span>
-              @if (!sidebarCollapsed()) {
-                <span class="truncate">Platos Vendidos</span>
-              }
-            </a>
-          }
-
           @if (auth.hasFeature('ConfigPersonal')) {
             <a routerLink="/admin/configuracion" routerLinkActive="bg-white/20 border-white/20" [ngClass]="sidebarCollapsed() ? 'justify-center px-0' : 'gap-3 px-4'" class="flex items-center py-3 rounded-xl bg-white/5 text-white font-semibold hover:bg-white/10 transition-all border border-transparent" [title]="sidebarCollapsed() ? lang.translations().sidebar.personal : ''">
               <span class="p-1.5 bg-accent/20 text-accent rounded-lg flex items-center justify-center shrink-0">
@@ -158,8 +136,8 @@ import { BrandingService } from '../../../core/services/branding.service';
               <svg class="w-7 h-7 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2 max-w-[200px] truncate">
-              <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100 flex">
-                <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
+              <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100 flex bg-[#042f2e]">
+                <img [src]="brandingService.resolveImageUrl(brandingService.logo())" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
               </div>
               <span class="truncate">{{ brandingService.appName() }}</span>
             </h2>
@@ -323,8 +301,8 @@ import { BrandingService } from '../../../core/services/branding.service';
               <div class="flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-xs">
                 <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
                   <span class="animate-spin absolute h-full w-full border-4 border-emerald-600 border-t-transparent rounded-full"></span>
-                  <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex">
-                    <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
+                  <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex bg-[#042f2e]">
+                    <img [src]="brandingService.resolveImageUrl(brandingService.logo())" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
                   </div>
                 </div>
                 <h3 class="text-lg font-black text-gray-800">Cargando datos...</h3>
@@ -344,8 +322,8 @@ import { BrandingService } from '../../../core/services/branding.service';
             <div class="p-6 border-b border-white/10 mt-4 flex justify-between items-center">
               <div class="overflow-hidden">
                 <h2 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-                  <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex">
-                    <img [src]="brandingService.logo()" class="w-full h-full object-cover" />
+                  <div class="w-10 h-10 rounded-2xl overflow-hidden shrink-0 shadow-md border border-white/10 flex bg-[#042f2e]">
+                    <img [src]="brandingService.resolveImageUrl(brandingService.logo())" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
                   </div>
                   <span class="truncate">{{ brandingService.appName() }}</span>
                 </h2>
@@ -381,15 +359,6 @@ import { BrandingService } from '../../../core/services/branding.service';
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
                   </span>
                   Cocina
-                </a>
-              }
-
-              @if (false) {
-                <a routerLink="/admin/ventas" (click)="mobileMenuOpen.set(false)" routerLinkActive="bg-white/20 border-white/20" class="flex items-center gap-4 py-4 px-5 rounded-2xl bg-white/5 text-white shadow-sm font-bold active:bg-white/10 transition-all border border-transparent text-lg">
-                  <span class="p-2 bg-accent/20 text-accent rounded-xl text-xl flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5h.007m-.007 3h.007m-.007 3h.007m-3-6h15a2.25 2.25 0 0 1 2.25 2.25v13.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75A2.25 2.25 0 0 1 3.75 4.5z" /></svg>
-                  </span>
-                  Ventas
                 </a>
               }
 
@@ -451,39 +420,18 @@ export class AdminLayoutComponent {
   
   mobileMenuOpen = signal(false);
   sidebarCollapsed = signal(false);
-  globalAppName = signal<string>('');
-  globalLogoBase64 = signal<string>('');
+  globalAppName = signal<string>('MozoGo');
+  globalLogoBase64 = signal<string>('/logo.png');
   showNotificationSettings = signal(false);
   isBrandingLoaded = signal(false);
 
   constructor() {
     const user = this.auth.currentUser();
 
-    this.http.get<any[]>(`${environment.apiUrl}/api/settings/public`).subscribe({
-      next: (data) => {
-        const appName = data.find(s => s.key === 'GlobalAppName')?.value;
-        const appLogo = data.find(s => s.key === 'GlobalLogoBase64')?.value;
-        const currentUser = this.auth.currentUser();
-        const hasRestaurant = !!currentUser?.restauranteId;
-
-        if (appName) {
-          this.globalAppName.set(appName);
-          if (!hasRestaurant) {
-            this.brandingService.appName.set(appName);
-          }
-        }
-        if (appLogo) {
-          this.globalLogoBase64.set(appLogo);
-          if (!hasRestaurant) {
-            this.brandingService.logo.set(appLogo);
-          }
-        }
-      },
-      error: () => {}
-    });
-
-    if (user && user.restauranteId) {
-      // If we already have cached branding for this restaurant in localStorage, render immediately with zero flash on F5
+    if (user?.role === 'SuperAdmin') {
+      this.brandingService.resetBranding();
+      this.isBrandingLoaded.set(true);
+    } else if (user && user.restauranteId) {
       if (this.brandingService.hasCachedRestaurantBranding(user.restauranteId)) {
         this.isBrandingLoaded.set(true);
       } else if (user.restauranteNombre) {

@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RestauranteService, Restaurante } from '../../../core/services/restaurante.service';
+import { BrandingService } from '../../../core/services/branding.service';
 
 @Component({
   selector: 'app-abm-restaurantes',
@@ -14,38 +15,38 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
           <h2 class="text-2xl font-black text-gray-800">Clientes / Restaurantes</h2>
           <p class="text-sm text-gray-500 mt-1">Administra los locales o sucursales de tu cuenta</p>
         </div>
-        <button (click)="openCreateForm()" class="bg-primary text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center gap-2">
+        <button (click)="openCreateForm()" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-bold shadow-sm transition-transform hover:scale-105 active:scale-95 flex items-center gap-2">
           <span>+</span> Nuevo Restaurante
         </button>
       </div>
 
       <!-- Formulario Mantenimiento -->
-      <div *ngIf="showForm" class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-100 animate-fade-in">
+      <div *ngIf="showForm" class="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200 animate-fade-in">
         <h3 class="text-lg font-bold text-gray-800 mb-4">{{ isEditing ? 'Editar Local' : 'Nuevo Local / Sucursal' }}</h3>
         
         <form [formGroup]="restauranteForm" (ngSubmit)="onSubmit()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="form-group">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre *</label>
             <input type="text" formControlName="nombre" 
-              class="w-full px-4 py-2 rounded-xl border focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+              class="w-full px-4 py-2 rounded-xl border focus:ring-2 focus:ring-primary/20 outline-none transition-all bg-white text-gray-800"
               [ngClass]="{'border-red-300': restauranteForm.get('nombre')?.invalid && restauranteForm.get('nombre')?.touched, 'border-gray-200': !(restauranteForm.get('nombre')?.invalid && restauranteForm.get('nombre')?.touched)}"
-              placeholder="Ej: La Pasiva Centro">
+              placeholder="Ej: Temple Craft Pub">
             <span *ngIf="restauranteForm.get('nombre')?.invalid && restauranteForm.get('nombre')?.touched" class="text-xs text-red-500 mt-1">El nombre es requerido</span>
           </div>
           
           <div class="form-group">
             <label class="block text-sm font-semibold text-gray-700 mb-1">Logo de la Sucursal</label>
             <div class="flex gap-4 items-center">
-              <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center">
-                  <img *ngIf="restauranteForm.get('logoUrl')?.value" [src]="restauranteForm.get('logoUrl')?.value" class="w-full h-full object-contain p-1" />
-                  <span *ngIf="!restauranteForm.get('logoUrl')?.value" class="text-xl opacity-20">📷</span>
+              <div class="w-12 h-12 rounded-xl bg-[#042f2e] border border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
+                  <img *ngIf="restauranteForm.get('logoUrl')?.value" [src]="brandingService.resolveImageUrl(restauranteForm.get('logoUrl')?.value)" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
+                  <img *ngIf="!restauranteForm.get('logoUrl')?.value" src="/logo.png" class="w-full h-full object-cover opacity-80" />
               </div>
               <div class="flex-1 flex items-center gap-2">
-                <input type="file" #restFile (change)="onLogoSelected($event)" accept="image/png, image/jpeg, image/svg+xml" class="hidden">
-                <button type="button" (click)="restFile.click()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors">
+                <input type="file" #restFile (change)="onLogoSelected($event)" accept="image/png, image/jpeg, image/svg+xml, image/webp" class="hidden">
+                <button type="button" (click)="restFile.click()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm">
                   Subir Imagen
                 </button>
-                <button type="button" *ngIf="restauranteForm.get('logoUrl')?.value" (click)="removeLogo()" class="text-xs text-red-500 font-bold hover:underline">
+                <button type="button" *ngIf="restauranteForm.get('logoUrl')?.value" (click)="removeLogo()" class="text-xs text-red-600 font-bold hover:underline">
                   Eliminar
                 </button>
               </div>
@@ -60,43 +61,43 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
           </div>
 
           <!-- Estilos y Branding -->
-          <div class="col-span-full mt-4 bg-gray-50 p-6 rounded-2xl border border-gray-100">
+          <div class="col-span-full mt-4 bg-white p-6 rounded-2xl border border-gray-200">
             <h3 class="text-lg font-black text-gray-800 mb-4">Personalización y Estilos</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-group">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Color Primario (Hex)</label>
                 <div class="flex gap-2 items-center">
                   <input type="color" formControlName="colorPrimario" class="h-10 w-10 p-0 border-0 rounded cursor-pointer">
-                  <input type="text" formControlName="colorPrimario" class="flex-1 px-4 py-2 rounded-xl border outline-none" placeholder="#0f5132">
+                  <input type="text" formControlName="colorPrimario" class="flex-1 px-4 py-2 rounded-xl border border-gray-200 outline-none text-gray-800" placeholder="#0f5132">
                 </div>
               </div>
               <div class="form-group">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Color Secundario (Hex)</label>
                 <div class="flex gap-2 items-center">
                   <input type="color" formControlName="colorSecundario" class="h-10 w-10 p-0 border-0 rounded cursor-pointer">
-                  <input type="text" formControlName="colorSecundario" class="flex-1 px-4 py-2 rounded-xl border outline-none" placeholder="#198754">
+                  <input type="text" formControlName="colorSecundario" class="flex-1 px-4 py-2 rounded-xl border border-gray-200 outline-none text-gray-800" placeholder="#198754">
                 </div>
               </div>
               <div class="form-group">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Color Fondo (Hex)</label>
                 <div class="flex gap-2 items-center">
                   <input type="color" formControlName="colorFondo" class="h-10 w-10 p-0 border-0 rounded cursor-pointer">
-                  <input type="text" formControlName="colorFondo" class="flex-1 px-4 py-2 rounded-xl border outline-none" placeholder="#f4f9f4">
+                  <input type="text" formControlName="colorFondo" class="flex-1 px-4 py-2 rounded-xl border border-gray-200 outline-none text-gray-800" placeholder="#f4f9f4">
                 </div>
               </div>
               <div class="form-group">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Imagen de Fondo del Menú</label>
                 <div class="flex gap-4 items-center">
-                  <div class="w-24 h-12 rounded-xl bg-white border border-gray-200 overflow-hidden flex items-center justify-center relative">
-                     <img *ngIf="restauranteForm.get('imagenFondoUrl')?.value" [src]="restauranteForm.get('imagenFondoUrl')?.value" class="w-full h-full object-cover" />
-                     <span *ngIf="!restauranteForm.get('imagenFondoUrl')?.value" class="text-xl opacity-20">🖼️</span>
+                  <div class="w-24 h-12 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center relative shrink-0">
+                     <img *ngIf="restauranteForm.get('imagenFondoUrl')?.value" [src]="brandingService.resolveImageUrl(restauranteForm.get('imagenFondoUrl')?.value)" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
+                     <span *ngIf="!restauranteForm.get('imagenFondoUrl')?.value" class="text-xl opacity-40">🖼️</span>
                   </div>
                   <div class="flex-1 flex items-center gap-2">
                     <input type="file" #fondoFile (change)="onFondoSelected($event)" accept="image/png, image/jpeg, image/webp" class="hidden">
-                    <button type="button" (click)="fondoFile.click()" class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors">
+                    <button type="button" (click)="fondoFile.click()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm">
                       Subir Fondo
                     </button>
-                    <button type="button" *ngIf="restauranteForm.get('imagenFondoUrl')?.value" (click)="removeFondo()" class="text-xs text-red-500 font-bold hover:underline">
+                    <button type="button" *ngIf="restauranteForm.get('imagenFondoUrl')?.value" (click)="removeFondo()" class="text-xs text-red-600 font-bold hover:underline">
                       Eliminar
                     </button>
                   </div>
@@ -106,40 +107,48 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
           </div>
 
           <div class="col-span-full flex justify-end gap-3 mt-4">
-            <button type="button" (click)="cancelForm()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition-colors">
+            <button type="button" (click)="cancelForm()" class="px-5 py-2.5 rounded-xl border border-gray-300 bg-white text-gray-700 font-bold hover:bg-gray-50 transition-colors">
               Cancelar
             </button>
-            <button type="submit" [disabled]="restauranteForm.invalid || isSaving" class="px-5 py-2.5 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2">
-              <span *ngIf="isSaving" class="animate-spin text-lg">↻</span>
-              {{ isEditing ? 'Actualizar' : 'Crear' }}
+            <button type="submit" [disabled]="restauranteForm.invalid || isSaving" 
+              class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm disabled:opacity-50 transition-all flex items-center gap-2">
+              <span *ngIf="isSaving" class="animate-spin">↻</span>
+              {{ isEditing ? 'Guardar Cambios' : 'Crear Restaurante' }}
             </button>
           </div>
         </form>
       </div>
 
       <!-- Tabla -->
-      <div class="overflow-x-auto rounded-2xl border border-gray-100 bg-white">
+      <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
         <table class="w-full text-left text-sm">
-          <thead class="bg-gray-50/80 border-b border-gray-100">
-            <tr class="text-gray-500 uppercase tracking-wider text-xs font-bold">
-              <th class="py-4 px-4">Nombre</th>
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr class="text-gray-600 uppercase tracking-wider text-xs font-bold">
+              <th class="py-4 px-4">Local</th>
               <th class="py-4 px-4">Estado</th>
               <th class="py-4 px-4">Creación</th>
               <th class="py-4 px-4 text-right">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-50">
-            <tr *ngFor="let r of restaurantes" class="hover:bg-primary/5 transition-colors group">
-              <td class="py-3 px-4 font-bold text-gray-800">{{ r.nombre }}</td>
-              <td class="py-3 px-4">
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let r of restaurantes" class="hover:bg-slate-50 transition-colors">
+              <td class="py-3.5 px-4 font-bold text-gray-800">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-xl overflow-hidden bg-[#042f2e] border border-gray-200 shrink-0 flex items-center justify-center">
+                    <img [src]="brandingService.resolveImageUrl(r.logoUrl)" (error)="$any($event.target).src = '/logo.png'" class="w-full h-full object-cover" />
+                  </div>
+                  <span>{{ r.iconoPrincipal || '🍽️' }} {{ r.nombre }}</span>
+                </div>
+              </td>
+              <td class="py-3.5 px-4">
                 <span class="px-2.5 py-1 text-xs font-bold rounded-lg" [ngClass]="r.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
                   {{ r.activo ? 'ACTIVO' : 'INACTIVO' }}
                 </span>
               </td>
-              <td class="py-3 px-4 text-gray-500">{{ r.fechaCreacion | date:'mediumDate' }}</td>
-              <td class="py-3 px-4 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                <button (click)="openEditForm(r)" class="text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg font-bold text-xs mr-2 transition-colors">Editar</button>
-                <button (click)="deleteRestaurante(r)" class="text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">Borrar</button>
+              <td class="py-3.5 px-4 text-gray-500">{{ r.fechaCreacion | date:'mediumDate' }}</td>
+              <td class="py-3.5 px-4 text-right">
+                <button (click)="openEditForm(r)" class="text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100 px-3 py-1.5 rounded-xl font-bold text-xs mr-2 transition-colors">Editar</button>
+                <button (click)="deleteRestaurante(r)" class="text-red-600 bg-red-50 border border-red-200 hover:bg-red-100 px-3 py-1.5 rounded-xl font-bold text-xs transition-colors">Borrar</button>
               </td>
             </tr>
             <tr *ngIf="restaurantes.length === 0 && !isLoading">
@@ -152,6 +161,7 @@ import { RestauranteService, Restaurante } from '../../../core/services/restaura
   `
 })
 export class AbmRestaurantesComponent implements OnInit {
+  public brandingService = inject(BrandingService);
   restaurantes: Restaurante[] = [];
   isLoading = false;
   isSaving = false;

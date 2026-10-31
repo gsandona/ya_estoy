@@ -12,7 +12,6 @@ import { TenantContextService } from '../../../../core/services/tenant-context.s
 import { LanguageService } from '../../../../core/services/language.service';
 
 @Component({
-// ... (omitted changing imports array to not overwrite metadata incorrectly)
   selector: 'app-admin-mesas',
   standalone: true,
   imports: [CommonModule, FormsModule],
@@ -91,7 +90,7 @@ import { LanguageService } from '../../../../core/services/language.service';
                 @if (mesa.codigoAcceso) {
                   <!-- Active Mesa Card -->
                   <div class="border border-green-200/80 rounded-3xl p-5 flex flex-col justify-between hover:border-green-400 transition relative group bg-white shadow-sm ring-4 ring-green-500/5">
-                    <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity">
                       <button (click)="openQrModal(mesa)" class="text-green-700 hover:text-green-900 font-bold text-[10px] bg-green-100/60 px-2.5 py-1 rounded-xl transition-colors border border-green-200/50">QR</button>
                       @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
                         <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">{{ lang.translations().common.edit }}</button>
@@ -100,11 +99,11 @@ import { LanguageService } from '../../../../core/services/language.service';
                     </div>
 
                     <div class="space-y-4">
-                      <div class="flex items-center gap-3">
-                        <div class="h-12 w-12 rounded-2xl flex items-center justify-center font-black text-lg bg-green-500/10 text-green-700 shadow-inner">
+                      <div class="flex items-center gap-3 pr-24">
+                        <div class="h-12 w-12 rounded-2xl flex items-center justify-center font-black text-lg bg-green-500/10 text-green-700 shadow-inner shrink-0">
                           {{ mesa.numero }}
                         </div>
-                        <div>
+                        <div class="min-w-0">
                           <h3 class="font-black text-gray-800 text-sm">{{ lang.translations().kitchen.table }} {{ mesa.numero }}</h3>
                           <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || lang.translations().tables.noLocation }}</p>
                         </div>
@@ -142,7 +141,7 @@ import { LanguageService } from '../../../../core/services/language.service';
                 } @else {
                   <!-- Inactive Mesa Card -->
                   <div class="border border-slate-200 rounded-3xl p-5 flex flex-col justify-between hover:border-slate-300 transition relative group bg-white shadow-sm hover:shadow-md">
-                    <div class="absolute top-3 right-3 flex gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <div class="absolute top-3 right-3 flex gap-1.5 transition-opacity">
                       <button (click)="openQrModal(mesa)" class="text-slate-600 hover:text-slate-800 font-bold text-[10px] bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">QR</button>
                       @if (auth.currentUser()?.role === 'Admin' || auth.currentUser()?.role === 'SuperAdmin') {
                         <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-[10px] bg-indigo-50 px-2.5 py-1 rounded-xl transition-colors border border-indigo-100">{{ lang.translations().common.edit }}</button>
@@ -151,11 +150,11 @@ import { LanguageService } from '../../../../core/services/language.service';
                     </div>
 
                     <div class="space-y-4">
-                      <div class="flex items-center gap-3">
-                        <div class="h-12 w-12 rounded-2xl flex items-center justify-center font-black text-lg bg-slate-100 text-slate-400">
+                      <div class="flex items-center gap-3 pr-24">
+                        <div class="h-12 w-12 rounded-2xl flex items-center justify-center font-black text-lg bg-slate-100 text-slate-400 shrink-0">
                           {{ mesa.numero }}
                         </div>
-                        <div>
+                        <div class="min-w-0">
                           <h3 class="font-black text-gray-800 text-sm">{{ lang.translations().kitchen.table }} {{ mesa.numero }}</h3>
                           <p class="text-[10px] text-gray-400 font-semibold truncate max-w-[120px]">{{ mesa.ubicacion || lang.translations().tables.noLocation }}</p>
                         </div>
@@ -247,10 +246,10 @@ import { LanguageService } from '../../../../core/services/language.service';
 
               <!-- Botones de Acción -->
               <div class="flex gap-3">
-                <button (click)="imprimirTicketFactura()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1.5 border border-slate-250">
+                <button (click)="imprimirTicketFactura()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 flex items-center justify-center gap-1.5 border border-slate-200">
                   🖨️ Imprimir
                 </button>
-                <button (click)="showBillingModal.set(false)" class="flex-1 bg-gray-150 hover:bg-gray-200 text-gray-650 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 text-center">
+                <button (click)="showBillingModal.set(false)" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-2xl text-xs font-black transition-all active:scale-95 text-center">
                   Cerrar
                 </button>
               </div>
@@ -263,7 +262,7 @@ import { LanguageService } from '../../../../core/services/language.service';
     <!-- Confirm Close Modal -->
     @if (showConfirmCloseModal()) {
       <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm border border-gray-150 shadow-2xl space-y-5 animate-scale-up text-left text-primary">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-sm border border-gray-200 shadow-2xl space-y-5 animate-scale-up text-left text-primary">
           <div class="pb-2 border-b border-gray-100">
             <h3 class="text-lg font-black text-gray-800">Cerrar Mesa {{ billingMesa()?.numero }}</h3>
             <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider mt-0.5">
@@ -272,13 +271,13 @@ import { LanguageService } from '../../../../core/services/language.service';
           </div>
 
           <div>
-            <p class="text-sm text-gray-650 font-semibold leading-relaxed">
+            <p class="text-sm text-gray-700 font-semibold leading-relaxed">
               ¿Está seguro que desea cerrar la Mesa {{ billingMesa()?.numero }}?
             </p>
           </div>
 
           <div class="flex gap-2.5 justify-end pt-2">
-            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-250 px-5 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-95">
+            <button (click)="showConfirmCloseModal.set(false)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 px-5 py-2.5 rounded-xl font-bold text-xs transition-all active:scale-95">
               Cancelar
             </button>
             <button (click)="ejecutarCierreYFacturacion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-black text-xs shadow-md transition-all active:scale-95">
@@ -343,7 +342,6 @@ export class AdminMesasComponent {
   
   currentDate = new Date();
 
-  // Signals para Facturación y Consumos Extra (POS Caja)
   showBillingModal = signal(false);
   showConfirmCloseModal = signal(false);
   billingMesa = signal<AdminMesa | null>(null);
@@ -356,12 +354,10 @@ export class AdminMesasComponent {
   manualChargeDescription = '';
   manualChargeMonto = 0;
 
-  // Signals para Filtros
   filterType = signal<string>('All');
   filterMesa = signal<string>('All');
   filterMozo = signal<string>('All');
 
-  // Asignaciones e inline abm
   showReassignModal = signal<string | null>(null);
   showForm = signal(false);
   editingId = signal<string | null>(null);
@@ -380,19 +376,16 @@ export class AdminMesasComponent {
     const userRole = this.auth.currentUser()?.role;
     const userId = this.auth.currentUser()?.id;
 
-    // Filtros de Admin
     if (this.filterType() !== 'All') allTasks = allTasks.filter((t: any) => t.type === this.filterType());
     if (this.filterMesa() !== 'All') allTasks = allTasks.filter((t: any) => t.tableId.toString() === this.filterMesa());
     if (this.filterMozo() !== 'All') allTasks = allTasks.filter((t: any) => t.assignedMozoId === this.filterMozo() || (!t.assignedMozoId && this.dataService.mesas().find((m: any) => m.numero === t.tableId)?.mozoId === this.filterMozo()));
 
     let filtered = allTasks;
     if (userRole !== 'Admin') {
-      // Filtro de Mozo (mis mesas o tareas reasignadas a mí)
       const myMesasNumeros = this.myMesas().map((m: any) => m.numero);
       filtered = allTasks.filter((t: any) => t.assignedMozoId === userId || (!t.assignedMozoId && myMesasNumeros.includes(t.tableId)));
     }
 
-    // Ordenar con prioridad: Listo -> Recibido/SinEstado -> Cuenta -> Llamado -> EnPreparacion
     return [...filtered].sort((a, b) => {
       const getPriority = (t: MesaTask) => {
         if (t.type === 'Pedido') {
@@ -589,9 +582,7 @@ export class AdminMesasComponent {
     this.http.post(`${environment.apiUrl}/api/pedido/${taskId}/aprobar`, {}, {
       headers: { 'Authorization': `Bearer ${token}` }
     }).subscribe({
-      next: () => {
-        // Tarea completada y retirada automáticamente por SignalR
-      },
+      next: () => {},
       error: (err) => console.error('Error al aprobar pedido:', err)
     });
   }
@@ -602,9 +593,7 @@ export class AdminMesasComponent {
     this.http.post(`${environment.apiUrl}/api/pedido/${pedidoId}/estado`, { estado: 'Entregado' }, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
-      next: () => {
-        // La actualización de SignalR retirará la tarea automáticamente
-      },
+      next: () => {},
       error: (err) => console.error('Error al entregar pedido:', err)
     });
   }
@@ -623,7 +612,6 @@ export class AdminMesasComponent {
       }
     }).subscribe({
       next: (res: any) => {
-        // Actualizar localmente la mesa en el dataService
         this.dataService.mesas.update((mesas: any) => 
           mesas.map((m: any) => m.id === mesaId ? { ...m, montoConsumo: res.montoConsumo } : m)
         );
@@ -889,7 +877,6 @@ export class AdminMesasComponent {
     }).subscribe({
       next: (res) => {
         this.dataService.refreshAll();
-        // Recargar consumos y limpiar temporales locales
         this.openBillingModal(mesa);
         alert('Consumos extras guardados en la mesa.');
       },

@@ -77,8 +77,10 @@ export class AuthService {
       this._token = savedToken;
       const user = JSON.parse(savedUser) as User;
 
-      // Auto-recover missing properties from JWT token if needed
-      if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && !user.restauranteId) {
+      if (user.role === 'SuperAdmin') {
+        user.restauranteId = undefined;
+        user.restauranteNombre = undefined;
+      } else if (!user.restauranteId) {
         const decoded = this.parseJwt(savedToken);
         if (decoded && decoded.TenantId) {
           user.restauranteId = decoded.TenantId;
@@ -88,14 +90,12 @@ export class AuthService {
 
       this._currentUser.set(user);
 
-      // Auto-set the active tenant ID for Admin and Mozo
-      if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && user.restauranteId) {
+      if (user.role !== 'SuperAdmin' && user.restauranteId) {
         if (!this.tenantContext.currentTenantId) {
           this.tenantContext.setTenantId(user.restauranteId);
         }
       }
 
-      // Wait for signalR connection or just call it, signalr.service buffers/handles it
       setTimeout(() => this.signalrService.joinGroup(user.role, user.id, user.restauranteId), 1000);
     }
   }
@@ -103,25 +103,28 @@ export class AuthService {
   login(username: string, password: string) {
     return this.http.post<User>(`${environment.apiUrl}/api/auth/login`, { username, password }).pipe(
       tap(user => {
+        if (user.role === 'SuperAdmin') {
+          user.restauranteId = undefined;
+          user.restauranteNombre = undefined;
+          this.brandingService.resetBranding();
+          this.tenantContext.setTenantId(null);
+        } else {
+          if (user.restauranteId && this.brandingService.restauranteId() && this.brandingService.restauranteId() !== user.restauranteId) {
+            this.brandingService.resetBranding();
+          }
+          if (user.restauranteId) {
+            this.brandingService.restauranteId.set(user.restauranteId);
+            this.tenantContext.setTenantId(user.restauranteId);
+          }
+          if (user.restauranteNombre) {
+            this.brandingService.appName.set(user.restauranteNombre);
+          }
+        }
+
         this._token = user.token;
         this._currentUser.set(user);
         localStorage.setItem('auth_token', user.token);
         localStorage.setItem('auth_user', JSON.stringify(user));
-
-        if (user.restauranteId && this.brandingService.restauranteId() && this.brandingService.restauranteId() !== user.restauranteId) {
-          this.brandingService.resetBranding();
-        }
-        if (user.restauranteId) {
-          this.brandingService.restauranteId.set(user.restauranteId);
-        }
-        if (user.restauranteNombre) {
-          this.brandingService.appName.set(user.restauranteNombre);
-        }
-
-        // Auto-set the active tenant ID for Admin and Mozo
-        if ((user.role === 'Admin' || user.role === 'Mozo' || user.role === 'Cocina') && user.restauranteId) {
-          this.tenantContext.setTenantId(user.restauranteId);
-        }
 
         this.signalrService.joinGroup(user.role, user.id, user.restauranteId);
       })
@@ -158,5 +161,9 @@ export class AuthService {
 
   getToken(): string | null {
     return this._token;
+  }
+
+  getRole(): string | null {
+    return this._currentUser()?.role || null;
   }
 }

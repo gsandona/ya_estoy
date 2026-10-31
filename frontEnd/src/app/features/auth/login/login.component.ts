@@ -12,14 +12,14 @@ import { BrandingService } from '../../../core/services/branding.service';
   template: `
     <!-- Splash Screen Inicial Institucional MozoGo -->
     @if (isSplashing()) {
-      <div class="fixed inset-0 bg-[#0f172a] flex flex-col items-center justify-center z-50 transition-opacity duration-500" [ngClass]="{'opacity-0 pointer-events-none': !isSplashing()}">
-        <div class="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-slate-900 to-[#064e3b]/40"></div>
+      <div class="fixed inset-0 bg-[#042f2e] flex flex-col items-center justify-center z-50 transition-opacity duration-500" [ngClass]="{'opacity-0 pointer-events-none': !isSplashing()}">
+        <div class="absolute inset-0 bg-gradient-to-br from-[#022c22] via-[#042f2e] to-[#0f172a]"></div>
         <div class="relative flex flex-col items-center text-center px-4 animate-fade-in">
           <!-- pulsing institutional logo -->
-          <div class="h-28 w-28 rounded-3xl overflow-hidden shadow-2xl mb-6 animate-pulse border border-emerald-500/20 flex items-center justify-center bg-slate-800/80 p-3">
-            <img src="/icon-512.png" alt="MozoGo" class="w-full h-full object-contain" />
+          <div class="h-32 w-32 rounded-3xl overflow-hidden shadow-2xl mb-6 animate-pulse border border-emerald-500/30 flex items-center justify-center bg-[#042f2e]">
+            <img src="/logo.png" alt="MozoGo" class="w-full h-full object-cover" />
           </div>
-          <h1 class="text-white text-4xl font-black tracking-tight mb-1">MozoGo</h1>
+          <h1 class="text-white text-4xl font-black tracking-tight mb-1">Mozo<span class="text-[#10b981]">Go</span></h1>
           <p class="text-emerald-400 text-xs font-bold uppercase tracking-widest mt-1">Plataforma Gastronómica Inteligente</p>
           <p class="text-slate-400 text-[11px] font-semibold uppercase tracking-widest mt-3">Cargando Sistema...</p>
           <div class="w-32 bg-white/10 h-1.5 rounded-full mt-5 overflow-hidden border border-white/5">
@@ -48,8 +48,8 @@ import { BrandingService } from '../../../core/services/branding.service';
           <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl flex flex-col items-center text-center max-w-xs w-full mx-4 border border-slate-100">
             <div class="h-16 w-16 mb-4 relative flex items-center justify-center p-2">
               <span class="animate-spin absolute h-full w-full border-4 border-[#10b981] border-t-transparent rounded-full"></span>
-              <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-slate-100 flex bg-white p-1.5">
-                <img src="/icon-512.png" alt="MozoGo" class="w-full h-full object-contain" />
+              <div class="w-11 h-11 rounded-xl overflow-hidden shadow-sm border border-slate-100 flex bg-[#042f2e]">
+                <img src="/logo.png" alt="MozoGo" class="w-full h-full object-cover" />
               </div>
             </div>
             <h3 class="text-lg font-black text-slate-900">Conectando...</h3>
@@ -63,12 +63,12 @@ import { BrandingService } from '../../../core/services/branding.service';
       
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-5">
-          <div class="h-20 w-20 rounded-2xl overflow-hidden shadow-lg border border-slate-200 flex bg-[#0f172a] p-2.5">
-            <img src="/icon-512.png" alt="MozoGo" class="w-full h-full object-contain" />
+          <div class="h-28 w-28 rounded-3xl overflow-hidden shadow-xl border border-emerald-900/20 flex bg-[#042f2e]">
+            <img src="/logo.png" alt="MozoGo" class="w-full h-full object-cover" />
           </div>
         </div>
-        <h2 class="text-center text-3xl font-black text-[#0f172a] tracking-tight mb-1 flex flex-col">
-          <span>MozoGo</span>
+        <h2 class="text-center text-3xl font-black text-[#0f172a] tracking-tight mb-1">
+          Mozo<span class="text-[#059669]">Go</span>
         </h2>
         <p class="text-center text-xs font-extrabold text-[#059669] uppercase tracking-widest">
           Plataforma Gastronómica Inteligente

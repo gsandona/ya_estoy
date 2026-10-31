@@ -1,5 +1,6 @@
 import { Injectable, Inject, PLATFORM_ID, signal, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 export interface BrandingState {
   restauranteId?: string;
@@ -11,12 +12,13 @@ export interface BrandingState {
 }
 
 const BRANDING_STORAGE_KEY = 'mozo_go_branding_state';
+const DEFAULT_LOGO = '/logo.png';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BrandingService {
-  logo = signal<string>('logo.png');
+  logo = signal<string>(DEFAULT_LOGO);
   appName = signal<string>('MozoGo');
   restauranteId = signal<string | null>(null);
   private currentColors: { primary?: string; secondary?: string; background?: string } = {};
@@ -33,16 +35,45 @@ export class BrandingService {
           document.title = currentName;
         }
         const hasCustomColors = !!(this.currentColors.primary || this.currentColors.secondary || this.currentColors.background);
-        if (currentRestId || hasCustomColors || (currentName && currentName !== 'MozoGo') || (currentLogo && currentLogo !== 'logo.png')) {
+        if (currentRestId || hasCustomColors || (currentName && currentName !== 'MozoGo') || (currentLogo && currentLogo !== DEFAULT_LOGO)) {
           this.saveToStorage({
             restauranteId: currentRestId || undefined,
             appName: currentName,
-            logo: currentLogo,
+            logo: this.resolveImageUrl(currentLogo),
             ...this.currentColors
           });
         }
       });
     }
+  }
+
+  /**
+   * Normaliza cualquier URL de imagen o logo para que funcione en cualquier ruta:
+   * - Rutas relativas al backend (/uploads/...) se prefijan con environment.apiUrl
+   * - Logos por defecto ('logo.png') se convierten a '/logo.png'
+   * - URLs absolutas (http/https) o data:image se mantienen intactas
+   */
+  resolveImageUrl(url?: string | null, fallback: string = DEFAULT_LOGO): string {
+    if (!url || !url.trim()) return fallback;
+    const trimmed = url.trim();
+    if (trimmed === 'logo.png' || trimmed === '/logo.png' || trimmed === 'icon-512.png' || trimmed === '/icon-512.png') {
+      return DEFAULT_LOGO;
+    }
+    if (trimmed.startsWith('/uploads/')) {
+      return `${environment.apiUrl}${trimmed}`;
+    }
+    if (trimmed.startsWith('uploads/')) {
+      return `${environment.apiUrl}/${trimmed}`;
+    }
+    if (
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('data:') ||
+      trimmed.startsWith('/')
+    ) {
+      return trimmed;
+    }
+    return `/${trimmed}`;
   }
 
   private restoreFromStorage() {
@@ -55,7 +86,7 @@ export class BrandingService {
         this.restauranteId.set(saved.restauranteId);
       }
       if (saved.logo) {
-        this.logo.set(saved.logo);
+        this.logo.set(this.resolveImageUrl(saved.logo));
       }
       if (saved.appName) {
         this.appName.set(saved.appName);
@@ -107,9 +138,7 @@ export class BrandingService {
     if (data.id) {
       this.restauranteId.set(data.id);
     }
-    if (data.logoUrl) {
-      this.logo.set(data.logoUrl);
-    }
+    this.logo.set(this.resolveImageUrl(data.logoUrl, DEFAULT_LOGO));
     if (data.nombre) {
       this.appName.set(data.nombre);
       if (isPlatformBrowser(this.platformId)) {
@@ -133,7 +162,7 @@ export class BrandingService {
     this.saveToStorage({
       restauranteId: this.restauranteId() || undefined,
       appName: this.appName(),
-      logo: this.logo(),
+      logo: this.resolveImageUrl(this.logo()),
       ...this.currentColors
     });
   }
@@ -141,7 +170,7 @@ export class BrandingService {
   resetBranding() {
     this.restauranteId.set(null);
     this.currentColors = {};
-    this.logo.set('logo.png');
+    this.logo.set(DEFAULT_LOGO);
     this.appName.set('MozoGo');
     if (isPlatformBrowser(this.platformId)) {
       try {

@@ -8,6 +8,7 @@ import { SuperadminCategoriesComponent } from './config/superadmin-categories.co
 import { SuperadminUsuariosComponent } from './config/superadmin-usuarios.component';
 import { SuperadminFeaturesComponent } from './config/superadmin-features.component';
 import { SuperadminImagesComponent } from './config/superadmin-images.component';
+import { BrandingService } from '../../core/services/branding.service';
 
 interface Restaurante {
   id: string;
@@ -96,7 +97,7 @@ interface ErrorLog {
           @if (configRestauranteId) {
             <div class="space-y-4">
               @for (widget of widgetConfigs(); track widget.widgetKey; let i = $index) {
-                <div class="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-150 shadow-sm">
+                <div class="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-200 shadow-sm">
                   <div class="flex items-center gap-3">
                     <input type="checkbox" [(ngModel)]="widget.activo" class="h-5 w-5 rounded border-gray-300 text-accent focus:ring-accent/10 cursor-pointer">
                     <div>
@@ -120,7 +121,7 @@ interface ErrorLog {
               }
 
               <div class="pt-6 border-t border-gray-100 flex justify-between items-center gap-3">
-                <button (click)="openAddWidgetModal()" class="bg-emerald-50 text-emerald-700 border border-emerald-250 px-5 py-2.5 rounded-xl text-xs font-black shadow-sm hover:bg-emerald-100 transition active:scale-95">
+                <button (click)="openAddWidgetModal()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-5 py-2.5 rounded-xl text-xs font-black shadow-sm hover:bg-emerald-100 transition active:scale-95">
                   + Agregar Widget
                 </button>
 
@@ -270,7 +271,7 @@ interface ErrorLog {
                 </div>
 
                 @if (err.stackTrace) {
-                  <details class="group bg-gray-50 border border-gray-150 rounded-2xl p-3">
+                  <details class="group bg-gray-50 border border-gray-200 rounded-2xl p-3">
                     <summary class="text-xs font-black text-gray-500 cursor-pointer select-none outline-none flex justify-between items-center">
                       <span>Ver Stack Trace Completo</span>
                       <span class="transition-transform group-open:rotate-180">▼</span>
@@ -297,16 +298,15 @@ interface ErrorLog {
           <div class="space-y-6">
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Nombre de la Aplicación</label>
-              <input type="text" [(ngModel)]="globalAppName" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-800" placeholder="Ej: Mi Sistema QR">
+              <input type="text" [(ngModel)]="globalAppName" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium text-gray-800" placeholder="Ej: MozoGo">
             </div>
 
             <div>
               <label class="block text-sm font-bold text-gray-700 mb-2">Logo Global</label>
               
               <div class="flex items-center gap-6 mt-2">
-                <div class="w-24 h-24 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden shadow-inner">
-                  <img *ngIf="globalLogoBase64" [src]="globalLogoBase64" class="w-full h-full object-contain p-2" />
-                  <svg *ngIf="!globalLogoBase64" class="w-8 h-8 opacity-20 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <div class="w-24 h-24 rounded-2xl bg-[#042f2e] border border-gray-200 flex items-center justify-center overflow-hidden shadow-inner">
+                  <img [src]="brandingService.resolveImageUrl(globalLogoBase64)" (error)="$any($event.target).src = '/logo.png'" alt="Logo MozoGo" class="w-full h-full object-cover" />
                 </div>
                 
                 <div class="flex-1">
@@ -314,7 +314,7 @@ interface ErrorLog {
                   <button (click)="fileInput.click()" class="bg-surface border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-bold hover:bg-gray-50 transition-colors mb-2 block">
                     Subir Imagen
                   </button>
-                  <p class="text-xs text-gray-400">Recomendado: PNG transparente, max 500kb.</p>
+                  <p class="text-xs text-gray-400">Recomendado: PNG o JPG cuadrado, max 500kb.</p>
                 </div>
               </div>
             </div>
@@ -350,6 +350,7 @@ interface ErrorLog {
 })
 export class SuperAdminDashboardComponent {
   private http = inject(HttpClient);
+  brandingService = inject(BrandingService);
   
   activeTab = signal<'restaurantes' | 'usuarios' | 'permisos' | 'dashboard-config' | 'auditoria' | 'errores' | 'branding' | 'menu-categories' | 'imagenes'>('restaurantes');
   restaurantes = signal<Restaurante[]>([]);
@@ -361,8 +362,8 @@ export class SuperAdminDashboardComponent {
   filterFechaInicio = '';
   filterFechaFin = '';
 
-  globalAppName = '';
-  globalLogoBase64 = '';
+  globalAppName = 'MozoGo';
+  globalLogoBase64 = '/logo.png';
   isSavingBranding = false;
 
   // Dashboard configs signals
@@ -379,7 +380,6 @@ export class SuperAdminDashboardComponent {
     { key: 'StaffPerformance', label: '🤵 Desempeño del Staff (Mozos)', desc: 'Productividad y volumen de servicio por mozo.' },
     { key: 'TopTables', label: '📊 Ranking de Mesas', desc: 'Listado de mesas con mayor uso y rotación.' },
     { key: 'PeakHours', label: '⏰ Horarios Pico', desc: 'Distribución de solicitudes según la hora del día.' },
-    // 5 nuevos widgets solicitados:
     { key: 'AvgServiceTime', label: '⏱️ KPI: Tiempo de Atención', desc: 'Minutos promedio para resolver un llamado de cliente.' },
     { key: 'OrderCancelRate', label: '❌ KPI: Tasa de Cancelación', desc: 'Porcentaje de comandas anuladas sobre el total.' },
     { key: 'ClientCallsPerTable', label: '🛎️ KPI: Llamados por Mesa', desc: 'Promedio de llamados emitidos por mesa ocupada.' },
@@ -458,7 +458,6 @@ export class SuperAdminDashboardComponent {
     this.http.get<ErrorLog[]>(url).subscribe(data => this.logsErrores.set(data));
   }
 
-  // Dashboard configuration methods
   loadDashboardWidgetConfigs() {
     if (!this.configRestauranteId) return;
     this.http.get<any[]>(`${environment.apiUrl}/api/dashboardconfig/${this.configRestauranteId}`).subscribe(data => {

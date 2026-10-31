@@ -36,8 +36,8 @@ interface WidgetConfig {
         <div class="py-20 flex flex-col items-center justify-center">
           <div class="relative h-16 w-16 mb-4 flex items-center justify-center p-2">
             <span class="animate-spin absolute h-full w-full border-4 border-accent border-t-transparent rounded-full"></span>
-            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex">
-              <img [src]="branding.logo()" class="w-full h-full object-cover" />
+            <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-gray-100 flex bg-[#042f2e]">
+              <img [src]="branding.resolveImageUrl(branding.logo())" (error)="$any($event.target).src = '/logo.png'" alt="Logo" class="w-full h-full object-cover" />
             </div>
           </div>
           <h3 class="text-lg font-black text-gray-800">{{ lang.translations().dashboard.loadingStats }}</h3>

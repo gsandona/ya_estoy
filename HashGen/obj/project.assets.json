@@ -52,11 +52,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\SISTEMAS\\ya_estoy\\HashGen\\HashGen.csproj",
+      "projectUniqueName": "C:\\Users\\gjsza\\OneDrive\\Desktop\\MozoGo\\sistema\\HashGen\\HashGen.csproj",
       "projectName": "HashGen",
-      "projectPath": "C:\\SISTEMAS\\ya_estoy\\HashGen\\HashGen.csproj",
+      "projectPath": "C:\\Users\\gjsza\\OneDrive\\Desktop\\MozoGo\\sistema\\HashGen\\HashGen.csproj",
       "packagesPath": "C:\\Users\\gjsza\\.nuget\\packages\\",
-      "outputPath": "C:\\SISTEMAS\\ya_estoy\\HashGen\\obj\\",
+      "outputPath": "C:\\Users\\gjsza\\OneDrive\\Desktop\\MozoGo\\sistema\\HashGen\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

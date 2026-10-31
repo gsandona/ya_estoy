@@ -27,8 +27,8 @@ interface MozoProfile {
       <!-- Top Brand -->
       <div class="sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10">
         <div class="flex justify-center mb-4">
-          <div class="h-16 w-16 rounded-2xl overflow-hidden shadow-md border border-gray-150 flex bg-white p-2.5">
-            <img [src]="branding.logo()" class="w-full h-full object-contain" />
+          <div class="h-16 w-16 rounded-2xl overflow-hidden shadow-md border border-gray-200 flex bg-[#042f2e]">
+            <img [src]="branding.resolveImageUrl(branding.logo())" (error)="$any($event.target).src = '/logo.png'" alt="Logo" class="w-full h-full object-cover" />
           </div>
         </div>
         <h2 class="text-3xl font-serif font-black text-primary">{{ branding.appName() }}</h2>
@@ -75,7 +75,7 @@ interface MozoProfile {
           </div>
         } @else {
           <!-- PIN/Password Input Panel -->
-          <div class="bg-white/95 backdrop-blur-md py-8 px-6 shadow-2xl rounded-3xl border border-gray-150 max-w-md mx-auto space-y-6 animate-scale-up">
+          <div class="bg-white/95 backdrop-blur-md py-8 px-6 shadow-2xl rounded-3xl border border-gray-200 max-w-md mx-auto space-y-6 animate-scale-up">
             <button 
               (click)="cancelSelection()"
               class="absolute top-4 left-4 text-gray-400 hover:text-gray-800 font-black text-lg p-2 transition active:scale-90"

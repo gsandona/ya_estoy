@@ -59,17 +59,17 @@ import { AuthService } from '../../../core/services/auth.service';
         @for (mesa of dataService.mesas(); track mesa.id) {
           <div class="border border-gray-200 rounded-2xl p-4 flex flex-col hover:border-accent transition relative group bg-white">
             
-            <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button (click)="openQrModal(mesa)" class="text-green-600 hover:text-green-800 font-bold text-xs bg-green-50 px-2 py-1 rounded-lg">🖨️ QR</button>
-              <button (click)="openEditForm(mesa)" class="text-indigo-500 hover:text-indigo-700 font-bold text-xs bg-indigo-50 px-2 py-1 rounded-lg">Editar</button>
-              <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-400 hover:text-red-600 font-bold text-xs bg-red-50 px-2 py-1 rounded-lg">Borrar</button>
+            <div class="absolute top-4 right-4 flex gap-1.5 transition-opacity">
+              <button (click)="openQrModal(mesa)" class="text-green-700 hover:text-green-900 font-bold text-xs bg-green-50 border border-green-200 px-2.5 py-1 rounded-lg">🖨️ QR</button>
+              <button (click)="openEditForm(mesa)" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-lg">Editar</button>
+              <button (click)="dataService.deleteMesa(mesa.id)" class="text-red-600 hover:text-red-800 font-bold text-xs bg-red-50 border border-red-200 px-2.5 py-1 rounded-lg">Borrar</button>
             </div>
 
-            <div class="flex items-center gap-3 mb-2">
-              <div class="h-10 w-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center font-black">{{ mesa.numero }}</div>
-              <div>
+            <div class="flex items-center gap-3 mb-2 pr-36">
+              <div class="h-10 w-10 bg-green-50 text-green-600 rounded-xl flex items-center justify-center font-black shrink-0">{{ mesa.numero }}</div>
+              <div class="min-w-0">
                 <h3 class="font-bold text-gray-800">Mesa {{ mesa.numero }}</h3>
-                <p class="text-xs text-gray-500">{{ mesa.ubicacion }}</p>
+                <p class="text-xs text-gray-500 truncate">{{ mesa.ubicacion }}</p>
               </div>
             </div>
             <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
@@ -215,7 +215,6 @@ export class AbmMesasComponent {
   }
 
   getQrImageUrl(mesa: AdminMesa) {
-    // Exacta ruta literal pedida sin # usando el frontend que esté corriendo
     const baseUrl = window.location.origin;
     const targetUrl = `${baseUrl}/mesa/${this.restauranteNombre()}/${mesa.numero}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&data=${encodeURIComponent(targetUrl)}`;
