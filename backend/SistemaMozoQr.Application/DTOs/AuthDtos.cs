@@ -1,5 +1,6 @@
 using SistemaMozoQr.Domain.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace SistemaMozoQr.Application.DTOs;
@@ -17,10 +18,15 @@ public class AuthResponseDto
 {
     public Guid Id { get; set; }
     public string Username { get; set; } = string.Empty;
+    public string? NombreCompleto { get; set; }
     public string Role { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty;
     public Guid? RestauranteId { get; set; }
     public string? RestauranteNombre { get; set; }
+    public string? RestauranteLogo { get; set; }
+    public string? ColorPrimario { get; set; }
+    public string? ColorSecundario { get; set; }
+    public string? ColorFondo { get; set; }
     public List<string> Features { get; set; } = new();
 }
 

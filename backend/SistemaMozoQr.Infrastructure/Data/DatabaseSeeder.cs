@@ -60,16 +60,48 @@ public static class DatabaseSeeder
 
         bool hasLegacyUsers = allUsernames.Any(u => LegacyUsernames.Contains(u));
 
-        // Si ya existe el SuperAdmin "gino", existen los 2 restaurantes demo y no quedan restaurantes ni usuarios basura antiguos, aseguramos logos y retornamos.
+        // Si ya existe el SuperAdmin "gino", existen los 2 restaurantes demo y no quedan restaurantes ni usuarios basura antiguos,
+        // aseguramos que los RoleFeatures, logos y los 16 usuarios base estén completos y sincronizados.
         if (ginoExists && allRestaurants.Count >= 2 && !hasLegacyRestaurants && !hasLegacyUsers)
         {
-            bool updatedLogos = false;
+            bool hasChanges = false;
             foreach (var r in allRestaurants.Where(r => string.IsNullOrWhiteSpace(r.LogoUrl)))
             {
                 r.LogoUrl = "/logo.png";
-                updatedLogos = true;
+                hasChanges = true;
             }
-            if (updatedLogos)
+
+            var existingFeatureIdsEarly = await context.RoleFeatures.IgnoreQueryFilters().Select(rf => rf.Id).ToListAsync();
+            var missingFeaturesEarly = ModelBuilderExtensions.GetSeededRoleFeatures()
+                .Where(rf => !existingFeatureIdsEarly.Contains(rf.Id))
+                .ToList();
+            if (missingFeaturesEarly.Any())
+            {
+                await context.RoleFeatures.AddRangeAsync(missingFeaturesEarly);
+                hasChanges = true;
+            }
+
+            var existingUsers = await context.Usuarios.IgnoreQueryFilters().ToListAsync();
+            foreach (var seededUser in ModelBuilderExtensions.GetSeededUsuarios())
+            {
+                var dbUser = existingUsers.FirstOrDefault(u => u.Username.Equals(seededUser.Username, StringComparison.OrdinalIgnoreCase));
+                if (dbUser == null)
+                {
+                    await context.Usuarios.AddAsync(seededUser);
+                    hasChanges = true;
+                }
+                else if (dbUser.RolId != seededUser.RolId || string.IsNullOrWhiteSpace(dbUser.PasswordHash))
+                {
+                    dbUser.Rol = seededUser.Rol;
+                    if (string.IsNullOrWhiteSpace(dbUser.PasswordHash))
+                    {
+                        dbUser.PasswordHash = seededUser.PasswordHash;
+                    }
+                    hasChanges = true;
+                }
+            }
+
+            if (hasChanges)
             {
                 await context.SaveChangesAsync();
             }

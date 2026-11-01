@@ -1,7 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap, catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { SignalrService } from './signalr.service';
 import { TenantContextService } from './tenant-context.service';
@@ -10,10 +9,15 @@ import { BrandingService } from './branding.service';
 export interface User {
   id: string;
   username: string;
+  nombreCompleto?: string;
   role: 'Admin' | 'Mozo' | 'SuperAdmin' | 'Cocina' | 'Caja' | 'MozoPortal';
   token: string;
   restauranteId?: string;
   restauranteNombre?: string;
+  restauranteLogo?: string;
+  colorPrimario?: string;
+  colorSecundario?: string;
+  colorFondo?: string;
   features?: string[];
 }
 
@@ -25,9 +29,9 @@ export class AuthService {
   private brandingService = inject(BrandingService);
   private _currentUser = signal<User | null>(null);
   private _token: string | null = null;
-  
+
   public currentUser = computed(() => this._currentUser());
-  public isAuthenticated = computed(() => !!this._currentUser());
+  public isAuthenticated = computed(() => !!this._currentUser() && !!this._token && !this.isTokenExpired(this._token));
   public isAdmin = computed(() => this._currentUser()?.role === 'Admin' || this._currentUser()?.role === 'SuperAdmin');
   public isSuperAdmin = computed(() => this._currentUser()?.role === 'SuperAdmin');
   public isMozo = computed(() => this._currentUser()?.role === 'Mozo');
@@ -39,7 +43,7 @@ export class AuthService {
     const user = this._currentUser();
     if (!user) return false;
     if (user.role === 'SuperAdmin') return true;
-    if (!user.features) {
+    if (!user.features || user.features.length === 0) {
       if (user.role === 'Admin') {
         return ['Metricas', 'MesasTareas', 'Cocina', 'Ventas', 'MetricasMenu', 'ConfigPersonal'].includes(key);
       }
@@ -50,7 +54,7 @@ export class AuthService {
         return ['Cocina'].includes(key);
       }
       if (user.role === 'Caja') {
-        return ['Cocina', 'Ventas', 'ConfigPersonal'].includes(key);
+        return ['MesasTareas', 'Cocina', 'Ventas', 'ConfigPersonal'].includes(key);
       }
       return false;
     }
@@ -60,43 +64,81 @@ export class AuthService {
   private parseJwt(token: string): any {
     try {
       const base64Url = token.split('.')[1];
+      if (!base64Url) return null;
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
       return JSON.parse(jsonPayload);
-    } catch (e) {
+    } catch {
       return null;
     }
+  }
+
+  public isTokenExpired(token: string): boolean {
+    const decoded = this.parseJwt(token);
+    if (!decoded || typeof decoded.exp !== 'number') {
+      return true;
+    }
+    return decoded.exp * 1000 <= Date.now();
+  }
+
+  public clearSession(): void {
+    this._token = null;
+    this._currentUser.set(null);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    this.tenantContext.setTenantId(null);
+    this.brandingService.resetBranding();
   }
 
   constructor() {
     const savedToken = localStorage.getItem('auth_token');
     const savedUser = localStorage.getItem('auth_user');
     if (savedToken && savedUser) {
-      this._token = savedToken;
-      const user = JSON.parse(savedUser) as User;
-
-      if (user.role === 'SuperAdmin') {
-        user.restauranteId = undefined;
-        user.restauranteNombre = undefined;
-      } else if (!user.restauranteId) {
-        const decoded = this.parseJwt(savedToken);
-        if (decoded && decoded.TenantId) {
-          user.restauranteId = decoded.TenantId;
-          localStorage.setItem('auth_user', JSON.stringify(user));
-        }
+      if (this.isTokenExpired(savedToken)) {
+        this.clearSession();
+        return;
       }
 
-      this._currentUser.set(user);
+      try {
+        const user = JSON.parse(savedUser) as User;
+        this._token = savedToken;
 
-      if (user.role !== 'SuperAdmin' && user.restauranteId) {
-        if (!this.tenantContext.currentTenantId) {
+        if (user.role === 'SuperAdmin') {
+          user.restauranteId = undefined;
+          user.restauranteNombre = undefined;
+        } else if (!user.restauranteId) {
+          const decoded = this.parseJwt(savedToken);
+          if (decoded && decoded.TenantId) {
+            user.restauranteId = decoded.TenantId;
+            localStorage.setItem('auth_user', JSON.stringify(user));
+          }
+        }
+
+        this._currentUser.set(user);
+
+        if (user.role !== 'SuperAdmin' && user.restauranteId) {
           this.tenantContext.setTenantId(user.restauranteId);
+          if (user.colorPrimario) {
+            this.brandingService.setRestaurantBranding({
+              id: user.restauranteId,
+              nombre: user.restauranteNombre,
+              logoUrl: user.restauranteLogo,
+              primary: user.colorPrimario,
+              secondary: user.colorSecundario,
+              background: user.colorFondo
+            });
+          }
         }
-      }
 
-      setTimeout(() => this.signalrService.joinGroup(user.role, user.id, user.restauranteId), 1000);
+        setTimeout(() => this.signalrService.joinGroup(user.role, user.id, user.restauranteId), 1000);
+      } catch {
+        this.clearSession();
+      }
     }
   }
 
@@ -109,15 +151,16 @@ export class AuthService {
           this.brandingService.resetBranding();
           this.tenantContext.setTenantId(null);
         } else {
-          if (user.restauranteId && this.brandingService.restauranteId() && this.brandingService.restauranteId() !== user.restauranteId) {
-            this.brandingService.resetBranding();
-          }
           if (user.restauranteId) {
-            this.brandingService.restauranteId.set(user.restauranteId);
             this.tenantContext.setTenantId(user.restauranteId);
-          }
-          if (user.restauranteNombre) {
-            this.brandingService.appName.set(user.restauranteNombre);
+            this.brandingService.setRestaurantBranding({
+              id: user.restauranteId,
+              nombre: user.restauranteNombre || 'MozoGo',
+              logoUrl: user.restauranteLogo || '/logo.png',
+              primary: user.colorPrimario || '#0f172a',
+              secondary: user.colorSecundario || '#10b981',
+              background: user.colorFondo || '#f8fafc'
+            });
           }
         }
 
@@ -134,25 +177,28 @@ export class AuthService {
   logout(): boolean {
     const portalToken = localStorage.getItem('portal_token');
     const portalUserStr = localStorage.getItem('portal_user');
-    
+
     this._token = null;
     this._currentUser.set(null);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
     this.tenantContext.setTenantId(null);
-    
-    if (portalToken && portalUserStr) {
+
+    if (portalToken && portalUserStr && !this.isTokenExpired(portalToken)) {
       localStorage.setItem('auth_token', portalToken);
       localStorage.setItem('auth_user', portalUserStr);
       this._token = portalToken;
       try {
-        const user = JSON.parse(portalUserStr);
+        const user = JSON.parse(portalUserStr) as User;
         this._currentUser.set(user);
         if (user.restauranteId) {
           this.tenantContext.setTenantId(user.restauranteId);
         }
-      } catch (e) {}
-      return true; // Portal session restored
+        return true; // Portal session restored
+      } catch {
+        localStorage.removeItem('portal_token');
+        localStorage.removeItem('portal_user');
+      }
     }
 
     this.brandingService.resetBranding();

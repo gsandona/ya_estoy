@@ -30,7 +30,7 @@ import { BrandingService } from '../../../core/services/branding.service';
     }
 
     <!-- Pantalla de Login Principal Institucional MozoGo -->
-    <div class="min-h-dvh bg-slate-50 flex flex-col justify-center py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div class="min-h-dvh bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       <!-- Toast Error -->
       @if (errorMessage()) {
         <div class="fixed top-6 left-0 right-0 z-50 flex justify-center w-full px-4 animate-[slide-down_0.5s_ease-out,shake_0.4s_ease-in-out_0.5s]">
@@ -78,17 +78,17 @@ import { BrandingService } from '../../../core/services/branding.service';
         </p>
       </div>
 
-      <div class="mt-6 sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10" style="animation-delay: 0.1s;">
-        <div class="bg-white py-8 px-6 shadow-[0_8px_30px_rgb(15,23,42,0.06)] sm:rounded-3xl sm:px-10 border border-slate-200/80 relative">
+      <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md animate-fade-in relative z-10" style="animation-delay: 0.1s;">
+        <div class="bg-white py-10 px-6 shadow-[0_8px_30px_rgb(15,23,42,0.06)] sm:rounded-3xl sm:px-10 border border-slate-200/80 relative">
           
-          <form class="space-y-5" (submit)="onLogin($event)">
+          <form class="space-y-6" (submit)="onLogin($event)">
             <div>
               <label for="username" class="block text-sm font-bold text-slate-700">Nombre de Usuario</label>
               <div class="mt-2 relative">
                 <input id="username" [(ngModel)]="username" name="username" type="text" required
                   maxlength="60" minlength="3" [pattern]="usernamePattern"
                   #usernameCtrl="ngModel"
-                  class="appearance-none block w-full px-4 py-3 border-2 border-slate-200 rounded-xl shadow-sm placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-[#10b981] focus:border-[#10b981] text-lg transition-colors bg-slate-50 focus:bg-white"
+                  class="appearance-none block w-full px-4 py-3.5 border-2 border-slate-200 rounded-xl shadow-sm placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-[#10b981] focus:border-[#10b981] text-lg transition-colors bg-slate-50 focus:bg-white"
                   [ngClass]="{'border-red-500': usernameCtrl.invalid && usernameCtrl.touched}"
                   placeholder="Ej: juan&#64;pub o admin&#64;pizzeria">
                 @if (usernameCtrl.invalid && usernameCtrl.touched) {
@@ -105,11 +105,11 @@ import { BrandingService } from '../../../core/services/branding.service';
               <label for="password" class="block text-sm font-bold text-slate-700">Contraseña Segura</label>
               <div class="mt-2 relative">
                 <input id="password" [(ngModel)]="password" name="password" [type]="showPassword() ? 'text' : 'password'" required 
-                  maxlength="50" minlength="6"
+                  maxlength="50" minlength="8"
                   #passCtrl="ngModel"
-                  class="appearance-none block w-full pl-4 pr-12 py-3 border-2 border-slate-200 rounded-xl shadow-sm placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-[#10b981] focus:border-[#10b981] text-lg transition-colors bg-slate-50 focus:bg-white"
+                  class="appearance-none block w-full pl-4 pr-12 py-3.5 border-2 border-slate-200 rounded-xl shadow-sm placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-[#10b981] focus:border-[#10b981] text-lg transition-colors bg-slate-50 focus:bg-white"
                   [ngClass]="{'border-red-500': passCtrl.invalid && passCtrl.touched}"
-                  placeholder="••••••••••">
+                  placeholder="•••••••••••">
                 <button type="button" (click)="showPassword.set(!showPassword())"
                   class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors"
                   title="Mostrar / ocultar contraseña">
@@ -121,11 +121,14 @@ import { BrandingService } from '../../../core/services/branding.service';
                 </button>
               </div>
               @if (passCtrl.invalid && passCtrl.touched) {
-                <p class="text-red-600 text-xs font-semibold mt-1.5">Contraseña requerida.</p>
+                <p class="text-red-600 text-xs font-semibold mt-1.5">
+                  @if(passCtrl.errors?.['required']) { La contraseña es requerida. }
+                  @if(passCtrl.errors?.['minlength']) { La contraseña debe tener al menos 8 caracteres. }
+                </p>
               }
             </div>
 
-            <div class="pt-1">
+            <div class="pt-2">
               <button type="submit" [disabled]="isLoading()"
                 class="w-full flex justify-center py-4 px-4 rounded-xl shadow-[0_4px_15px_rgba(16,185,129,0.25)] text-lg font-black text-white bg-[#059669] hover:bg-[#047857] hover:shadow-[0_8px_25px_rgba(16,185,129,0.35)] transition-all active:scale-[0.98] disabled:opacity-75 disabled:active:scale-100 disabled:hover:shadow-none items-center gap-3 tracking-wide outline-none">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"></path></svg>
@@ -133,39 +136,6 @@ import { BrandingService } from '../../../core/services/branding.service';
               </button>
             </div>
           </form>
-
-          <!-- Acceso Rápido Demo (1 Click) -->
-          <div class="mt-6 pt-5 border-t border-slate-100">
-            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center mb-3">
-              ⚡ Acceso Rápido Demo (1 Click)
-            </p>
-            <div class="grid grid-cols-2 gap-2">
-              <button type="button" (click)="quickLogin('gino', '@Manzana.2024')"
-                class="px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                <span>👑</span> <span>gino (SuperAdmin)</span>
-              </button>
-              <button type="button" (click)="quickLogin('tiziano', '@Manzana.2024')"
-                class="px-3 py-2 rounded-xl border border-emerald-200 bg-emerald-50/70 hover:bg-emerald-100 text-emerald-900 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                <span>👑</span> <span>tiziano (SuperAdmin)</span>
-              </button>
-              <button type="button" (click)="quickLogin('admin@pub', 'MozoGo1234!')"
-                class="px-3 py-2 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100 text-amber-950 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                <span>🍺</span> <span>admin&#64;pub</span>
-              </button>
-              <button type="button" (click)="quickLogin('juan@pub', 'MozoGo1234!')"
-                class="px-3 py-2 rounded-xl border border-amber-200 bg-amber-50/70 hover:bg-amber-100 text-amber-950 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                <span>🍺</span> <span>juan&#64;pub (Mozo)</span>
-              </button>
-              <button type="button" (click)="quickLogin('admin@pizzeria', 'MozoGo1234!')"
-                class="px-3 py-2 rounded-xl border border-red-200 bg-red-50/70 hover:bg-red-100 text-red-950 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                <span>🍕</span> <span>admin&#64;pizzeria</span>
-              </button>
-              <button type="button" (click)="quickLogin('juan@pizzeria', 'MozoGo1234!')"
-                class="px-3 py-2 rounded-xl border border-red-200 bg-red-50/70 hover:bg-red-100 text-red-950 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1.5">
-                <span>🍕</span> <span>juan&#64;pizzeria (Mozo)</span>
-              </button>
-            </div>
-          </div>
 
         </div>
       </div>
@@ -200,11 +170,11 @@ export class LoginComponent implements OnInit {
   authService = inject(AuthService);
   router = inject(Router);
   branding = inject(BrandingService);
-  
+
   username = '';
   password = '';
   usernamePattern = '^[a-zA-Z0-9._-]+(@[a-zA-Z0-9_-]+)?$';
-  
+
   showPassword = signal(false);
   isLoading = signal(false);
   errorMessage = signal('');
@@ -217,30 +187,30 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.branding.resetBranding();
-  }
 
-  quickLogin(user: string, pass: string) {
-    this.username = user;
-    this.password = pass;
-    this.executeLogin(user, pass);
+    // En desarrollo local, limpiar Service Workers antiguos en caché que puedan interceptar peticiones HTTP
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      navigator.serviceWorker?.getRegistrations().then(registrations => {
+        for (const registration of registrations) {
+          registration.unregister();
+        }
+      });
+    }
   }
 
   onLogin(event: Event) {
     event.preventDefault();
     const cleanUsername = this.username.trim().toLowerCase();
-    const cleanPassword = this.password.trim();
+    const cleanPassword = this.password;
     this.username = cleanUsername;
-    this.password = cleanPassword;
 
-    if (cleanUsername && cleanPassword) {
-      this.executeLogin(cleanUsername, cleanPassword);
+    if (!cleanUsername || !cleanPassword) {
+      return;
     }
-  }
 
-  private executeLogin(cleanUsername: string, cleanPassword: string) {
     this.isLoading.set(true);
     this.errorMessage.set('');
-    
+
     this.authService.login(cleanUsername, cleanPassword).subscribe({
       next: () => {
         this.isLoading.set(false);
@@ -255,11 +225,11 @@ export class LoginComponent implements OnInit {
         console.error(err);
         this.isLoading.set(false);
         if (err.status === 0) {
-          this.errorMessage.set('No se pudo conectar con el servidor Backend (http://localhost:5122).');
+          this.errorMessage.set('No se pudo conectar con el servidor de autenticación.');
         } else if (err.status === 429) {
           this.errorMessage.set('Demasiados intentos seguidos. Espera unos segundos e intenta de nuevo.');
         } else {
-          this.errorMessage.set('Usuario o contraseña incorrectos. Verifica la contraseña o usa los botones de Acceso Rápido.');
+          this.errorMessage.set('Credenciales inválidas. Verifica tu usuario (formato usuario@local) y contraseña.');
         }
       }
     });

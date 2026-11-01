@@ -52,10 +52,11 @@ public static class ModelBuilderExtensions
         // Cocina (only 'Cocina')
         new RoleFeature { Id = Guid.Parse("c0000000-0000-0000-0000-000000000001"), RoleId = 4, FeatureKey = "Cocina", Activo = true },
 
-        // Caja (Cocina, Ventas, ConfigPersonal)
+        // Caja (MesasTareas, Cocina, Ventas, ConfigPersonal)
         new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000001"), RoleId = 5, FeatureKey = "Cocina", Activo = true },
         new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000002"), RoleId = 5, FeatureKey = "Ventas", Activo = true },
-        new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000003"), RoleId = 5, FeatureKey = "ConfigPersonal", Activo = true }
+        new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000003"), RoleId = 5, FeatureKey = "ConfigPersonal", Activo = true },
+        new RoleFeature { Id = Guid.Parse("b0000000-0000-0000-0000-000000000004"), RoleId = 5, FeatureKey = "MesasTareas", Activo = true }
     };
 
     public static List<Restaurante> GetSeededRestaurantes() => new()
@@ -209,7 +210,7 @@ public static class ModelBuilderExtensions
             new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000008"), RestauranteId = DonatelloPizzeriaId, Categoria = "Antipasti & Entradas", Nombre = "Fainá Crocante al Romero", Descripcion = "Porción doble de fainá tradicional de harina de garbanzos al horno de barro con romero fresco y pimienta negra.", Precio = 3200, MenuCategoryId = panesId, Activo = true },
             new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000009"), RestauranteId = DonatelloPizzeriaId, Categoria = "Bebidas & Vinos", Nombre = "Limonada Siciliana con Menta", Descripcion = "Jugo de limones recién exprimidos, almíbar de jengibre orgánico, hojas de menta fresca y agua con gas (500ml).", Precio = 3400, MenuCategoryId = bebidaFriaId, Activo = true },
             new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000010"), RestauranteId = DonatelloPizzeriaId, Categoria = "Bebidas & Vinos", Nombre = "Copa Vino Malbec Reserva", Descripcion = "Copa de Malbec Reserva de altura (Valle de Uco), notas a frutos rojos maduros, violetas y crianza en roble francés.", Precio = 4800, MenuCategoryId = bebidaAlcoholId, Activo = true },
-            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000011"), RestauranteId = DonatelloPizzeriaId, Categoria = "Dolci & Postres", Nombre = "Tiramisú Tradizionale della Nonna", Descripcion = "Vainillas artesanales embebidas en espresso italiano, crema de mascarpone legítimo y cacao amargo holandés.", Precio = 5800, MenuCategoryId = postreId, Activo = true },
+            new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000011"), RestauranteId = DonatelloPizzeriaId, Categoria = "Dolci & Postres", Nombre = "Tiramisú Tradizionale della Nonna", Descripcion = "Vainillas artesanales embebidas en espresso italiano, crema de mascarpone legítimo y cacao amargo hollandés.", Precio = 5800, MenuCategoryId = postreId, Activo = true },
             new MenuItem { Id = Guid.Parse("22222999-0000-0000-0000-000000000012"), RestauranteId = DonatelloPizzeriaId, Categoria = "Dolci & Postres", Nombre = "Cannoli Siciliani", Descripcion = "Dos tubos crujientes de masa frita rellenos al momento con crema de ricotta dulce, chips de chocolate amargo y pistachos tostados.", Precio = 5400, MenuCategoryId = postreId, Activo = true }
         };
     }
