@@ -41,9 +41,12 @@ public class RestaurantesController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "SuperAdmin,Admin,Caja,Mozo,Cocina,MozoPortal")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        var restaurante = await _context.Restaurantes.FindAsync(id);
+        var restaurante = await _context.Restaurantes
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(r => r.Id == id);
         if (restaurante == null) return NotFound();
         
         if (!_context.IsSuperAdmin && restaurante.Id != _context.CurrentTenantId && restaurante.ParentRestauranteId != _context.CurrentTenantId)
@@ -78,7 +81,7 @@ public class RestaurantesController : ControllerBase
         var existing = await _context.Restaurantes.FindAsync(id);
         if (existing == null) return NotFound();
 
-        if (!_context.IsSuperAdmin && existing.ParentRestauranteId != _context.CurrentTenantId)
+        if (!_context.IsSuperAdmin && existing.Id != _context.CurrentTenantId && existing.ParentRestauranteId != _context.CurrentTenantId)
             return Forbid();
 
         existing.Nombre = restaurante.Nombre;

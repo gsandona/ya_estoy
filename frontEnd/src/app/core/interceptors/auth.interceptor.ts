@@ -3,23 +3,24 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
+  const authService = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Ignoramos el endpoint /verify porque usa 401 para lógica de PIN en el frontend.
-      const isVerifyEndpoint = req.url.includes('/verify');
-      
-      if (error.status === 401 && !isVerifyEndpoint) {
-        console.warn('Unauthorized request - JWT might be expired');
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('auth_user');
-        
-        // Solo redirigimos a login si el usuario está intentando navegar o se encuentra en una ruta de administración
+      // Ignoramos /verify (usa 401 para PIN de mesa) y /api/auth/login (credenciales inválidas en formulario)
+      const isPublicAuthFlow = req.url.includes('/verify') || req.url.includes('/api/auth/login');
+      const hadAuthHeader = req.headers.has('Authorization');
+
+      if (error.status === 401 && !isPublicAuthFlow && hadAuthHeader) {
+        console.warn('Unauthorized request - JWT expired or invalid');
+        authService.clearSession();
+
         const currentUrl = router.url;
-        if (currentUrl.includes('/admin') || currentUrl.includes('/sistema')) {
+        if (currentUrl.includes('/admin') || currentUrl.includes('/sistema') || currentUrl.includes('/mozo-select')) {
           router.navigate(['/login']);
         }
       }

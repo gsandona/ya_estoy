@@ -37,16 +37,17 @@ export class AdminDataService {
   public users = signal<AdminUser[]>([]);
   public mesas = signal<AdminMesa[]>([]);
   public menuItems = signal<AdminMenuItem[]>([]);
-  public isLoading = signal(true);
+  public isLoading = signal(false);
   
   public mozos = computed(() => this.users().filter(u => u.role === 'Mozo'));
 
   constructor() {
     this.tenantContext.tenantId$.subscribe(tenantId => {
-      if (tenantId) {
+      const hasToken = !!localStorage.getItem('auth_token');
+      if (tenantId && hasToken) {
         this.refreshAll();
       } else {
-        // Limpiar datos si no hay inquilino activo (logout)
+        // Limpiar datos si no hay inquilino activo o sesión autenticada
         this.users.set([]);
         this.mesas.set([]);
         this.menuItems.set([]);
@@ -57,6 +58,11 @@ export class AdminDataService {
 
   // Trae todo nuevamente
   refreshAll() {
+    if (!localStorage.getItem('auth_token')) {
+      this.isLoading.set(false);
+      return;
+    }
+
     this.isLoading.set(true);
     let usersDone = false;
     let mesasDone = false;
@@ -68,10 +74,24 @@ export class AdminDataService {
       }
     };
 
-    this.http.get<AdminUser[]>(`${environment.apiUrl}/api/users`).subscribe({
-      next: d => { this.users.set(d); usersDone = true; checkDone(); },
-      error: () => { this.users.set([]); usersDone = true; checkDone(); }
-    });
+    // Solo consultar /api/users si el rol tiene permisos administrativos (Admin, SuperAdmin, Caja)
+    let userRole: string | null = null;
+    try {
+      const savedUser = localStorage.getItem('auth_user');
+      if (savedUser) {
+        userRole = JSON.parse(savedUser)?.role || null;
+      }
+    } catch {}
+
+    if (userRole === 'Admin' || userRole === 'SuperAdmin' || userRole === 'Caja') {
+      this.http.get<AdminUser[]>(`${environment.apiUrl}/api/users`).subscribe({
+        next: d => { this.users.set(d); usersDone = true; checkDone(); },
+        error: () => { this.users.set([]); usersDone = true; checkDone(); }
+      });
+    } else {
+      this.users.set([]);
+      usersDone = true;
+    }
     
     this.http.get<AdminMesa[]>(`${environment.apiUrl}/api/mesas`).subscribe({
       next: d => { this.mesas.set(d); mesasDone = true; checkDone(); },

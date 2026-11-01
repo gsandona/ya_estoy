@@ -122,7 +122,6 @@ export class AuthService {
         this._currentUser.set(user);
 
         if (user.role !== 'SuperAdmin' && user.restauranteId) {
-          this.tenantContext.setTenantId(user.restauranteId);
           if (user.colorPrimario) {
             this.brandingService.setRestaurantBranding({
               id: user.restauranteId,
@@ -133,11 +132,17 @@ export class AuthService {
               background: user.colorFondo
             });
           }
+          this.tenantContext.setTenantId(user.restauranteId);
         }
 
         setTimeout(() => this.signalrService.joinGroup(user.role, user.id, user.restauranteId), 1000);
       } catch {
         this.clearSession();
+      }
+    } else {
+      // Si no hay sesión autenticada, limpiar cualquier active_tenant_id huérfano para evitar peticiones sin token
+      if (this.tenantContext.currentTenantId) {
+        this.tenantContext.setTenantId(null);
       }
     }
   }
@@ -148,26 +153,29 @@ export class AuthService {
         if (user.role === 'SuperAdmin') {
           user.restauranteId = undefined;
           user.restauranteNombre = undefined;
-          this.brandingService.resetBranding();
-          this.tenantContext.setTenantId(null);
-        } else {
-          if (user.restauranteId) {
-            this.tenantContext.setTenantId(user.restauranteId);
-            this.brandingService.setRestaurantBranding({
-              id: user.restauranteId,
-              nombre: user.restauranteNombre || 'MozoGo',
-              logoUrl: user.restauranteLogo || '/logo.png',
-              primary: user.colorPrimario || '#0f172a',
-              secondary: user.colorSecundario || '#10b981',
-              background: user.colorFondo || '#f8fafc'
-            });
-          }
         }
 
+        // CRÍTICO: Persistir token y usuario en memoria y localStorage ANTES de emitir cambios en tenantContext,
+        // ya que los suscriptores reactivos (ej. AdminDataService) disparan peticiones HTTP sincrónicamente al cambiar el tenantId.
         this._token = user.token;
         this._currentUser.set(user);
         localStorage.setItem('auth_token', user.token);
         localStorage.setItem('auth_user', JSON.stringify(user));
+
+        if (user.role === 'SuperAdmin') {
+          this.brandingService.resetBranding();
+          this.tenantContext.setTenantId(null);
+        } else if (user.restauranteId) {
+          this.brandingService.setRestaurantBranding({
+            id: user.restauranteId,
+            nombre: user.restauranteNombre || 'MozoGo',
+            logoUrl: user.restauranteLogo || '/logo.png',
+            primary: user.colorPrimario || '#0f172a',
+            secondary: user.colorSecundario || '#10b981',
+            background: user.colorFondo || '#f8fafc'
+          });
+          this.tenantContext.setTenantId(user.restauranteId);
+        }
 
         this.signalrService.joinGroup(user.role, user.id, user.restauranteId);
       })
@@ -185,11 +193,11 @@ export class AuthService {
     this.tenantContext.setTenantId(null);
 
     if (portalToken && portalUserStr && !this.isTokenExpired(portalToken)) {
-      localStorage.setItem('auth_token', portalToken);
-      localStorage.setItem('auth_user', portalUserStr);
-      this._token = portalToken;
       try {
         const user = JSON.parse(portalUserStr) as User;
+        localStorage.setItem('auth_token', portalToken);
+        localStorage.setItem('auth_user', portalUserStr);
+        this._token = portalToken;
         this._currentUser.set(user);
         if (user.restauranteId) {
           this.tenantContext.setTenantId(user.restauranteId);
